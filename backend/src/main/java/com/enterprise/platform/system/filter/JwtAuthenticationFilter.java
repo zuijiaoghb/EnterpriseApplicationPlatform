@@ -106,34 +106,47 @@ private final AuthenticationManager authenticationManager;
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
         
-        logger.debug("收到请求: {} {}, Origin: {}", 
+        // 增强日志记录
+        logger.info("收到请求 - 方法: {}, 路径: {}, Origin: {}, Content-Type: {}", 
             request.getMethod(), 
             request.getRequestURI(),
-            request.getHeader("Origin"));
+            request.getHeader("Origin"),
+            request.getHeader("Content-Type"));
         
-        // 放行OPTIONS预检请求
-        if (HttpMethod.OPTIONS.toString().equals(request.getMethod())) {
+        // 特殊处理登录请求，直接放行
+        if (request.getRequestURI().equals("/auth/login")) {
             chain.doFilter(request, response);
             return;
         }
-        
-        // 原有JWT验证逻辑
+            
+        // JWT验证逻辑
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
+            logger.debug("找到Bearer Token: {}", token.substring(0, Math.min(token.length(), 10)) + "...");
+            
             if (jwtUtil.validateToken(token, null)) {
+                String username = jwtUtil.getUsernameFromToken(token);
+                logger.info("Token验证成功 - 用户: {}", username);
+                
                 Authentication auth = new UsernamePasswordAuthenticationToken(
-                    jwtUtil.getUsernameFromToken(token),
+                    username,
                     null,
                     jwtUtil.getAuthoritiesFromToken(token)
                 );
                 SecurityContextHolder.getContext().setAuthentication(auth);
+            } else {
+                logger.warn("Token验证失败");
             }
+        } else {
+            logger.debug("未找到有效的Authorization头");
         }
+        
         try {
             chain.doFilter(request, response);
         } catch (IOException | ServletException e) {
-            throw new RuntimeException(e);  // 捕获并包装过滤器链执行中的异常
+            logger.error("过滤器链执行异常", e);
+            throw new RuntimeException(e);
         }
     }
 }
