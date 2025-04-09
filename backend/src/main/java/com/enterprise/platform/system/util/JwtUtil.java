@@ -93,4 +93,16 @@ public class JwtUtil {
                 .map(auth -> new org.springframework.security.core.authority.SimpleGrantedAuthority(auth))
                 .collect(Collectors.toList());
     }
+    
+    public boolean validateToken(String token) {
+        try {
+            io.jsonwebtoken.Jws<io.jsonwebtoken.Claims> claims = Jwts.parserBuilder()
+                .setSigningKey(io.jsonwebtoken.security.Keys.hmacShaKeyFor(secret.getBytes()))
+                .build()
+                .parseClaimsJws(token);
+            return !claims.getBody().getExpiration().before(new Date());
+        } catch (io.jsonwebtoken.JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
 }

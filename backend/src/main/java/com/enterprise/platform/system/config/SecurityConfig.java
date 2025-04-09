@@ -11,8 +11,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.enterprise.platform.system.filter.JwtAuthenticationFilter;
+import com.enterprise.platform.system.util.JwtUtil;
 
 import org.springframework.web.cors.CorsConfigurationSource;
 import java.util.Arrays;
@@ -61,26 +65,26 @@ public class SecurityConfig {
 
     // 修改安全配置
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        System.out.println("初始化安全配置...");
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtUtil jwtUtil) throws Exception {        
+        // 创建过滤器时不设置处理URL
+        JwtAuthenticationFilter jwtFilter = new JwtAuthenticationFilter(            
+            jwtUtil
+        );
+        
         http
-            .cors(cors -> {
-                // 配置CORS策略
-                cors.configurationSource(corsConfigurationSource());
-            })
-            .csrf(csrf -> {
-                System.out.println("禁用CSRF保护");
-                csrf.disable();
-            })
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().authenticated()
-            );
-
-        System.out.println("安全配置完成");
+            )
+            // 确保只添加一次过滤器
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        
         return http.build();
     }
+        
 }
 
