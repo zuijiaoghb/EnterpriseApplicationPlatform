@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, message } from 'antd';
+import { Form, Input, Button, message, Card, Typography } from 'antd';
 import api from '../../api';
 import { useNavigate } from 'react-router-dom';
+import './Login.css'; // 新增样式文件
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import bgImage from '../../assets/login-bg.jpg'; // 添加背景图片导入
+
+const { Title } = Typography;
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -49,21 +54,54 @@ const Login = () => {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: '0 auto' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: 24 }}>系统登录</h2>
-      <Form onFinish={onFinish}>
-        <Form.Item name="username" rules={[{ required: true }]}>
-          <Input placeholder="用户名" />
-        </Form.Item>
-        <Form.Item name="password" rules={[{ required: true }]}>
-          <Input.Password placeholder="密码" />
-        </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading} block>
-            登录
-          </Button>
-        </Form.Item>
-      </Form>
+    <div className="login-container" style={{ 
+      backgroundImage: `url(${bgImage})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center'
+    }}>
+      <Card className="login-card" hoverable>
+        <div className="login-header">
+          <Title level={3} className="login-title">企业应用平台</Title>
+          <div className="login-subtitle">欢迎登录</div>
+        </div>
+        
+        <Form onFinish={onFinish} layout="vertical">
+          <Form.Item 
+            name="username" 
+            rules={[{ required: true, message: '请输入用户名' }]}
+          >
+            <Input 
+              placeholder="用户名" 
+              size="large"
+              prefix={<UserOutlined className="input-icon" />}
+            />
+          </Form.Item>
+          
+          <Form.Item 
+            name="password" 
+            rules={[{ required: true, message: '请输入密码' }]}
+          >
+            <Input.Password 
+              placeholder="密码" 
+              size="large"
+              prefix={<LockOutlined className="input-icon" />}
+            />
+          </Form.Item>
+          
+          <Form.Item>
+            <Button 
+              type="primary" 
+              htmlType="submit" 
+              loading={loading} 
+              block
+              size="large"
+              className="login-button"
+            >
+              登 录
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
     </div>
   );
 };
