@@ -8,16 +8,22 @@ import bgImage from '../../assets/login-bg.jpg'; // 添加背景图片导入
 
 const { Title } = Typography;
 
+
 const Login = () => {
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [loginError, setLoginError] = useState(false); // 新增状态
+
+  const navigate = useNavigate();  
 
   const onFinish = async (values) => {
     setLoading(true);
+    setLoginError(false); // 重置错误状态
     try {
       const response = await api.post('/auth/login', values, {
         withCredentials: true
       });
+      
+      console.log('response.status:',response.status);
 
       // 调试所有可用头信息
       console.log('所有响应头:', Object.keys(response.headers));
@@ -39,15 +45,28 @@ const Login = () => {
       // 设置全局token
       api.defaults.headers.common['Authorization'] = `Bearer ${normalizedToken}`;
       
-      message.success('登录成功');
+      message.success('登录成功');              
+      
       navigate('/equipments');
-    } catch (error) {
+    } catch (error) {      
       console.error('完整错误详情:', {
         error: error.message,
         response: error.response,
         config: error.config
       });
-      message.error(error.response?.data?.message || error.message || '网络请求异常');
+     
+    // 修复后的错误处理逻辑
+    if (error.response) {
+      console.log('error.response.status:', error.response.status);
+      if (error.response.status === 401) {
+        setLoginError(true);
+        message.error('用户名或密码错误', 3);
+      } else {
+        message.error(error.response.data?.message || '网络请求异常', 3);
+      }
+    } else {
+      message.error(error.response?.data?.message || error.message || '网络请求异常', 3);
+    }
     } finally {
       setLoading(false);
     }
@@ -66,6 +85,13 @@ const Login = () => {
         </div>
         
         <Form onFinish={onFinish} layout="vertical">
+          {/* 添加错误提示 */}
+          {loginError && (
+            <div style={{ color: 'red', marginBottom: 16, textAlign: 'center' }}>
+              用户名或密码错误
+            </div>
+          )}
+
           <Form.Item 
             name="username" 
             rules={[{ required: true, message: '请输入用户名' }]}

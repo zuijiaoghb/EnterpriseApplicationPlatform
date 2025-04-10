@@ -18,7 +18,11 @@ api.interceptors.request.use(config => {
   if (token) {
     config.headers['Authorization'] = `Bearer ${token}`;
     config.headers['Content-Type'] = 'application/json';
-  } else {
+  } else if (config.url.includes('/auth/login')) {
+    // 如果是登录请求，不添加token
+    delete config.headers['Authorization']; 
+  }
+  else {
     // 如果没有token且不是登录请求，重定向到登录
     if (!config.url.includes('/auth/login')) {
       window.location.href = '/login';
@@ -38,10 +42,16 @@ api.interceptors.response.use(response => {
   return response;
 }, error => {
   if (error.response?.status === 401 || error.response?.status === 403) {
-    localStorage.removeItem('token');
-    window.location.href = '/login';
+    localStorage.removeItem('token');    
   }
-  return Promise.reject(error.response?.data || error);
+  // 修改错误处理，确保返回完整响应
+  if (error.response) {
+    if (!error.response.config.url.includes('/auth/login')) {
+      window.location.href = '/login';
+    }
+    return Promise.reject(error); // 返回完整错误对象
+  }
+  return Promise.reject(error);
 });
 
 export default api;

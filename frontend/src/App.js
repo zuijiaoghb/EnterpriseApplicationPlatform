@@ -15,9 +15,7 @@ function App() {
         <Content style={{ padding: '50px' }}>
           <Routes>
             <Route path="/" element={
-              <AuthGuard>
                 <Login />
-              </AuthGuard>
             } />
             <Route path="/equipments" element={
               <AuthGuard>
