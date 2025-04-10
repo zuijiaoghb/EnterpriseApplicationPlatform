@@ -22,5 +22,5 @@
   },
   "include": [
     "src"
-, "src/equipment/pages/EquipmentList.js", "src/system/pages/Login.js", "src/system/components"  ]
+, "src/equipment/pages/EquipmentList.js", "src/system/pages/Login.js", "src/components"  ]
 }

@@ -1,32 +1,24 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { Layout } from 'antd';
-import EquipmentList from './equipment/pages/EquipmentList';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import MainLayout from './components/MainLayout';
 import Login from './system/pages/Login';
-import AuthGuard from './system/components/AuthGuard'; // 新增导入
-import './App.css';
-
-const { Content } = Layout;
+import EquipmentList from './equipment/pages/EquipmentList';
+import SystemSettings from './system/pages/SystemSettings';
+import Dashboard from './dashboard/pages/Dashboard';
+import AuthGuard from './components/AuthGuard';
 
 function App() {
   return (
-    <Router>
-      <Layout className="layout">
-        <Content style={{ padding: '50px' }}>
-          <Routes>
-            <Route path="/" element={
-                <Login />
-            } />
-            <Route path="/equipments" element={
-              <AuthGuard>
-                <EquipmentList />
-              </AuthGuard>
-            } />
-            <Route path="/login" element={<Login />} /> {/* 新增登录路由 */}
-          </Routes>
-        </Content>
-      </Layout>
-    </Router>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
+        <Route element={<AuthGuard><MainLayout /></AuthGuard>}>          
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/equipments" element={<EquipmentList />} />
+          <Route path="/system" element={<SystemSettings />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

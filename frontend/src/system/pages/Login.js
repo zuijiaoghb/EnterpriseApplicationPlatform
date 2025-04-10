@@ -47,7 +47,7 @@ const Login = () => {
       
       message.success('登录成功');              
       
-      navigate('/equipments');
+      navigate('/dashboard');
     } catch (error) {      
       console.error('完整错误详情:', {
         error: error.message,

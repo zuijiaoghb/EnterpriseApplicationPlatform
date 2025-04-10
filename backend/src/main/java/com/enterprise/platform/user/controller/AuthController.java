@@ -79,9 +79,17 @@ public class AuthController {
     @PreAuthorize("isAuthenticated()")  // 要求已认证用户才能访问
     @GetMapping("/info") 
     public ResponseEntity<?> getUserInfo() {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext()
+        Object principal = SecurityContextHolder.getContext()
             .getAuthentication().getPrincipal();
         
-        return ResponseEntity.ok(userDetails);
+        // 处理principal可能是String或UserDetails的情况
+        if (principal instanceof UserDetails) {
+            return ResponseEntity.ok(principal);
+        } else {
+            // 当principal是字符串时(如JWT subject)
+            return ResponseEntity.ok(Map.of(
+                "username", principal.toString()
+            ));
+        }
     }
 }
