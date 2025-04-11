@@ -44,7 +44,16 @@ public class UserServiceImpl implements UserService {
             user.setStatus(1); // 1表示启用状态
         }
         
-        return userRepository.save(user);
+        // 保存用户基本信息
+        User savedUser = userRepository.save(user);
+        
+        // 如果有关联角色，保存角色关系
+        if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+            savedUser.setRoles(user.getRoles());
+            return userRepository.save(savedUser);
+        }
+        
+        return savedUser;
     }
 
     @Override
@@ -67,5 +76,10 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new RuntimeException("用户不存在"));
         // 这里需要实现角色更新逻辑
         return userRepository.save(user);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 }

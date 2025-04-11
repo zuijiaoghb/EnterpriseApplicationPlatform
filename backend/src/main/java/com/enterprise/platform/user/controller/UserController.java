@@ -1,11 +1,15 @@
 package com.enterprise.platform.user.controller;
 
+import com.enterprise.platform.user.dto.UserCreateRequest;
+import com.enterprise.platform.user.model.Role;
 import com.enterprise.platform.user.model.User;
 import com.enterprise.platform.user.service.UserService;
 
 import jakarta.validation.Valid;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +35,26 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-        // 这里会通过@Valid自动验证User对象中的@NotNull等注解
+    public ResponseEntity<User> createUser(@RequestBody @Valid UserCreateRequest request) {
+        // 使用专门的DTO接收请求数据
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setPassword(request.getPassword());
+        user.setEmail(request.getEmail());
+        // 其他字段设置...
+        
+        // 处理角色
+        if (request.getRoleIds() != null && !request.getRoleIds().isEmpty()) {
+            Set<Role> roles = request.getRoleIds().stream()
+                .map(roleId -> {
+                    Role role = new Role();
+                    role.setId(roleId);
+                    return role;
+                })
+                .collect(Collectors.toSet());
+            user.setRoles(roles);
+        }
+        
         return ResponseEntity.ok(userService.createUser(user));
     }
 
@@ -52,5 +74,12 @@ public class UserController {
             @PathVariable Long id, 
             @RequestBody Set<Long> roleIds) {
         return ResponseEntity.ok(userService.updateUserRoles(id, roleIds));
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<Map<String, Boolean>> checkEmailExists(
+        @RequestParam String email) {
+        boolean exists = userService.existsByEmail(email);
+        return ResponseEntity.ok(Map.of("exists", exists));
     }
 }
