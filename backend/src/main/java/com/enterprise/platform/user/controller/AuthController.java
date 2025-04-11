@@ -88,8 +88,19 @@ public class AuthController {
         } else {
             // 当principal是字符串时(如JWT subject)
             return ResponseEntity.ok(Map.of(
-                "username", principal.toString()
+                "username", principal.toString(),
+                "roles", SecurityContextHolder.getContext().getAuthentication().getAuthorities()  // 获取用户实际角色列表
             ));
         }
     }
+
+    @GetMapping("/check-role")
+    public ResponseEntity<?> checkUserRole() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean hasAdminRole = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+        
+        return ResponseEntity.ok(Map.of("hasAdminRole", hasAdminRole));
+    }
+
 }

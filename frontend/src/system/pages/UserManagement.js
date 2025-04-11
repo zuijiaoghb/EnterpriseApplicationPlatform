@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Space, Modal, Form, Input, Select, message } from 'antd';
 import api from '../../api';
+import { useNavigate } from 'react-router-dom';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -8,6 +9,27 @@ const UserManagement = () => {
   const [visible, setVisible] = useState(false);
   const [current, setCurrent] = useState(null);
   const [form] = Form.useForm();
+
+  const navigate = useNavigate();
+  const [hasAdminRole, setHasAdminRole] = useState(false);
+
+  useEffect(() => {
+    checkUserRole();
+  }, []);
+
+  const checkUserRole = async () => {
+    try {
+      const { data } = await api.get('/auth/check-role');
+      setHasAdminRole(data.hasAdminRole);
+      if (!data.hasAdminRole) {
+        message.warning('您没有权限访问此功能');
+        navigate('/'); // 跳转到首页而不是登录页
+      }
+    } catch (error) {
+      message.error('获取用户权限失败');
+      navigate('/');
+    }
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -71,7 +93,7 @@ const UserManagement = () => {
       />
       <Modal
         title={current ? '编辑用户' : '新增用户'}
-        visible={visible}
+        open={visible}
         onOk={handleSubmit}
         onCancel={() => setVisible(false)}
       >
@@ -79,6 +101,16 @@ const UserManagement = () => {
           <Form.Item name="username" label="用户名" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
+          {/* 新增密码输入栏位 */}
+          {!current && (
+            <Form.Item 
+              name="password" 
+              label="密码" 
+              rules={[{ required: true, message: '请输入密码' }]}
+            >
+              <Input.Password />
+            </Form.Item>
+          )}
           <Form.Item name="email" label="邮箱" rules={[{ required: true, type: 'email' }]}>
             <Input />
           </Form.Item>

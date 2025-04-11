@@ -3,6 +3,8 @@ package com.enterprise.platform.user.controller;
 import com.enterprise.platform.user.model.User;
 import com.enterprise.platform.user.service.UserService;
 
+import jakarta.validation.Valid;
+
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -29,7 +31,8 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+        // 这里会通过@Valid自动验证User对象中的@NotNull等注解
         return ResponseEntity.ok(userService.createUser(user));
     }
 

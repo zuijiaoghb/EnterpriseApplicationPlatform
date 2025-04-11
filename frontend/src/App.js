@@ -15,7 +15,7 @@ function App() {
         <Route element={<AuthGuard><MainLayout /></AuthGuard>}>          
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/equipments" element={<EquipmentList />} />
-          <Route path="/system" element={<SystemSettings />} />
+          <Route path="/system" element={<AuthGuard><SystemSettings /></AuthGuard>} meta={{ requiresAuth: true, requiredRole: 'ROLE_ADMIN' }} />
         </Route>
       </Routes>
     </BrowserRouter>

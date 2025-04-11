@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
@@ -28,6 +29,7 @@ public class User {
     private String username;
     
     @Column(nullable = false)
+    @NotBlank(message = "密码不能为空")
     private String password;
     
     private String salt;
