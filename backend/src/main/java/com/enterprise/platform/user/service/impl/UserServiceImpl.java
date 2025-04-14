@@ -57,10 +57,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
+    @Transactional  
     public User updateUser(Long id, User user) {
-        user.setId(id);
-        return userRepository.save(user);
+        User existingUser = userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        // 更新基础字段
+        existingUser.setUsername(user.getUsername());
+        existingUser.setEmail(user.getEmail());
+        existingUser.setStatus(user.getStatus());
+        existingUser.setCreateTime(user.getCreateTime());
+        
+        // 更新密码（如果有）
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        
+        // 更新角色
+        if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+            existingUser.setRoles(user.getRoles());
+        }
+        
+        return userRepository.save(existingUser);
     }
 
     @Override

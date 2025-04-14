@@ -7,6 +7,7 @@ import com.enterprise.platform.user.service.UserService;
 
 import jakarta.validation.Valid;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -59,7 +60,28 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody @Valid UserCreateRequest request) {
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setPassword(request.getPassword());
+        user.setEmail(request.getEmail());
+        
+        // 处理角色
+        if (request.getRoleIds() != null && !request.getRoleIds().isEmpty()) {
+            Set<Role> roles = request.getRoleIds().stream()
+                .map(roleId -> {
+                    Role role = new Role();
+                    role.setId(roleId);
+                    return role;
+                })
+                .collect(Collectors.toSet());
+            user.setRoles(roles);
+        }
+        
+        // 设置默认状态和创建时间
+        user.setStatus(1); // 默认状态为1
+        user.setCreateTime(LocalDateTime.now()); // 当前系统时间
+        
         return ResponseEntity.ok(userService.updateUser(id, user));
     }
 

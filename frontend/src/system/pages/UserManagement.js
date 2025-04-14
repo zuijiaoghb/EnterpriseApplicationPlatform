@@ -38,7 +38,12 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     const { data } = await api.get('/api/users');
-    setUsers(data.content);
+    // 对返回的用户数据进行处理，隐藏密码字段
+    const processedUsers = data.content.map(user => ({
+      ...user,
+      password: '******' // 密码字段脱敏处理
+    }));
+    setUsers(processedUsers);
   };
 
   const fetchRoles = async () => {
@@ -50,7 +55,17 @@ const UserManagement = () => {
     try {
       const values = await form.validateFields();
       if (current) {
-        await api.put(`/api/users/${current.id}`, values);
+        // 只提交修改的字段
+        const updateData = {
+          username: values.username,
+          email: values.email,
+          roleIds: values.roleIds || []
+        };
+        // 只有密码不为空且不等于原始密码时才更新密码
+        if (values.password && values.password !== current.password) {
+          updateData.password = values.password;
+        }
+        await api.put(`/api/users/${current.id}`, updateData);
         message.success('更新成功');
       } else {
         // 修改为正确的数据结构
@@ -76,6 +91,7 @@ const UserManagement = () => {
     form.setFieldsValue({
       username: record.username,
       email: record.email,
+      password: '', // 编辑时清空密码字段
       roleIds: record.roles?.map(role => role.id) || []
     });
     setVisible(true);
@@ -87,10 +103,15 @@ const UserManagement = () => {
     fetchUsers();
   };
 
-  // 添加邮箱校验函数
+  // 修改邮箱校验函数
   const validateEmail = async (_, value) => {
     if (!value) {
       return Promise.reject('请输入邮箱');
+    }
+    
+    // 编辑时且邮箱未修改则不校验
+    if (current && current.email === value) {
+      return Promise.resolve();
     }
     
     try {
@@ -143,12 +164,24 @@ const UserManagement = () => {
               name="password" 
               label="密码" 
               rules={[
-                { required: !current, message: '请输入密码' },
-                {
-                  pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
-                  message: '密码必须至少8位且包含大小写字母和数字'
-                }
-              ]}
+                !current && {  // 仅在新增时必填
+                  required: true, 
+                  message: '请输入密码' 
+                },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    // 编辑时且密码未修改则不校验
+                    if (current && value === current.password) {
+                      return Promise.resolve();
+                    }
+                    // 新增或修改密码时校验复杂度
+                    if (!value || /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(value)) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject('密码必须至少8位且包含大小写字母和数字');
+                  }
+                })
+              ].filter(Boolean)}
             >
               <Input.Password placeholder={current ? '留空则不修改密码' : ''} />
             </Form.Item>
