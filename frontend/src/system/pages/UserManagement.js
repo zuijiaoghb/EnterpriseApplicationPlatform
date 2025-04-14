@@ -125,9 +125,33 @@ const UserManagement = () => {
     }
   };
 
+  // 添加用户名校验函数
+  const validateUsername = async (_, value) => {
+    if (!value) {
+      return Promise.reject('请输入用户名');
+    }
+    
+    try {
+      const { data } = await api.get(`/api/users/check-username?username=${value}`);
+      if (data.exists) {
+        return Promise.reject('该用户名已存在');
+      }
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject('用户名校验失败');
+    }
+  };  
+
   return (
     <div>
-      <Button type="primary" onClick={() => { setCurrent(null); setVisible(true); }}>
+      <Button 
+        type="primary" 
+        onClick={() => { 
+          setCurrent(null); 
+          form.resetFields(); // 新增用户时重置表单
+          setVisible(true); 
+        }}
+      >
         新增用户
       </Button>
       <Table
@@ -151,11 +175,18 @@ const UserManagement = () => {
         title={current ? '编辑用户' : '新增用户'}
         open={visible}
         onOk={handleSubmit}
-        onCancel={() => setVisible(false)}
+        onCancel={() => {setVisible(false);form.resetFields();}}
       >
         <Form form={form} initialValues={current || {}}>
-          <Form.Item name="username" label="用户名" rules={[{ required: true }]}>
-            <Input />
+            <Form.Item 
+              name="username" 
+              label="用户名" 
+              rules={[
+                { required: true, message: '请输入用户名' },
+                { validator: validateUsername }
+              ]}
+            >
+              <Input />
           </Form.Item>
           
           {/* 密码输入栏位 - 新增用户或admin编辑时显示 */}

@@ -104,4 +104,11 @@ public class UserController {
         boolean exists = userService.existsByEmail(email);
         return ResponseEntity.ok(Map.of("exists", exists));
     }
+
+    @GetMapping("/check-username")
+    public ResponseEntity<Map<String, Boolean>> checkUsernameExists(
+        @RequestParam String username) {
+        boolean exists = userService.existsByUsername(username);
+        return ResponseEntity.ok(Map.of("exists", exists));
+    }
 }
