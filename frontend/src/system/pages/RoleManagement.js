@@ -50,7 +50,11 @@ const RoleManagement = () => {
 
   return (
     <div>
-      <Button type="primary" onClick={() => { setCurrent(null); setVisible(true); }}>
+      <Button type="primary" onClick={() => { 
+        setCurrent(null); 
+        form.resetFields(); // 新增时重置表单
+        setVisible(true); 
+      }}>
         新增角色
       </Button>
       <Table
@@ -62,8 +66,15 @@ const RoleManagement = () => {
           {
             title: '操作',
             render: (_, record) => (
-              <Space>
-                <Button onClick={() => { setCurrent(record); setVisible(true); }}>编辑</Button>
+              <Space>                
+                <Button onClick={() => { 
+                  setCurrent(record);
+                  form.resetFields(); // 先重置表单
+                  form.setFieldsValue(record); // 再设置表单值
+                  setVisible(true);
+                }}>
+                  编辑
+                </Button>
                 <Button danger onClick={() => handleDelete(record.id)}>删除</Button>
               </Space>
             ),
@@ -75,9 +86,13 @@ const RoleManagement = () => {
         title={current ? '编辑角色' : '新增角色'}
         visible={visible}
         onOk={handleSubmit}
-        onCancel={() => setVisible(false)}
+        onCancel={() => {
+          setVisible(false);
+          form.resetFields(); // 取消时重置表单
+        }}
       >
-        <Form form={form} initialValues={current || {}}>
+        <Form form={form}  key={current ? `edit-${current.id}` : 'create'} // 添加key强制重新渲染
+        >
           <Form.Item name="name" label="角色名称" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
