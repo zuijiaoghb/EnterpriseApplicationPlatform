@@ -36,14 +36,36 @@ const UserManagement = () => {
     fetchRoles();
   }, []);
 
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
+  
+  useEffect(() => {
+    fetchUsers();
+  }, [pagination.current, pagination.pageSize]); // 添加分页参数依赖
+  
   const fetchUsers = async () => {
-    const { data } = await api.get('/api/users');
-    // 对返回的用户数据进行处理，隐藏密码字段
-    const processedUsers = data.content.map(user => ({
-      ...user,
-      password: '******' // 密码字段脱敏处理
-    }));
-    setUsers(processedUsers);
+    try {
+      const { data } = await api.get('/api/users', {
+        params: {
+          page: pagination.current - 1,
+          size: pagination.pageSize
+        }
+      });
+      const processedUsers = data.content.map(user => ({
+        ...user,
+        password: '******'
+      }));
+      setUsers(processedUsers);
+      setPagination({
+        ...pagination,
+        total: data.totalElements
+      });
+    } catch (error) {
+      message.error('获取用户列表失败');
+    }
   };
 
   const fetchRoles = async () => {
@@ -130,6 +152,11 @@ const UserManagement = () => {
     if (!value) {
       return Promise.reject('请输入用户名');
     }
+
+    // 编辑时且用户名未修改则不校验
+    if (current && current.username === value) {
+      return Promise.resolve();
+    }
     
     try {
       const { data } = await api.get(`/api/users/check-username?username=${value}`);
@@ -170,14 +197,29 @@ const UserManagement = () => {
             ),
           },
         ]}
+        pagination={{
+          ...pagination,
+          showSizeChanger: true,
+          onChange: (page, pageSize) => {
+            setPagination({...pagination, current: page, pageSize});
+          },
+          onShowSizeChange: (current, size) => {
+            setPagination({...pagination, current: 1, pageSize: size});
+          }
+        }}
+        rowKey="id"
       />
       <Modal
         title={current ? '编辑用户' : '新增用户'}
         open={visible}
         onOk={handleSubmit}
-        onCancel={() => {setVisible(false);form.resetFields();}}
+        onCancel={() => {
+          setVisible(false);
+          form.resetFields();
+        }}
       >
-        <Form form={form} initialValues={current || {}}>
+        <Form form={form} key={current ? `edit-${current.id}` : 'create'} // 添加key强制重新渲染
+        >
             <Form.Item 
               name="username" 
               label="用户名" 
