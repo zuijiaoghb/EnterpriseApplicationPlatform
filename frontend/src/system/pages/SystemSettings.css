@@ -1,0 +1,49 @@
+.system-settings-card {
+    margin: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .no-permission-card {
+    margin: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding: 40px 0;
+  }
+  
+  .no-permission-content {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .no-permission-content h2 {
+    margin-top: 16px;
+    color: #333;
+  }
+  
+  .no-permission-content p {
+    color: #666;
+  }
+  
+  .system-tabs {
+    min-height: 500px;
+  }
+  
+  .system-tabs .ant-tabs-tab {
+    padding: 12px 24px !important;
+    margin: 8px 0 !important;
+  }
+  
+  .system-tabs .ant-tabs-tab-active {
+    background: #f0f7ff;
+    border-radius: 4px;
+  }
+  
+  .system-tabs .ant-tabs-ink-bar {
+    background: #1890ff;
+  }
+  
+  .system-tabs .ant-tabs-nav {
+    padding: 16px 0;
+  }

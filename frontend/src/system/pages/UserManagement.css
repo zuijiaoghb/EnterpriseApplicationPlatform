@@ -1,0 +1,44 @@
+.user-management-card {
+    margin: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .user-management-header {
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .user-table {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .user-table .ant-table-thead > tr > th {
+    background: #f0f7ff;
+    font-weight: 600;
+  }
+  
+  .user-modal .ant-modal-header {
+    border-bottom: none;
+  }
+  
+  .user-modal .ant-modal-title {
+    font-size: 18px;
+    font-weight: 500;
+  }
+  
+  .user-modal .ant-form-item-label > label {
+    font-weight: 500;
+  }
+  
+  .user-modal .ant-input,
+  .user-modal .ant-select-selector {
+    border-radius: 4px;
+  }
+  
+  .user-modal .ant-btn-primary {
+    background-color: #1890ff;
+    border-color: #1890ff;
+  }

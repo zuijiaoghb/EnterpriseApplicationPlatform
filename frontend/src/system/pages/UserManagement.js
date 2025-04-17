@@ -1,7 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Modal, Form, Input, Select, message } from 'antd';
+import { 
+  Table, 
+  Button, 
+  Space, 
+  Modal, 
+  Form, 
+  Input, 
+  Select, 
+  message,
+  Card,
+  Tag
+} from 'antd';
+import { 
+  UserAddOutlined, 
+  EditOutlined, 
+  DeleteOutlined,
+  MailOutlined,
+  LockOutlined,
+  TeamOutlined,
+  UserOutlined
+} from '@ant-design/icons';
 import api from '../../api';
 import { useNavigate } from 'react-router-dom';
+import './UserManagement.css'; // 新增样式文件
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -170,29 +191,59 @@ const UserManagement = () => {
   };  
 
   return (
-    <div>
-      <Button 
-        type="primary" 
-        onClick={() => { 
-          setCurrent(null); 
-          form.resetFields(); // 新增用户时重置表单
-          setVisible(true); 
-        }}
-      >
-        新增用户
-      </Button>
+    <Card className="user-management-card">
+      <div className="user-management-header">
+        <Button 
+          type="primary" 
+          icon={<UserAddOutlined />}
+          onClick={() => { 
+            setCurrent(null); 
+            form.resetFields();
+            setVisible(true); 
+          }}
+        >
+          新增用户
+        </Button>
+      </div>
+      
       <Table
         dataSource={users}
         columns={[
-          { title: '用户名', dataIndex: 'username' },
-          { title: '邮箱', dataIndex: 'email' },
-          { title: '状态', dataIndex: 'status' },
+          { 
+            title: <span><UserOutlined /> 用户名</span>, 
+            dataIndex: 'username',
+            render: text => <Tag color="blue">{text}</Tag>
+          },
+          { 
+            title: <span><MailOutlined /> 邮箱</span>, 
+            dataIndex: 'email' 
+          },
+          { 
+            title: '状态', 
+            dataIndex: 'status',
+            render: status => (
+              <Tag color={status === 1 ? 'green' : 'red'}>
+                {status === 1 ? '活跃' : '禁用'}
+              </Tag>
+            )
+          },
           {
             title: '操作',
             render: (_, record) => (
               <Space>
-                <Button onClick={() => handleEditUser(record)}>编辑</Button>
-                <Button danger onClick={() => handleDelete(record.id)}>删除</Button>
+                <Button 
+                  icon={<EditOutlined />} 
+                  onClick={() => handleEditUser(record)}
+                >
+                  编辑
+                </Button>
+                <Button 
+                  danger 
+                  icon={<DeleteOutlined />}
+                  onClick={() => handleDelete(record.id)}
+                >
+                  删除
+                </Button>
               </Space>
             ),
           },
@@ -200,6 +251,7 @@ const UserManagement = () => {
         pagination={{
           ...pagination,
           showSizeChanger: true,
+          showTotal: total => `共 ${total} 条`,
           onChange: (page, pageSize) => {
             setPagination({...pagination, current: page, pageSize});
           },
@@ -208,39 +260,43 @@ const UserManagement = () => {
           }
         }}
         rowKey="id"
+        className="user-table"
       />
+
       <Modal
-        title={current ? '编辑用户' : '新增用户'}
+        title={
+          <span>
+            {current ? <EditOutlined /> : <UserAddOutlined />}
+            {current ? '编辑用户' : '新增用户'}
+          </span>
+        }
         open={visible}
         onOk={handleSubmit}
         onCancel={() => {
           setVisible(false);
           form.resetFields();
         }}
+        className="user-modal"
       >
-        <Form form={form} key={current ? `edit-${current.id}` : 'create'} // 添加key强制重新渲染
-        >
-            <Form.Item 
-              name="username" 
-              label="用户名" 
-              rules={[
-                { required: true, message: '请输入用户名' },
-                { validator: validateUsername }
-              ]}
-            >
-              <Input />
+        <Form form={form} key={current ? `edit-${current.id}` : 'create'}>
+          <Form.Item 
+            name="username" 
+            label={<span><UserOutlined /> 用户名</span>}
+            rules={[
+              { required: true, message: '请输入用户名' },
+              { validator: validateUsername }
+            ]}
+          >
+            <Input placeholder="请输入用户名" />
           </Form.Item>
           
           {/* 密码输入栏位 - 新增用户或admin编辑时显示 */}
           {(hasAdminRole || !current) && (
             <Form.Item 
               name="password" 
-              label="密码" 
+              label={<span><LockOutlined /> 密码</span>}
               rules={[
-                !current && {  // 仅在新增时必填
-                  required: true, 
-                  message: '请输入密码' 
-                },
+                !current && { required: true, message: '请输入密码' },
                 ({ getFieldValue }) => ({
                   validator(_, value) {
                     // 编辑时且密码未修改则不校验
@@ -256,32 +312,37 @@ const UserManagement = () => {
                 })
               ].filter(Boolean)}
             >
-              <Input.Password placeholder={current ? '留空则不修改密码' : ''} />
+              <Input.Password placeholder={current ? '留空则不修改密码' : '请输入密码'} />
             </Form.Item>
           )}
                     
           <Form.Item 
             name="email" 
-            label="邮箱" 
+            label={<span><MailOutlined /> 邮箱</span>}
             rules={[
               { required: true, message: '请输入邮箱' },
               { type: 'email', message: '请输入有效的邮箱地址' },
               { validator: validateEmail }
             ]}
           >
-            <Input />
+            <Input placeholder="请输入邮箱" />
           </Form.Item>
           
-          <Form.Item name="roleIds" label="角色">
-            <Select mode="multiple">
+          <Form.Item 
+            name="roleIds" 
+            label={<span><TeamOutlined /> 角色</span>}
+          >
+            <Select mode="multiple" placeholder="请选择角色">
               {roles.map(role => (
-                <Select.Option key={role.id} value={role.id}>{role.name}</Select.Option>
+                <Select.Option key={role.id} value={role.id}>
+                  {role.name}
+                </Select.Option>
               ))}
             </Select>
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+    </Card>
   );
 };
 
