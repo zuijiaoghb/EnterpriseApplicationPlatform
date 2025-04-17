@@ -65,7 +65,7 @@ public class AuthController {
                 .header("Access-Control-Expose-Headers", "Authorization")
                 .body(Map.of(
                     "status", 200,
-                    "message", "登录成功"
+                    "message", "登录成功"                 
                 ));
         } catch (org.springframework.security.core.AuthenticationException e) {
             logger.error("认证失败", e);

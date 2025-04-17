@@ -41,6 +41,25 @@ const Login = () => {
       // 标准化token格式
       const normalizedToken = token.replace(/^Bearer\s+/i, '');
       localStorage.setItem('token', normalizedToken);
+    
+      console.log('response.data.user:', response.data?.user);
+      // 新增：确保存储完整的用户信息（包含roles）
+      if (response.data?.user) {
+        if (!response.data.user.roles) {
+          // 如果返回的用户信息没有roles，则主动获取
+          const userInfo = await api.get('/auth/info');
+          localStorage.setItem('user', JSON.stringify({
+            ...response.data.user,
+            roles: userInfo.data.roles
+          }));
+        } else {
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+        }
+      } else {
+        // 如果没有返回用户信息，则获取完整用户信息
+        const userInfo = await api.get('/auth/info');
+        localStorage.setItem('user', JSON.stringify(userInfo.data));
+      }
       
       // 设置全局token
       api.defaults.headers.common['Authorization'] = `Bearer ${normalizedToken}`;

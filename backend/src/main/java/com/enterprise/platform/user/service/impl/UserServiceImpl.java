@@ -1,6 +1,8 @@
 package com.enterprise.platform.user.service.impl;
 
+import com.enterprise.platform.user.model.Role;
 import com.enterprise.platform.user.model.User;
+import com.enterprise.platform.user.repository.RoleRepository;
 import com.enterprise.platform.user.repository.UserRepository;
 import com.enterprise.platform.user.service.UserService;
 import org.springframework.data.domain.Page;
@@ -15,10 +17,12 @@ import java.util.Set;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository,PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -51,6 +55,12 @@ public class UserServiceImpl implements UserService {
         if (user.getRoles() != null && !user.getRoles().isEmpty()) {
             savedUser.setRoles(user.getRoles());
             return userRepository.save(savedUser);
+        }
+
+        if (user.getRoles() == null || user.getRoles().isEmpty()) {
+            Role defaultRole = roleRepository.findByCode("ROLE_USER")
+                .orElseThrow(() -> new RuntimeException("默认角色未配置"));
+            user.setRoles(Set.of(defaultRole));
         }
         
         return savedUser;

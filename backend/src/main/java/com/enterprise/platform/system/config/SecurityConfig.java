@@ -78,6 +78,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/api/**").authenticated()
+                .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers("/api/roles/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             // 确保只添加一次过滤器

@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Modal, Form, Input, message } from 'antd';
+import { Table, Button, Space, Modal, Form, Input, message, Transfer } from 'antd';
 import api from '../../api';
+import { checkPermission } from '../services/auth';
 
 const RoleManagement = () => {
   const [roles, setRoles] = useState([]);
   const [visible, setVisible] = useState(false);
   const [current, setCurrent] = useState(null);
   const [form] = Form.useForm();
+  const [permissions, setPermissions] = useState([]);
+  const [permissionModalVisible, setPermissionModalVisible] = useState(false);
+  const [selectedRole, setSelectedRole] = useState(null);
+  const [targetKeys, setTargetKeys] = useState([]);
 
   useEffect(() => {
     fetchRoles();
+    fetchAllPermissions(); // 添加这行调用
   }, []);
 
   const fetchRoles = async () => {
@@ -48,6 +54,27 @@ const RoleManagement = () => {
     }
   };
 
+  // 获取所有权限
+  const fetchAllPermissions = async () => {
+    const { data } = await api.get('/api/permissions');
+    setPermissions(data);
+  };
+
+  // 打开权限分配模态框
+  const showPermissionModal = async (role) => {
+    setSelectedRole(role);
+    const { data } = await api.get(`/api/roles/${role.id}/permissions`);
+    setTargetKeys(data.map(p => p.id));
+    setPermissionModalVisible(true);
+  };
+
+  // 保存权限分配
+  const saveRolePermissions = async () => {
+    await api.put(`/api/roles/${selectedRole.id}/permissions`, targetKeys);
+    message.success('权限分配成功');
+    setPermissionModalVisible(false);
+  };  
+
   return (
     <div>
       <Button type="primary" onClick={() => { 
@@ -76,6 +103,7 @@ const RoleManagement = () => {
                   编辑
                 </Button>
                 <Button danger onClick={() => handleDelete(record.id)}>删除</Button>
+                <Button onClick={() => showPermissionModal(record)} disabled={!checkPermission('role:assign-permission')} >分配权限</Button>
               </Space>
             ),
           },
@@ -84,7 +112,7 @@ const RoleManagement = () => {
       />
       <Modal
         title={current ? '编辑角色' : '新增角色'}
-        visible={visible}
+        open={visible}
         onOk={handleSubmit}
         onCancel={() => {
           setVisible(false);
@@ -103,6 +131,23 @@ const RoleManagement = () => {
             <Input.TextArea />
           </Form.Item>
         </Form>
+      </Modal>
+      <Modal
+        title={`分配权限 - ${selectedRole?.name}`}
+        open={permissionModalVisible}
+        onOk={saveRolePermissions}
+        onCancel={() => setPermissionModalVisible(false)}
+      >
+        <Transfer
+          dataSource={permissions.map(p => ({
+            key: p.id,
+            title: p.name,
+            description: p.description
+          }))}
+          targetKeys={targetKeys}
+          onChange={setTargetKeys}
+          render={item => item.title}
+        />
       </Modal>
     </div>
   );
