@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Menu, theme, Dropdown, Avatar, message } from 'antd';
+import { Layout, Menu, Dropdown, Avatar, message } from 'antd';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
+import { 
+  LogoutOutlined, 
+  UserOutlined,
+  DashboardOutlined,
+  ToolOutlined,
+  SettingOutlined
+} from '@ant-design/icons';
 import api from '../api';
+import './MainLayout.css';
 
 const { Header, Content } = Layout;
 
 const MainLayout = () => {
   const [currentUser, setCurrentUser] = useState(null);
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken();
+
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -31,10 +36,12 @@ const MainLayout = () => {
         const baseItems = [
           {
             key: 'dashboard',
+            icon: <DashboardOutlined />,
             label: '仪表盘',
           },
           {
             key: 'equipments',
+            icon: <ToolOutlined />,
             label: '设备管理',
           }
         ];
@@ -44,6 +51,7 @@ const MainLayout = () => {
         if (response.data.roles?.some(role => role.authority === 'ROLE_ADMIN')) {
           baseItems.push({
             key: 'system',
+            icon: <SettingOutlined />,
             label: '系统管理'
           });
         }
@@ -68,9 +76,9 @@ const MainLayout = () => {
 
   return (
     <Layout className="layout">
-      <Header style={{ display: 'flex', alignItems: 'center' }}>
-        <div className="logo" style={{ color: 'white', fontSize: '20px', marginRight: '24px' }}>
-          企业应用平台
+      <Header className="main-header">
+        <div className="logo-container">
+          <div className="logo">企业应用平台</div>
         </div>
         <Menu
           theme="dark"
@@ -78,17 +86,17 @@ const MainLayout = () => {
           defaultSelectedKeys={['dashboard']}
           items={menuItems}
           onClick={({ key }) => navigate(`/${key}`)}
-          style={{ flex: 1, minWidth: 0 }}
+          className="main-menu"
         />
-        <Dropdown menu={{ items: userMenuItems }}  placement="bottomRight">
-          <div style={{ color: 'white', cursor: 'pointer' }}>
+        <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+          <div className="user-info">
             <Avatar icon={<UserOutlined />} />
-            <span style={{ marginLeft: 8 }}>{currentUser?.username || '用户'}</span>
+            <span className="username">{currentUser?.username || '用户'}</span>
           </div>
         </Dropdown>
       </Header>
-      <Content style={{ padding: '24px 50px' }}>
-        <div style={{ background: colorBgContainer, padding: 24, minHeight: 'calc(100vh - 64px - 48px)' }}>
+      <Content className="main-content">
+        <div className="content-container">
           <Outlet />
         </div>
       </Content>
