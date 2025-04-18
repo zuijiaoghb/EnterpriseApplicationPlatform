@@ -9,7 +9,7 @@ import {
   Select, 
   message,
   Card,
-  Tag
+  Tag, Typography
 } from 'antd';
 import { 
   UserAddOutlined, 
@@ -18,11 +18,13 @@ import {
   MailOutlined,
   LockOutlined,
   TeamOutlined,
-  UserOutlined
+  UserOutlined, SafetyOutlined
 } from '@ant-design/icons';
 import api from '../../api';
 import { useNavigate } from 'react-router-dom';
 import './UserManagement.css'; // 新增样式文件
+
+const { Title } = Typography;
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -191,8 +193,15 @@ const UserManagement = () => {
   };  
 
   return (
-    <Card className="user-management-card">
-      <div className="user-management-header">
+    <Card 
+      title={
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <SafetyOutlined style={{ fontSize: 24, marginRight: 12 }} />
+          <Title level={4} style={{ margin: 0 }}>用户管理</Title>
+        </div>
+      }
+      bordered={false}
+      extra={
         <Button 
           type="primary" 
           icon={<UserAddOutlined />}
@@ -204,22 +213,23 @@ const UserManagement = () => {
         >
           新增用户
         </Button>
-      </div>
-      
+      }
+    >
       <Table
         dataSource={users}
         columns={[
           { 
-            title: <span><UserOutlined /> 用户名</span>, 
+            title: <span><UserOutlined /> 用户名</span>,
             dataIndex: 'username',
             render: text => <Tag color="blue">{text}</Tag>
           },
           { 
-            title: <span><MailOutlined /> 邮箱</span>, 
-            dataIndex: 'email' 
+            title: <span><MailOutlined /> 邮箱</span>,
+            dataIndex: 'email',
+            render: text => <Tag color="geekblue">{text}</Tag>
           },
           { 
-            title: '状态', 
+            title: '状态',
             dataIndex: 'status',
             render: status => (
               <Tag color={status === 1 ? 'green' : 'red'}>
@@ -232,7 +242,7 @@ const UserManagement = () => {
             render: (_, record) => (
               <Space>
                 <Button 
-                  icon={<EditOutlined />} 
+                  icon={<EditOutlined />}
                   onClick={() => handleEditUser(record)}
                 >
                   编辑
@@ -260,7 +270,7 @@ const UserManagement = () => {
           }
         }}
         rowKey="id"
-        className="user-table"
+        bordered
       />
 
       <Modal
@@ -276,7 +286,7 @@ const UserManagement = () => {
           setVisible(false);
           form.resetFields();
         }}
-        className="user-modal"
+        width={600}
       >
         <Form form={form} key={current ? `edit-${current.id}` : 'create'}>
           <Form.Item 

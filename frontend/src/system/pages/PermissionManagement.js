@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Modal, Form, Input, Tree, message, Card, Select } from 'antd';
+import { 
+  Table, Button, Space, Modal, Form, Input, 
+  Tree, message, Card, Select, Typography, Tag 
+} from 'antd';
+import { 
+  PlusOutlined, EditOutlined, DeleteOutlined, 
+  SafetyOutlined, KeyOutlined, FileTextOutlined,
+  ApartmentOutlined
+} from '@ant-design/icons';
 import api from '../../api';
+
+const { Title } = Typography;
 
 const PermissionManagement = () => {
   const [permissions, setPermissions] = useState([]);
@@ -84,73 +94,144 @@ const PermissionManagement = () => {
   };
 
   return (
-    <div>
-      <Button type="primary" onClick={() => { 
-        setCurrent(null); 
-        form.resetFields(); // 重置表单
-        setVisible(true); 
-      }}>
-        新增权限
-      </Button>
+    <Card 
+      title={
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <SafetyOutlined style={{ fontSize: 24, marginRight: 12 }} />
+          <Title level={4} style={{ margin: 0 }}>权限管理</Title>
+        </div>
+      }
+      bordered={false}
+      extra={
+        <Button 
+          type="primary" 
+          icon={<PlusOutlined />}
+          onClick={() => { 
+            setCurrent(null); 
+            form.resetFields();
+            setVisible(true); 
+          }}
+        >
+          新增权限
+        </Button>
+      }
+    >
       <Table
         dataSource={permissions}
         columns={[
-          { title: '权限名称', dataIndex: 'name' },
-          { title: '权限编码', dataIndex: 'code' },
-          { title: '描述', dataIndex: 'description' },
+          { 
+            title: <span><KeyOutlined /> 权限名称</span>,
+            dataIndex: 'name',
+            render: (text) => <Tag color="blue">{text}</Tag>
+          },
+          { 
+            title: <span><KeyOutlined /> 权限编码</span>,
+            dataIndex: 'code',
+            render: (text) => <Tag color="geekblue">{text}</Tag>
+          },
+          { 
+            title: <span><FileTextOutlined /> 描述</span>,
+            dataIndex: 'description',
+            render: (text) => text || '-'
+          },
           {
             title: '操作',
             render: (_, record) => (
               <Space>
-                <Button onClick={() => { 
-                  setCurrent(record);
-                  form.resetFields(); // 重置表单
-                  form.setFieldsValue(record); // 设置表单值 
-                  setVisible(true); 
-                }}>编辑</Button>
-                <Button danger onClick={() => handleDelete(record.id)}>删除</Button>
+                <Button 
+                  icon={<EditOutlined />}
+                  onClick={() => { 
+                    setCurrent(record);
+                    form.resetFields();
+                    form.setFieldsValue(record);
+                    setVisible(true); 
+                  }}
+                >
+                  编辑
+                </Button>
+                <Button 
+                  danger 
+                  icon={<DeleteOutlined />}
+                  onClick={() => handleDelete(record.id)}
+                >
+                  删除
+                </Button>
               </Space>
             ),
           },
         ]}
         rowKey="id"
+        bordered
       />
-      <Card title="权限树" style={{ marginTop: 16 }}>
-        <Tree treeData={treeData} />
+
+      <Card 
+        title={
+          <span>
+            <ApartmentOutlined /> 权限树形结构
+          </span>
+        }
+        style={{ marginTop: 16 }}
+      >
+        <Tree
+          treeData={treeData}
+          defaultExpandAll
+          showLine
+          style={{ padding: '8px 0' }}
+        />
       </Card>
+
       <Modal
-        title={current ? '编辑权限' : '新增权限'}
+        title={
+          <span>
+            {current ? <EditOutlined /> : <PlusOutlined />}
+            {current ? '编辑权限' : '新增权限'}
+          </span>
+        }
         open={visible}
         onOk={handleSubmit}
         onCancel={() => setVisible(false)}
-      >        
+        width={600}
+      >
         <Form form={form} key={current ? `edit-${current.id}` : 'create'}>
-          <Form.Item name="name" label="权限名称" rules={[{ required: true }]}>
-            <Input />
+          <Form.Item 
+            name="name" 
+            label="权限名称" 
+            rules={[{ required: true, message: '请输入权限名称' }]}
+          >
+            <Input placeholder="请输入权限名称" prefix={<KeyOutlined />} />
           </Form.Item>
-          <Form.Item name="code" label="权限编码" rules={[{ required: true }]}>
-            <Input />
+          <Form.Item 
+            name="code" 
+            label="权限编码" 
+            rules={[{ required: true, message: '请输入权限编码' }]}
+          >
+            <Input placeholder="请输入权限编码" prefix={<KeyOutlined />} />
           </Form.Item>
-          <Form.Item name="parentId" label="父权限">          
-              <Select 
-                placeholder="选择父权限(不选则为顶级权限)"
-                allowClear
-              >
-                {Array.isArray(permissions) && permissions
-                  .filter(p => !p.parentId)
-                  .map(p => (
-                    <Select.Option key={p.id} value={p.id}>
-                      {p.name}
-                    </Select.Option>
-                  ))}
-              </Select>
+          <Form.Item name="parentId" label="父权限">
+            <Select
+              placeholder="选择父权限(不选则为顶级权限)"
+              allowClear
+              suffixIcon={<ApartmentOutlined />}
+            >
+              {Array.isArray(permissions) && permissions
+                .filter(p => !p.parentId)
+                .map(p => (
+                  <Select.Option key={p.id} value={p.id}>
+                    {p.name}
+                  </Select.Option>
+                ))}
+            </Select>
           </Form.Item>
           <Form.Item name="description" label="描述">
-            <Input.TextArea />
+            <Input.TextArea 
+              rows={3} 
+              placeholder="请输入权限描述" 
+              prefix={<FileTextOutlined />}
+            />
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+    </Card>
   );
 };
 
