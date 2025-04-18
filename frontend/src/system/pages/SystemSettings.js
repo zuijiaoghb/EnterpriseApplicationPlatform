@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, Card, message } from 'antd';
+import { 
+  UserOutlined, 
+  TeamOutlined, 
+  LockOutlined,
+  SettingOutlined 
+} from '@ant-design/icons';
 import UserManagement from './UserManagement';
 import RoleManagement from './RoleManagement';
 import PermissionManagement from './PermissionManagement';
 import api from '../../api';
+import './SystemSettings.css'; // 新增样式文件
 
 const { TabPane } = Tabs;
 
@@ -24,19 +31,55 @@ const SystemSettings = () => {
   };
 
   if (!hasAdminRole) {
-    return <Card>您没有权限访问系统管理功能</Card>;
+    return (
+      <Card className="no-permission-card">
+        <div className="no-permission-content">
+          <SettingOutlined style={{ fontSize: '48px', color: '#1890ff' }} />
+          <h2>您没有权限访问系统管理功能</h2>
+          <p>请联系系统管理员获取权限</p>
+        </div>
+      </Card>
+    );
   }
 
   return (
-    <Card>
-      <Tabs defaultActiveKey="1">
-        <TabPane tab="用户管理" key="1">
+    <Card className="system-settings-card">
+      <Tabs 
+        defaultActiveKey="1" 
+        tabPosition="left"
+        className="system-tabs"
+      >
+        <TabPane 
+          tab={
+            <span>
+              <UserOutlined />
+              用户管理
+            </span>
+          } 
+          key="1"
+        >
           <UserManagement />
         </TabPane>
-        <TabPane tab="角色管理" key="2">
+        <TabPane 
+          tab={
+            <span>
+              <TeamOutlined />
+              角色管理
+            </span>
+          } 
+          key="2"
+        >
           <RoleManagement />
         </TabPane>
-        <TabPane tab="权限配置" key="3">
+        <TabPane 
+          tab={
+            <span>
+              <LockOutlined />
+              权限配置
+            </span>
+          } 
+          key="3"
+        >
           <PermissionManagement />
         </TabPane>
       </Tabs>
