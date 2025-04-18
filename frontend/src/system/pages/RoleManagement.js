@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Modal, Form, Input, message, Transfer } from 'antd';
+import { 
+  Table, Button, Space, Modal, Form, Input, 
+  message, Transfer, Card, Tag, Typography 
+} from 'antd';
+import { 
+  PlusOutlined, EditOutlined, DeleteOutlined, 
+  LockOutlined, TeamOutlined, SafetyOutlined 
+} from '@ant-design/icons';
 import api from '../../api';
 import { checkPermission } from '../services/auth';
+
+const { Title } = Typography;
 
 const RoleManagement = () => {
   const [roles, setRoles] = useState([]);
@@ -76,67 +85,127 @@ const RoleManagement = () => {
   };  
 
   return (
-    <div>
-      <Button type="primary" onClick={() => { 
-        setCurrent(null); 
-        form.resetFields(); // 新增时重置表单
-        setVisible(true); 
-      }}>
-        新增角色
-      </Button>
+    <Card 
+      title={
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <SafetyOutlined style={{ fontSize: 24, marginRight: 12 }} />
+          <Title level={4} style={{ margin: 0 }}>角色管理</Title>
+        </div>
+      }
+      bordered={false}
+      extra={
+        <Button 
+          type="primary" 
+          icon={<PlusOutlined />}
+          onClick={() => { 
+            setCurrent(null); 
+            form.resetFields();
+            setVisible(true); 
+          }}
+        >
+          新增角色
+        </Button>
+      }
+    >
       <Table
         dataSource={roles}
         columns={[
-          { title: '角色名称', dataIndex: 'name' },
-          { title: '角色编码', dataIndex: 'code' },
+          { 
+            title: <span><TeamOutlined /> 角色名称</span>,
+            dataIndex: 'name',
+            render: (text) => <Tag color="blue">{text}</Tag>
+          },
+          { 
+            title: <span><LockOutlined /> 角色编码</span>,
+            dataIndex: 'code',
+            render: (text) => <Tag color="geekblue">{text}</Tag>
+          },
           { title: '描述', dataIndex: 'description' },
           {
             title: '操作',
             render: (_, record) => (
-              <Space>                
-                <Button onClick={() => { 
-                  setCurrent(record);
-                  form.resetFields(); // 先重置表单
-                  form.setFieldsValue(record); // 再设置表单值
-                  setVisible(true);
-                }}>
+              <Space>
+                <Button 
+                  icon={<EditOutlined />} 
+                  onClick={() => { 
+                    setCurrent(record);
+                    form.resetFields();
+                    form.setFieldsValue(record);
+                    setVisible(true);
+                  }}
+                >
                   编辑
                 </Button>
-                <Button danger onClick={() => handleDelete(record.id)}>删除</Button>
-                <Button onClick={() => showPermissionModal(record)} disabled={!checkPermission('role:assign-permission')} >分配权限</Button>
+                <Button 
+                  danger 
+                  icon={<DeleteOutlined />}
+                  onClick={() => handleDelete(record.id)}
+                >
+                  删除
+                </Button>
+                <Button 
+                  type="dashed"
+                  onClick={() => showPermissionModal(record)} 
+                  disabled={!checkPermission('role:assign-permission')}
+                >
+                  分配权限
+                </Button>
               </Space>
             ),
           },
         ]}
         rowKey="id"
+        bordered
       />
+
+      {/* 角色编辑/新增模态框 */}
       <Modal
-        title={current ? '编辑角色' : '新增角色'}
+        title={
+          <span>
+            {current ? <EditOutlined /> : <PlusOutlined />}
+            {current ? '编辑角色' : '新增角色'}
+          </span>
+        }
         open={visible}
         onOk={handleSubmit}
         onCancel={() => {
           setVisible(false);
-          form.resetFields(); // 取消时重置表单
+          form.resetFields();
         }}
+        width={600}
       >
-        <Form form={form}  key={current ? `edit-${current.id}` : 'create'} // 添加key强制重新渲染
-        >
-          <Form.Item name="name" label="角色名称" rules={[{ required: true }]}>
-            <Input />
+        <Form form={form} key={current ? `edit-${current.id}` : 'create'}>
+          <Form.Item 
+            name="name" 
+            label="角色名称" 
+            rules={[{ required: true, message: '请输入角色名称' }]}
+          >
+            <Input placeholder="请输入角色名称" />
           </Form.Item>
-          <Form.Item name="code" label="角色编码" rules={[{ required: true }]}>
-            <Input />
+          <Form.Item 
+            name="code" 
+            label="角色编码" 
+            rules={[{ required: true, message: '请输入角色编码' }]}
+          >
+            <Input placeholder="请输入角色编码" />
           </Form.Item>
           <Form.Item name="description" label="描述">
-            <Input.TextArea />
+            <Input.TextArea rows={3} placeholder="请输入角色描述" />
           </Form.Item>
         </Form>
       </Modal>
+
+      {/* 权限分配模态框 */}
       <Modal
-        title={`分配权限 - ${selectedRole?.name}`}
+        title={
+          <span>
+            <SafetyOutlined /> 分配权限 - {selectedRole?.name}
+          </span>
+        }
         open={permissionModalVisible}
         onOk={saveRolePermissions}
         onCancel={() => setPermissionModalVisible(false)}
+        width={800}
       >
         <Transfer
           dataSource={permissions.map(p => ({
@@ -147,9 +216,15 @@ const RoleManagement = () => {
           targetKeys={targetKeys}
           onChange={setTargetKeys}
           render={item => item.title}
+          listStyle={{
+            width: '45%',
+            height: 400,
+          }}
+          operations={['添加权限', '移除权限']}
+          titles={['所有权限', '已分配权限']}
         />
       </Modal>
-    </div>
+    </Card>
   );
 };
 
