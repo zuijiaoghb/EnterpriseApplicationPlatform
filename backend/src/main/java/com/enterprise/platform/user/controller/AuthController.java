@@ -2,18 +2,23 @@ package com.enterprise.platform.user.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.enterprise.platform.system.util.JwtUtil;
 import com.enterprise.platform.user.dto.LoginRequest;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails; // 确保导入了正确的UserDetails类
@@ -23,29 +28,31 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 
 
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.JwtEncodingException;
+import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.PostMapping;
-
 
 @CrossOrigin(origins = "http://192.168.21.175:3000", allowCredentials = "true")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-    
+
     @Autowired
     private AuthenticationManager authenticationManager;
     
     @Autowired
-    private JwtUtil jwtUtil;
-    
-    
-    @PreAuthorize("permitAll()")
-    @PostMapping("/login") // 添加明确的路径映射
+    private JwtEncoder jwtEncoder;
+
+    @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest) {
         try {
-            logger.info("开始认证用户: {}", loginRequest.getUsername());
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                     loginRequest.getUsername(),
@@ -53,52 +60,86 @@ public class AuthController {
                 )
             );
             
-            logger.info("认证成功，开始生成JWT");
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = jwtUtil.generateToken(authentication);
             
-            logger.info("生成的JWT: {}", jwt);
-            logger.info("设置的Authorization头: Bearer {}", jwt);
+            logger.info("Generating JWT Token for user: {}", authentication.getName());
+            
+            // 构建JWT时明确指定密钥
+            // 添加JWS Header配置
+            JwsHeader jwsHeaders = JwsHeader.with(() -> "HS256")
+                    .type("JWT")
+                    .keyId("HS256-KEY")
+                    .build();               
+            
+            JwtClaimsSet claimsSet = JwtClaimsSet.builder()
+                    .issuer("enterprise-platform")
+                    .issuedAt(Instant.now())
+                    .expiresAt(Instant.now().plus(24, ChronoUnit.HOURS))
+                    .subject(authentication.getName())
+                    .claim("roles", authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .filter(auth -> auth.startsWith("ROLE_"))
+                        //.map(auth -> auth.substring(5))
+                        .collect(Collectors.toList()))
+                    .build();
+            
+            // 使用带Header的JwtEncoderParameters
+            Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeaders, claimsSet));
+            
+            logger.debug("JWT generated successfully");
             
             return ResponseEntity.ok()
-                .header("Authorization", "Bearer " + jwt)
-                .header("Access-Control-Expose-Headers", "Authorization")
+                .header("Authorization", "Bearer " + jwt.getTokenValue())
                 .body(Map.of(
                     "status", 200,
-                    "message", "登录成功"                 
+                    "message", "登录成功",
+                    "user", Map.of(
+                        "username", authentication.getName(),
+                        "roles", authentication.getAuthorities()
+                    )                
                 ));
-        } catch (org.springframework.security.core.AuthenticationException e) {
-            logger.error("认证失败", e);
-            return ResponseEntity.status(401).body(Map.of(
-                "status", 401,
-                "message", "认证失败"
-            ));
+        } catch (AuthenticationException e) {
+            logger.error("Authentication failed", e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("status", 401, "message", "认证失败"));
+        } catch (JwtEncodingException e) {
+            logger.error("JWT encoding failed", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("status", 500, "message", "令牌生成失败"));
+        } catch (Exception e) {
+            logger.error("Unexpected error during login", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("status", 500, "message", "系统错误"));
         }
     }
     
     @PreAuthorize("isAuthenticated()")  // 要求已认证用户才能访问
     @GetMapping("/info") 
     public ResponseEntity<?> getUserInfo() {
-        Object principal = SecurityContextHolder.getContext()
-            .getAuthentication().getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
         
-        // 处理principal可能是String或UserDetails的情况
         if (principal instanceof UserDetails) {
             return ResponseEntity.ok(principal);
+        } else if (principal instanceof Jwt) {
+            Jwt jwt = (Jwt) principal;
+            return ResponseEntity.ok(Map.of(
+                "username", jwt.getSubject(),
+                "roles", jwt.getClaimAsStringList("roles") // 从JWT claims中获取roles
+            ));
         } else {
-            // 当principal是字符串时(如JWT subject)
             return ResponseEntity.ok(Map.of(
                 "username", principal.toString(),
-                "roles", SecurityContextHolder.getContext().getAuthentication().getAuthorities()  // 获取用户实际角色列表
+                "roles", authentication.getAuthorities()
             ));
         }
     }
 
+    @PreAuthorize("isAuthenticated()")  // 要求已认证用户才能访问
     @GetMapping("/check-role")
     public ResponseEntity<?> checkUserRole() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean hasAdminRole = authentication.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+        boolean hasAdminRole = ((Jwt) (authentication.getPrincipal())).getClaimAsStringList("roles").contains("ROLE_ADMIN");
         
         return ResponseEntity.ok(Map.of("hasAdminRole", hasAdminRole));
     }

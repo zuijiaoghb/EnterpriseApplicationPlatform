@@ -48,7 +48,7 @@ const MainLayout = () => {
         
         console.log('User Info roles:', response.data.roles?.some(role => role.authority === 'ROLE_ADMIN'));
         // 只有管理员才显示系统管理菜单
-        if (response.data.roles?.some(role => role.authority === 'ROLE_ADMIN')) {
+        if (response.data.roles?.some(role => role === 'ADMIN' || role === 'ROLE_ADMIN')) {
           baseItems.push({
             key: 'system',
             icon: <SettingOutlined />,

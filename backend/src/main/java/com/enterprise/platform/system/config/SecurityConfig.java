@@ -1,7 +1,11 @@
 package com.enterprise.platform.system.config;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -11,24 +15,46 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.enterprise.platform.system.filter.JwtAuthenticationFilter;
-import com.enterprise.platform.system.util.JwtUtil;
-
 import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import org.springframework.http.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.KeyUse;
+import com.nimbusds.jose.jwk.OctetSequenceKey;
+import com.nimbusds.jose.proc.SecurityContext;
+import javax.crypto.spec.SecretKeySpec; // 导入缺失的类
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
+@EnableAutoConfiguration(exclude = {
+    OAuth2ResourceServerAutoConfiguration.class,  // 排除OAuth2资源服务器自动配置
+    org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class  // 排除默认的安全配置    
+})
 public class SecurityConfig {
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
+    @Value("${jwt.secret}")
+    private String jwtSecret;  // 将JWT密钥配置移动到类字段
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -63,30 +89,78 @@ public class SecurityConfig {
         return source;
     }
 
-    // 修改安全配置
+    
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtUtil jwtUtil) throws Exception {        
-        // 创建过滤器时不设置处理URL
-        JwtAuthenticationFilter jwtFilter = new JwtAuthenticationFilter(            
-            jwtUtil
-        );
+    @Primary  // 添加@Primary注解确保优先使用这个Bean
+    public JwtEncoder jwtEncoder() {  // 移除方法参数
+        logger.info("Initializing JWT Encoder with secret key length: {}", jwtSecret.length());
         
+        try {
+            byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
+            if (keyBytes.length < 32) {
+                throw new IllegalArgumentException("JWT secret key must be at least 32 bytes");
+            }
+        
+            SecretKeySpec key = new SecretKeySpec(keyBytes, "HmacSHA256");
+            JWK jwk = new OctetSequenceKey.Builder(key)
+                    .keyID("HS256-KEY")
+                    .algorithm(JWSAlgorithm.HS256)
+                    .keyUse(KeyUse.SIGNATURE)
+                    .build();
+        
+            JWKSource<SecurityContext> jwkSource = new ImmutableJWKSet<>(new JWKSet(jwk));
+            return new NimbusJwtEncoder(jwkSource);
+        } catch (Exception e) {
+            logger.error("Failed to initialize JWT Encoder", e);
+            throw new RuntimeException("JWT Encoder initialization failed", e);
+        }
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        SecretKeySpec key = new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA256");
+        
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(key)
+                .macAlgorithm(MacAlgorithm.HS256)
+                .build();
+                
+        return jwtDecoder;
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
+        // 添加以下两行配置
+        converter.setAuthorityPrefix(""); // 移除默认的SCOPE_前缀
+        converter.setAuthoritiesClaimName("roles"); // 指定使用JWT中的roles声明
+        
+        JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
+        jwtConverter.setJwtGrantedAuthoritiesConverter(converter);
+        return jwtConverter;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {  // 移除secretKey参数
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/api/**").authenticated()
-                .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "MANAGER")
-                .requestMatchers("/api/roles/**").hasRole("ADMIN")
+                .requestMatchers("/api/equipments/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SBGL")
+                .requestMatchers("/api/users/**").permitAll()
+                .requestMatchers("/api/roles/**").permitAll()
+                .requestMatchers("/api/permissions/**").permitAll()
                 .anyRequest().authenticated()
             )
-            // 确保只添加一次过滤器
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt
+                    .decoder(jwtDecoder())
+                    .jwtAuthenticationConverter(jwtAuthenticationConverter()) // 在这里配置转换器
+                )
+            );
         
         return http.build();
     }
-        
 }
 

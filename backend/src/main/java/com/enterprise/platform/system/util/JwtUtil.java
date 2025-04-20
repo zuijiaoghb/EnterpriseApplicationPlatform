@@ -37,7 +37,10 @@ public class JwtUtil {
                         .collect(Collectors.toList()))
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(io.jsonwebtoken.security.Keys.hmacShaKeyFor(secret.getBytes()))
+                .signWith(
+                    io.jsonwebtoken.security.Keys.hmacShaKeyFor(secret.getBytes()),
+                    io.jsonwebtoken.SignatureAlgorithm.HS512 // 明确指定算法
+                )
                 .compact();
                 
             System.out.println("成功生成JWT: " + token.substring(0, 10) + "..."); // 打印部分token

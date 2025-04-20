@@ -17,7 +17,7 @@ const Login = () => {
 
   const onFinish = async (values) => {
     setLoading(true);
-    setLoginError(false); // 重置错误状态
+    setLoginError(false);
     try {
       const response = await api.post('/auth/login', values, {
         withCredentials: true
@@ -29,7 +29,7 @@ const Login = () => {
       console.log('所有响应头:', Object.keys(response.headers));
       console.log('完整响应:', response);
       
-      // 尝试获取各种可能的头名称
+      // 从响应头获取标准OAuth2 Token
       const token = response.headers['authorization'] 
                 || response.headers['Authorization']
                 || response.headers['x-auth-token'];
@@ -37,55 +37,28 @@ const Login = () => {
       if (!token) {
         throw new Error('认证失败：未获取到有效token');
       }
-
+      
       // 标准化token格式
       const normalizedToken = token.replace(/^Bearer\s+/i, '');
       localStorage.setItem('token', normalizedToken);
-    
-      console.log('response.data.user:', response.data?.user);
-      // 新增：确保存储完整的用户信息（包含roles）
+      
+      // 存储用户信息
       if (response.data?.user) {
-        if (!response.data.user.roles) {
-          // 如果返回的用户信息没有roles，则主动获取
-          const userInfo = await api.get('/auth/info');
-          localStorage.setItem('user', JSON.stringify({
-            ...response.data.user,
-            roles: userInfo.data.roles
-          }));
-        } else {
-          localStorage.setItem('user', JSON.stringify(response.data.user));
-        }
-      } else {
-        // 如果没有返回用户信息，则获取完整用户信息
-        const userInfo = await api.get('/auth/info');
-        localStorage.setItem('user', JSON.stringify(userInfo.data));
+        localStorage.setItem('user', JSON.stringify({
+          username: response.data.user.username,
+          roles: response.data.user.roles
+        }));
       }
       
       // 设置全局token
       api.defaults.headers.common['Authorization'] = `Bearer ${normalizedToken}`;
       
       message.success('登录成功');              
-      
       navigate('/dashboard');
-    } catch (error) {      
-      console.error('完整错误详情:', {
-        error: error.message,
-        response: error.response,
-        config: error.config
-      });
-     
-    // 修复后的错误处理逻辑
-    if (error.response) {
-      console.log('error.response.status:', error.response.status);
-      if (error.response.status === 401) {
-        setLoginError(true);
-        message.error('用户名或密码错误', 3);
-      } else {
-        message.error(error.response.data?.message || '网络请求异常', 3);
-      }
-    } else {
-      message.error(error.response?.data?.message || error.message || '网络请求异常', 3);
-    }
+    } catch (error) {
+      console.error('登录错误:', error);
+      setLoginError(true);
+      message.error(error.message || '登录失败');
     } finally {
       setLoading(false);
     }

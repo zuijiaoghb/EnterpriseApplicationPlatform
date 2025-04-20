@@ -22,7 +22,7 @@ private static final Logger logger = LoggerFactory.getLogger(EquipmentController
     @Autowired
     private EquipmentService equipmentService;
     
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SBGL', 'ROLE_USER')")
     @GetMapping
     public ResponseEntity<List<Equipment>> getAllEquipments() {
         org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
@@ -35,14 +35,14 @@ private static final Logger logger = LoggerFactory.getLogger(EquipmentController
         return ResponseEntity.ok(equipmentService.getEquipmentById(id));
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN', 'ROLE_BGL')")
     @PostMapping
     public ResponseEntity<Equipment> createEquipment(@RequestBody Equipment equipment) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(equipmentService.createEquipment(equipment));
     }
  
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN','ROLE_SBGL')")
     @PutMapping("/{id}")
     public ResponseEntity<Equipment> updateEquipment(
             @PathVariable String id, 
@@ -50,27 +50,27 @@ private static final Logger logger = LoggerFactory.getLogger(EquipmentController
         return ResponseEntity.ok(equipmentService.updateEquipment(id, equipment));
     }
  
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN','ROLE_SBGL')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEquipment(@PathVariable String id) {
         equipmentService.deleteEquipment(id);
         return ResponseEntity.noContent().build();
     }
  
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_SBGL', 'ROLE_USER')")
     @GetMapping("/status/{status}")
     public ResponseEntity<List<Equipment>> getByStatus(@PathVariable String status) {
         List<Equipment> equipments = equipmentService.getEquipmentsByStatus(status);
         return ResponseEntity.ok(equipments);
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SBGL', 'ROLE_USER')")
     @GetMapping("/last-maintenance")
     public ResponseEntity<List<Equipment>> getEquipmentsNeedMaintenance() {
         return ResponseEntity.ok(equipmentService.getEquipmentsNeedMaintenance());
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SBGL', 'ROLE_USER')")
     @GetMapping("/statuses")
     public ResponseEntity<EquipmentStatus[]> getAllStatuses() {
         return ResponseEntity.ok(EquipmentStatus.values());
