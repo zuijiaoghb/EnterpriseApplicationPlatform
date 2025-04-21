@@ -42,6 +42,10 @@ import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.proc.SecurityContext;
 import javax.crypto.spec.SecretKeySpec; // 导入缺失的类
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
 
 @Configuration
 @EnableWebSecurity
@@ -140,27 +144,46 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {  // 移除secretKey参数
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/auth/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/oauth2/token").permitAll() // 允许令牌端点匿名访问
                 .requestMatchers("/api/equipments/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SBGL")
-                .requestMatchers("/api/users/**").permitAll()
-                .requestMatchers("/api/roles/**").permitAll()
-                .requestMatchers("/api/permissions/**").permitAll()
+                .requestMatchers("/api/users/**").hasAnyAuthority("ROLE_ADMIN","ROLE_CLIENT")
+                .requestMatchers("/api/roles/**").hasAnyAuthority("ROLE_ADMIN")
+                .requestMatchers("/api/permissions/**").hasAnyAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwt -> jwt
                     .decoder(jwtDecoder())
-                    .jwtAuthenticationConverter(jwtAuthenticationConverter()) // 在这里配置转换器
+                    .jwtAuthenticationConverter(jwtAuthenticationConverter())
                 )
+            )
+            // 添加OAuth2客户端配置
+            .oauth2Client(oauth2 -> oauth2
+                .clientRegistrationRepository(clientRegistrationRepository())
             );
-        
+            
         return http.build();
+    }
+
+    // 添加客户端注册配置
+    @Bean
+    public ClientRegistrationRepository clientRegistrationRepository() {
+        return new InMemoryClientRegistrationRepository(
+            ClientRegistration.withRegistrationId("client")
+                .clientId("client-id")
+                .clientSecret("client-secret")
+                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                .tokenUri("http://192.168.21.175:8081/auth/oauth2/token")
+                .scope("api.read", "api.write")
+                .build()
+        );
     }
 }
 

@@ -5,9 +5,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.enterprise.platform.user.dto.LoginRequest;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -74,7 +77,7 @@ public class AuthController {
             JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                     .issuer("enterprise-platform")
                     .issuedAt(Instant.now())
-                    .expiresAt(Instant.now().plus(24, ChronoUnit.HOURS))
+                    .expiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
                     .subject(authentication.getName())
                     .claim("roles", authentication.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
@@ -144,4 +147,52 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("hasAdminRole", hasAdminRole));
     }
 
+    @PostMapping("/oauth2/token")
+    public ResponseEntity<Map<String, Object>> getTokenByClientCredentials(
+        @RequestParam("grant_type") String grantType,
+        @RequestParam("client_id") String clientId,
+        @RequestParam("client_secret") String clientSecret) {
+        
+        try {
+            // 验证客户端凭证
+            if (!"client-id".equals(clientId) || !"client-secret".equals(clientSecret)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "invalid_client"));
+            }
+    
+            // 设置令牌过期时间为30分钟
+            Instant now = Instant.now();
+            Instant expiresAt = now.plus(30, ChronoUnit.MINUTES);
+
+            // 构建JWT时明确指定密钥
+            // 添加JWS Header配置
+            JwsHeader jwsHeaders = JwsHeader.with(() -> "HS256")
+                    .type("JWT")
+                    .keyId("HS256-KEY")
+                    .build();  
+            
+            JwtClaimsSet claimsSet = JwtClaimsSet.builder()
+                .issuer("enterprise-platform")
+                .issuedAt(now)
+                .expiresAt(expiresAt)
+                .subject(clientId)
+                .claim("roles", Collections.singletonList("ROLE_CLIENT"))
+                .build();
+                    
+            // 使用带Header的JwtEncoderParameters
+            Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeaders, claimsSet));
+            
+            return ResponseEntity.ok()
+                .body(Map.of(
+                    "access_token", jwt.getTokenValue(),
+                    "token_type", "Bearer",
+                    "expires_in", Duration.between(now, expiresAt).getSeconds(),
+                    "scope", "api.read api.write"
+                ));
+        } catch (Exception e) {
+            logger.error("Client credentials token generation failed", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "server_error"));
+        }
+    }
 }

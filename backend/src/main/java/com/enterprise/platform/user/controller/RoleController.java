@@ -4,7 +4,6 @@ import com.enterprise.platform.user.model.Permission;
 import com.enterprise.platform.user.model.Role;
 import com.enterprise.platform.user.service.RoleService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
