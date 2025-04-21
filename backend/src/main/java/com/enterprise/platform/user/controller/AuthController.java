@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,11 +36,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.JwtEncodingException;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 
 @CrossOrigin(origins = "http://192.168.21.175:3000", allowCredentials = "true")
 @RestController
@@ -52,6 +55,10 @@ public class AuthController {
     
     @Autowired
     private JwtEncoder jwtEncoder;
+
+    @Autowired
+    private ClientRegistrationRepository clientRegistrationRepository;
+
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest) {
@@ -153,14 +160,14 @@ public class AuthController {
         @RequestParam("client_id") String clientId,
         @RequestParam("client_secret") String clientSecret) {
         
-        try {
-            // 验证客户端凭证
-            if (!"client-id".equals(clientId) || !"client-secret".equals(clientSecret)) {
+        try {            
+            ClientRegistration client = clientRegistrationRepository.findByRegistrationId(clientId);
+            if (client == null || !client.getClientSecret().equals(clientSecret)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "invalid_client"));
             }
     
-            // 设置令牌过期时间为30分钟
+            // 设置令牌过期时间
             Instant now = Instant.now();
             Instant expiresAt = now.plus(30, ChronoUnit.MINUTES);
 
@@ -177,6 +184,7 @@ public class AuthController {
                 .expiresAt(expiresAt)
                 .subject(clientId)
                 .claim("roles", Collections.singletonList("ROLE_CLIENT"))
+                .claim("scopes", client.getScopes()) // 添加scope声明
                 .build();
                     
             // 使用带Header的JwtEncoderParameters
@@ -187,8 +195,11 @@ public class AuthController {
                     "access_token", jwt.getTokenValue(),
                     "token_type", "Bearer",
                     "expires_in", Duration.between(now, expiresAt).getSeconds(),
-                    "scope", "api.read api.write"
+                    "scope", String.join(" ", client.getScopes())
                 ));
+        } catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", "invalid_client"));
         } catch (Exception e) {
             logger.error("Client credentials token generation failed", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

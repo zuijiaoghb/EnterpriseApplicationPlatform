@@ -1,5 +1,6 @@
 package com.enterprise.platform.system.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration;
@@ -35,6 +36,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
+import com.enterprise.platform.system.repository.JdbcClientRegistrationRepository;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -43,9 +45,6 @@ import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.proc.SecurityContext;
 import javax.crypto.spec.SecretKeySpec; // 导入缺失的类
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
 
 @Configuration
 @EnableWebSecurity
@@ -56,6 +55,9 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 })
 public class SecurityConfig {
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
+    @Autowired
+    JdbcClientRegistrationRepository repository;
 
     @Value("${jwt.secret}")
     private String jwtSecret;  // 将JWT密钥配置移动到类字段
@@ -166,24 +168,16 @@ public class SecurityConfig {
             )
             // 添加OAuth2客户端配置
             .oauth2Client(oauth2 -> oauth2
-                .clientRegistrationRepository(clientRegistrationRepository())
+                .clientRegistrationRepository(clientRegistrationRepository(repository))
             );
             
         return http.build();
     }
 
-    // 添加客户端注册配置
+    // 替换原有的InMemoryClientRegistrationRepository
     @Bean
-    public ClientRegistrationRepository clientRegistrationRepository() {
-        return new InMemoryClientRegistrationRepository(
-            ClientRegistration.withRegistrationId("client")
-                .clientId("client-id")
-                .clientSecret("client-secret")
-                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .tokenUri("http://192.168.21.175:8081/auth/oauth2/token")
-                .scope("api.read", "api.write")
-                .build()
-        );
+    public ClientRegistrationRepository clientRegistrationRepository(JdbcClientRegistrationRepository repository) {
+        return repository;
     }
 }
 

@@ -9,6 +9,7 @@ import {
 import UserManagement from './UserManagement';
 import RoleManagement from './RoleManagement';
 import PermissionManagement from './PermissionManagement';
+import ClientManagement from './ClientManagement'; // 导入新的组件
 import api from '../../api';
 import './SystemSettings.css'; // 新增样式文件
 
@@ -81,6 +82,17 @@ const SystemSettings = () => {
           key="3"
         >
           <PermissionManagement />
+        </TabPane>
+        <TabPane 
+          tab={
+            <span>
+              <LockOutlined />
+              客户端管理
+            </span>
+          } 
+          key="4"
+        >
+          <ClientManagement />
         </TabPane>
       </Tabs>
     </Card>

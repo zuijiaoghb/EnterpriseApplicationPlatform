@@ -25,16 +25,20 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(unique = true, nullable = false)
+    @Column(name = "username", unique = true, nullable = false, length = 50)
     private String username;
     
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false, length = 100)
     @NotBlank(message = "密码不能为空")
     private String password;
     
+    @Column(name = "salt", length = 20)
     private String salt;
-    @Column(columnDefinition = "TINYINT")
-    private Integer status;
+    
+    @Column(name = "status", columnDefinition = "TINYINT")
+    private Integer status = 1;
+    
+    @Column(name = "create_time", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createTime;
     
     @ManyToMany(fetch = FetchType.EAGER)
