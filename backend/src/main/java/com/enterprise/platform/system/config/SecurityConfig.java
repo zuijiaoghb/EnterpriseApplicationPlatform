@@ -157,7 +157,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/equipments/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SBGL")
                 .requestMatchers("/api/users/**").hasAnyAuthority("ROLE_ADMIN","ROLE_CLIENT")
                 .requestMatchers("/api/roles/**").hasAnyAuthority("ROLE_ADMIN")
-                .requestMatchers("/api/permissions/**").hasAnyAuthority("ROLE_ADMIN")
+                .requestMatchers("/api/permissions/**").hasAnyAuthority("ROLE_ADMIN")               
+                .requestMatchers("/api/clients/**").hasAnyAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2

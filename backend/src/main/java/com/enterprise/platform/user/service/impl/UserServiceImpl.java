@@ -48,6 +48,11 @@ public class UserServiceImpl implements UserService {
             user.setStatus(1); // 1表示启用状态
         }
         
+        // 设置创建时间为当前系统时间
+        // 修改为使用系统默认时区的当前时间
+        // 修改为使用ZonedDateTime获取北京时间
+        user.setCreateTime(java.time.ZonedDateTime.now(java.time.ZoneId.of("Asia/Shanghai")).toLocalDateTime());
+        
         // 保存用户基本信息
         User savedUser = userRepository.save(user);
         

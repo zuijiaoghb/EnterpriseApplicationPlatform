@@ -26,12 +26,26 @@ public class ClientController {
     
     @GetMapping
     public ResponseEntity<List<OAuth2Client>> listClients() {
-        return ResponseEntity.ok(clientService.listClients());
+        return ResponseEntity.ok(clientService.listActiveClients());
     }
     
     @DeleteMapping("/{clientId}")
     public ResponseEntity<Void> disableClient(@PathVariable String clientId) {
         clientService.disableClient(clientId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{clientId}")
+    public ResponseEntity<OAuth2Client> updateClient(
+            @PathVariable String clientId,
+            @RequestBody OAuth2Client client) {
+        client.setClientId(clientId);
+        return ResponseEntity.ok(clientService.updateClient(client));
+    }
+
+    @PutMapping("/{clientId}/reset-secret")
+    public ResponseEntity<OAuth2Client> resetClientSecret(
+            @PathVariable String clientId) {
+        return ResponseEntity.ok(clientService.resetClientSecret(clientId));
     }
 }
