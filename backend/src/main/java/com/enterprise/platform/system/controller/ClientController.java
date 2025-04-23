@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/clients")
@@ -62,5 +64,12 @@ public class ClientController {
         // 返回包含新生成的原始密钥的对象
         return ResponseEntity.ok(updated.setRawClientSecret(updated.getRawClientSecret()));
         //return ResponseEntity.ok(clientService.resetClientSecret(clientId));
+    }
+
+    @GetMapping("/check-id")
+    public ResponseEntity<Map<String, Boolean>> checkClientIdExists(
+            @RequestParam String clientId) {
+        boolean exists = clientService.clientIdExists(clientId);
+        return ResponseEntity.ok(Collections.singletonMap("exists", exists));
     }
 }

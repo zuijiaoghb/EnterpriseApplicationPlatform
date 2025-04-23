@@ -137,83 +137,7 @@ const ClientManagement = () => {
       console.error('启用客户端错误:', error);
     }
   };
-  
-  // columns中使用loading状态
-  const columns = [
-    {
-      title: '客户端ID',
-      dataIndex: 'clientId',
-      key: 'clientId',
-    },
-    {
-      title: '客户端名称',
-      dataIndex: 'clientName',
-      key: 'clientName',
-    },
-    {
-      title: '客户端密钥',
-      dataIndex: 'clientSecret',
-      key: 'clientSecret',
-      render: (secret) => (
-        <Input.Password 
-          value={secret} 
-          visibilityToggle={{ visible: false }} // 默认不显示明文
-          readOnly
-          style={{ border: 'none', background: 'transparent' }}
-          iconRender={(visible) => (
-            <Button 
-              type="text" 
-              icon={visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
-              onClick={(e) => e.stopPropagation()}
-            />
-          )}
-        />
-      )
-    },
-    {
-      title: '权限范围',
-      dataIndex: 'scopes',
-      key: 'scopes',
-    },
-    {
-      title: '状态',
-      dataIndex: 'active',
-      key: 'active',
-      render: (active) => (
-        <Tag color={active ? 'green' : 'red'}>
-          {active ? '启用' : '禁用'}
-        </Tag>
-      )
-    },
-    {
-      title: '操作',
-      key: 'action',
-      render: (_, record) => (
-        <Space>
-          <Button onClick={() => handleEdit(record)}>编辑</Button>
-          {record.active ? (
-            <Button 
-              danger 
-              onClick={() => handleDisable(record.clientId)}
-              loading={loading}
-            >
-              禁用
-            </Button>
-          ) : (
-            <Button 
-              type="primary"
-              onClick={() => handleEnable(record.clientId)}
-            >
-              启用
-            </Button>
-          )}
-          <Button onClick={() => handleResetSecret(record.clientId)}>
-            重置密钥
-          </Button>
-        </Space>
-      ),
-    },
-  ];
+    
 
   return (
     <Card 
@@ -223,7 +147,7 @@ const ClientManagement = () => {
           <Title level={4} style={{ margin: 0 }}>客户端管理</Title>
         </div>
       }
-      bordered={false}
+      variant={false}
       extra={
         <Button 
           type="primary" 
@@ -340,7 +264,26 @@ const ClientManagement = () => {
         key="create-client-modal" // 新增：添加唯一key
       >
         <Form form={form} key={currentClient ? `edit-${currentClient.id}` : 'create'}>
-          <Form.Item name="clientId" label="客户端ID" rules={[{ required: true }]}>
+          <Form.Item 
+            name="clientId" 
+            label="客户端ID" 
+            rules={[
+              { required: true, message: '请输入客户端ID' },
+              { 
+                validator: async (_, value) => {
+                  if (!value) return Promise.resolve();
+                  try {
+                    const response = await api.get(`/api/clients/check-id?clientId=${value}`);
+                    return response.data.exists 
+                      ? Promise.reject(new Error('客户端ID已存在'))
+                      : Promise.resolve();
+                  } catch (error) {
+                    return Promise.reject(new Error('校验失败'));
+                  }
+                }
+              }
+            ]}
+          >
             <Input />
           </Form.Item>
           <Form.Item name="clientName" label="客户端名称" rules={[{ required: true }]}>

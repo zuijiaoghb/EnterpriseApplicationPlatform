@@ -115,4 +115,8 @@ public class OAuth2ClientService {
         return repository.findById(clientId)
         .orElseThrow(() -> new ClientNotFoundException(clientId));
     }
+    
+    public boolean clientIdExists(String clientId) {
+        return repository.existsById(clientId);
+    }
 }
