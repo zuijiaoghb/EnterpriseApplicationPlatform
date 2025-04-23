@@ -4,6 +4,7 @@ import com.enterprise.platform.system.exception.ClientNotFoundException;
 import com.enterprise.platform.system.exception.DuplicateClientException;
 import com.enterprise.platform.system.model.OAuth2Client;
 import com.enterprise.platform.system.repository.OAuth2ClientRepository;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,10 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @Transactional(readOnly = true)
 public class OAuth2ClientService {
+    private static final Logger logger = LoggerFactory.getLogger(OAuth2ClientService.class);
     
     private final OAuth2ClientRepository repository;
     private final PasswordEncoder passwordEncoder;
@@ -33,10 +37,16 @@ public class OAuth2ClientService {
             throw new DuplicateClientException("客户端ID已存在");
         }
         
-        client.setClientSecret(passwordEncoder.encode(client.getClientSecret()));
+        // 自动生成随机密钥
+        String rawSecret = generateRandomSecret();
+        client.setClientSecret(passwordEncoder.encode(rawSecret));
         client.setCreatedAt(LocalDateTime.now());
         client.setActive(true);
-        return repository.save(client);
+        
+        OAuth2Client saved = repository.save(client);
+        logger.info("Client created: {}", saved.getClientId());
+        // 返回包含原始密钥的对象
+        return saved.setRawClientSecret(rawSecret);
     }
 
     public List<OAuth2Client> listActiveClients() {
@@ -78,13 +88,31 @@ public class OAuth2ClientService {
         client.setUpdatedAt(LocalDateTime.now());
         
         OAuth2Client saved = repository.save(client);
-        saved.setClientSecret(newSecret); // 返回明文密钥供一次性显示
-        
-        return saved;
+        // 返回包含原始密钥的对象
+        return saved.setRawClientSecret(newSecret);
     }
 
     private String generateRandomSecret() {
         // 实现随机密钥生成逻辑
         return UUID.randomUUID().toString().replace("-", "");
+    }
+
+    public List<OAuth2Client> listAllClients() {
+        return repository.findAllClients();
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public OAuth2Client enableClient(String clientId) {
+        OAuth2Client client = repository.findById(clientId)
+            .orElseThrow(() -> new ClientNotFoundException(clientId));
+        
+        client.setActive(true);
+        return repository.save(client);
+    }
+    
+    public OAuth2Client getClientById(String clientId) {
+        return repository.findById(clientId)
+        .orElseThrow(() -> new ClientNotFoundException(clientId));
     }
 }

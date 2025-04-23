@@ -34,4 +34,16 @@ public class OAuth2Client {
     @Column(name = "updated_at", 
            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
+    
+    @Transient  // 表示这个字段不会被持久化到数据库
+    private String rawClientSecret;
+    
+    public OAuth2Client setRawClientSecret(String rawClientSecret) {
+        this.rawClientSecret = rawClientSecret;
+        return this;
+    }
+    
+    public String getRawClientSecret() {
+        return this.rawClientSecret;
+    }
 }

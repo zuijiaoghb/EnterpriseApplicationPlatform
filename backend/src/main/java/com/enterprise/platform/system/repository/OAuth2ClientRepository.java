@@ -13,6 +13,10 @@ public interface OAuth2ClientRepository extends JpaRepository<OAuth2Client, Stri
     
     List<OAuth2Client> findByActiveTrue();
     
+    // 添加查询所有客户端的方法
+    @Query("SELECT c FROM OAuth2Client c")
+    List<OAuth2Client> findAllClients();
+    
     @Modifying
     @Query("UPDATE OAuth2Client c SET c.active = :active WHERE c.clientId = :clientId")
     int updateActiveStatus(@Param("clientId") String clientId, @Param("active") boolean active);

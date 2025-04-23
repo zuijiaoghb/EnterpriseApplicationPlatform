@@ -2,6 +2,8 @@ package com.enterprise.platform.user.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.enterprise.platform.system.model.OAuth2Client;
+import com.enterprise.platform.system.service.OAuth2ClientService;
 import com.enterprise.platform.user.dto.LoginRequest;
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +28,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails; // 确保导入了正确的UserDetails类
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -58,7 +61,12 @@ public class AuthController {
 
     @Autowired
     private ClientRegistrationRepository clientRegistrationRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private OAuth2ClientService oAuth2ClientService;
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest) {
@@ -162,7 +170,14 @@ public class AuthController {
         
         try {            
             ClientRegistration client = clientRegistrationRepository.findByRegistrationId(clientId);
-            if (client == null || !client.getClientSecret().equals(clientSecret)) {
+            if (client == null || !passwordEncoder.matches(clientSecret, client.getClientSecret())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "invalid_client"));
+            }
+            
+            // 新增：从数据库查询客户端状态
+            OAuth2Client oauth2Client = oAuth2ClientService.getClientById(clientId);
+            if (oauth2Client == null || !oauth2Client.getActive()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "invalid_client"));
             }
