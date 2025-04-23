@@ -29,6 +29,7 @@ const ClientManagement = () => {
       setNewSecret(response.data.rawClientSecret);
       setSuccessModalVisible(true);
       setVisible(false);
+      form.resetFields(); // 新增：重置表单字段
       fetchClients();
     } catch (error) {
       message.error('创建失败');
@@ -36,6 +37,7 @@ const ClientManagement = () => {
   };
 
   const handleEdit = (client) => {
+    form.resetFields(); // 新增：先重置表单
     setCurrentClient(client);
     form.setFieldsValue(client);
     setEditModalVisible(true);
@@ -47,6 +49,8 @@ const ClientManagement = () => {
       await api.put(`/api/clients/${currentClient.clientId}`, values);
       message.success('客户端更新成功');
       setEditModalVisible(false);
+      form.resetFields(); // 新增：重置表单字段
+      setCurrentClient(null); // 新增：清空当前客户端数据
       fetchClients();
     } catch (error) {
       message.error('更新失败');
@@ -211,9 +215,10 @@ const ClientManagement = () => {
         title="创建新客户端"
         open={visible}
         onOk={handleCreate}
-        onCancel={() => setVisible(false)}
+        onCancel={() => {setVisible(false);form.resetFields();}}
+        key="create-client-modal" // 新增：添加唯一key
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} key={currentClient ? `edit-${currentClient.id}` : 'create'}>
           <Form.Item name="clientId" label="客户端ID" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
@@ -245,7 +250,8 @@ const ClientManagement = () => {
         title="编辑客户端"
         open={editModalVisible}
         onOk={handleUpdate}
-        onCancel={() => setEditModalVisible(false)}
+        onCancel={() => {setEditModalVisible(false);form.resetFields();}}
+        key={`edit-client-${currentClient?.clientId || ''}`} // 新增：动态key
       >
         <Form form={form} layout="vertical">
           <Form.Item name="clientName" label="客户端名称" rules={[{ required: true }]}>
