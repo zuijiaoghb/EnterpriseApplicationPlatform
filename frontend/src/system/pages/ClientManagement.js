@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, message, Space, Tag } from 'antd';
+import { 
+  Table, Button, Modal, Form, Input, 
+  message, Space, Tag, Card, Typography 
+} from 'antd';
 import api from '../../api';
-import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import { 
+  EyeOutlined, EyeInvisibleOutlined,
+  PlusOutlined, EditOutlined, 
+  DeleteOutlined, SafetyOutlined,
+  LockOutlined, CheckCircleOutlined,
+  CloseCircleOutlined
+} from '@ant-design/icons';
+
+const { Title } = Typography;
 
 const ClientManagement = () => {
   const [clients, setClients] = useState([]);
@@ -205,14 +216,124 @@ const ClientManagement = () => {
   ];
 
   return (
-    <div>
-      <Button type="primary" onClick={() => setVisible(true)} style={{ marginBottom: 16 }}>
-        创建客户端
-      </Button>
-      <Table dataSource={clients} columns={columns} rowKey="clientId" />
+    <Card 
+      title={
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <SafetyOutlined style={{ fontSize: 24, marginRight: 12 }} />
+          <Title level={4} style={{ margin: 0 }}>客户端管理</Title>
+        </div>
+      }
+      bordered={false}
+      extra={
+        <Button 
+          type="primary" 
+          icon={<PlusOutlined />}
+          onClick={() => setVisible(true)}
+        >
+          创建客户端
+        </Button>
+      }
+    >
+      <Table
+        dataSource={clients}
+        columns={[
+          {
+            title: <span><LockOutlined /> 客户端ID</span>,
+            dataIndex: 'clientId',
+            key: 'clientId',
+            render: text => <Tag color="blue">{text}</Tag>
+          },
+          {
+            title: '客户端名称',
+            dataIndex: 'clientName',
+            key: 'clientName',
+            render: text => <Tag color="geekblue">{text}</Tag>
+          },
+          {
+            title: '客户端密钥',
+            dataIndex: 'clientSecret',
+            key: 'clientSecret',
+            render: (secret) => (
+              <Input.Password 
+                value={secret} 
+                visibilityToggle={{ visible: false }}
+                readOnly
+                style={{ border: 'none', background: 'transparent' }}
+                iconRender={(visible) => (
+                  <Button 
+                    type="text" 
+                    icon={visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                )}
+              />
+            )
+          },
+          {
+            title: '权限范围',
+            dataIndex: 'scopes',
+            key: 'scopes',
+          },
+          {
+            title: '状态',
+            dataIndex: 'active',
+            key: 'active',
+            render: (active) => (
+              <Tag 
+                color={active ? 'green' : 'red'}
+                icon={active ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
+              >
+                {active ? '启用' : '禁用'}
+              </Tag>
+            )
+          },
+          {
+            title: '操作',
+            key: 'action',
+            render: (_, record) => (
+              <Space>
+                <Button 
+                  icon={<EditOutlined />}
+                  onClick={() => handleEdit(record)}
+                >
+                  编辑
+                </Button>
+                {record.active ? (
+                  <Button 
+                    danger 
+                    icon={<DeleteOutlined />}
+                    onClick={() => handleDisable(record.clientId)}
+                    loading={loading}
+                  >
+                    禁用
+                  </Button>
+                ) : (
+                  <Button 
+                    type="primary"
+                    onClick={() => handleEnable(record.clientId)}
+                  >
+                    启用
+                  </Button>
+                )}
+                <Button onClick={() => handleResetSecret(record.clientId)}>
+                  重置密钥
+                </Button>
+              </Space>
+            ),
+          },
+        ]}
+        rowKey="clientId"
+        bordered
+      />
 
+      {/* 模态框部分保持原有功能，仅优化样式 */}
       <Modal
-        title="创建新客户端"
+        title={
+          <span>
+            {currentClient ? <EditOutlined /> : <PlusOutlined />}
+            {currentClient ? '编辑客户端' : '创建客户端'}
+          </span>
+        }
         open={visible}
         onOk={handleCreate}
         onCancel={() => {setVisible(false);form.resetFields();}}
@@ -301,7 +422,8 @@ const ClientManagement = () => {
       <p>新密钥为: <b>{newSecret}</b></p>
       <p style={{color: 'red'}}>请妥善保存此密钥，离开此页面后将无法再次查看</p>
     </Modal>
-  </div>    
+    
+  </Card>    
   );
 };
 
