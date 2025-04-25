@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Table, Button, Modal, Form, Input, 
   message, Space, Tag, Card, Typography 
@@ -22,14 +22,14 @@ const ClientManagement = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [currentClient, setCurrentClient] = useState(null);
 
-  useEffect(() => {
-    fetchClients();
+  const fetchClients = useCallback(async () => {
+    const response = await api.get('/api/clients/all');
+    setClients(response.data);
   }, []);
 
-  const fetchClients = async () => {
-    const response = await api.get('/api/clients/all'); // 修改为获取所有客户端
-    setClients(response.data);
-  };
+  useEffect(() => {
+    fetchClients();
+  }, [fetchClients]);
 
   const handleCreate = async () => {
     try {

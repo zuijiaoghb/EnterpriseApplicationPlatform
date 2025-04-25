@@ -76,13 +76,14 @@ public class SecurityConfig {
     // 新增CORS配置Bean（必须）
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        logger.info("创建CORS配置，允许来源: http://192.168.21.175:3000");
+        logger.info("创建CORS配置，允许来源: http://localhost:3001");
 
         CorsConfiguration config = new CorsConfiguration();
         // 使用具体的前端地址
-        config.setAllowedOriginPatterns(Arrays.asList(
-            "http://192.168.21.175:3000",
-            "http://localhost:3000"
+        config.setAllowedOriginPatterns(Arrays.asList(            
+            "http://188.188.1.25:3001",
+            "http://192.168.21.175:3001",
+            "http://localhost:3001"
         ));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("*"));
