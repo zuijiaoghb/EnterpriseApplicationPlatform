@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8081',
+  baseURL: 'http://192.168.21.175:8081',
   timeout: 10000,
   withCredentials: true, // 必须与后端setAllowCredentials(true)对应
   headers: {
