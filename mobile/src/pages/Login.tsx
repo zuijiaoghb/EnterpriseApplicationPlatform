@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LoginScreenNavigationProp } from '../navigation/types';
 import api from '../api';
 import Icon from 'react-native-vector-icons/AntDesign';
+import axios from 'axios';
 // 提取公共的 name 和 size 值，避免多次指定
 const DEFAULT_ICON_NAME = "user";
 const DEFAULT_ICON_SIZE = 20;
@@ -15,15 +17,22 @@ const LockOutlined = (props: React.ComponentProps<typeof Icon>) => <Icon {...pro
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
-  const [loginError, setLoginError] = useState(false);
+  const [loginError, setLoginError] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   
-  const navigation = useNavigation<LoginScreenNavigationProp>();
+  type RootStackParamList = {
+  Login: undefined;
+  Dashboard: undefined;
+};
+
+type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+
+const navigation = useNavigation<LoginScreenNavigationProp>();
 
   const handleLogin = async () => {
     setLoading(true);
-    setLoginError(false);
+    setLoginError('');
     try {
       const response = await api.post('/auth/login', {
         username,
@@ -46,9 +55,14 @@ const Login = () => {
       // 这里需要根据移动端存储方案调整
       
       navigation.navigate('Dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error('登录错误:', error);
-      setLoginError(true);
+      setLoginError('登录失败，请检查用户名和密码是否正确');
+      if (error.response?.data?.message) {
+        setLoginError(error.response.data.message);
+      } else {
+        setLoginError('用户名或密码错误');
+      }
     } finally {
       setLoading(false);
     }
