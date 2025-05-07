@@ -16,9 +16,13 @@ const SystemSettings = () => {
     checkUserRole();
   }, []);
 
-  const checkUserRole = async () => {
+  interface CheckRoleResponse {
+  hasAdminRole: boolean;
+}
+
+const checkUserRole = async () => {
     try {
-      const { data } = await api.get('/auth/check-role');
+      const { data } = await api.get<CheckRoleResponse>('/auth/check-role');
       setHasAdminRole(data.hasAdminRole);
     } catch (error) {
       // 使用Toast或其他React Native提示组件
@@ -36,10 +40,10 @@ const SystemSettings = () => {
 
   return (
     <Tab.Navigator
-      tabBarOptions={{
-        scrollEnabled: true,
-        tabStyle: { width: 120 },
-        labelStyle: { fontSize: 12 },
+      screenOptions={{
+        tabBarScrollEnabled: true,
+        tabBarItemStyle: { width: 120 },
+        tabBarLabelStyle: { fontSize: 12 },
       }}
     >
       <Tab.Screen name="用户管理" component={UserManagement} />

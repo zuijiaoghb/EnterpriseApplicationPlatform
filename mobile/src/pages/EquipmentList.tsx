@@ -3,10 +3,19 @@ import { View, Text, Button, StyleSheet, FlatList, TouchableOpacity } from 'reac
 import api from '../api';
 import EquipmentForm from './EquipmentForm';
 
+interface Equipment {
+  id: number;
+  name: string;
+  model: string;
+  status: string;
+  qrCode: string;
+  lastMaintenance: string;
+}
+
 const EquipmentList = () => {
-  const [equipments, setEquipments] = useState([]);
+  const [equipments, setEquipments] = useState<Equipment[]>([]);
   const [visible, setVisible] = useState(false);
-  const [current, setCurrent] = useState(null);
+  const [current, setCurrent] = useState<Equipment | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -20,7 +29,7 @@ const EquipmentList = () => {
   const fetchEquipments = async () => {
     try {
       console.log('正在请求设备数据...');
-      const { data } = await api.get('/api/equipments');
+      const { data } = await api.get<Equipment[]>('/api/equipments');
       console.log('获取到的数据:', data);
       setEquipments(data);
     } catch (error) {
@@ -29,7 +38,7 @@ const EquipmentList = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: number) => {
     try {
       await api.delete(`/api/equipments/${id}`);
       // 使用Toast或其他React Native提示组件
@@ -39,7 +48,7 @@ const EquipmentList = () => {
     }
   };
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item }: { item: Equipment }) => (
     <View style={styles.itemContainer}>
       <Text>ID: {item.id}</Text>
       <Text>名称: {item.name}</Text>
