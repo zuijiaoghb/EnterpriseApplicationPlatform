@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LoginScreenNavigationProp } from '../navigation/types';
@@ -15,6 +16,11 @@ const LOCK_ICON_NAME = "lock";
 const LOCK_ICON_SIZE = 20;
 const LockOutlined = (props: React.ComponentProps<typeof Icon>) => <Icon {...props} name={LOCK_ICON_NAME} size={LOCK_ICON_SIZE} />;
 
+interface LoginResponse {
+  username: string;
+  roles?: string[];
+}
+
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
@@ -22,19 +28,20 @@ const Login = () => {
   const [password, setPassword] = useState('');
   
   type RootStackParamList = {
-  Login: undefined;
-  Dashboard: undefined;
-};
+    Login: undefined;
+    Dashboard: undefined;
+    Main: undefined;
+  };
 
-type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+  type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
-const navigation = useNavigation<LoginScreenNavigationProp>();
+  const navigation = useNavigation<LoginScreenNavigationProp>();
 
   const handleLogin = async () => {
     setLoading(true);
     setLoginError('');
     try {
-      const response = await api.post('/auth/login', {
+      const response = await api.post<LoginResponse>('/auth/login', {
         username,
         password
       }, {
@@ -52,9 +59,16 @@ const navigation = useNavigation<LoginScreenNavigationProp>();
       const normalizedToken = token.replace(/^Bearer\s+/i, '');
       
       // 存储token和用户信息
-      // 这里需要根据移动端存储方案调整
+      await AsyncStorage.setItem('token', normalizedToken);
+      await AsyncStorage.setItem('user', JSON.stringify({
+        username: response.data?.username,
+        roles: response.data?.roles
+      }));
       
-      navigation.navigate('Dashboard');
+      // 设置API默认请求头
+      api.defaults.headers.common['Authorization'] = `Bearer ${normalizedToken}`;
+      
+      navigation.navigate('Main');
     } catch (error: any) {
       console.error('登录错误:', error);
       setLoginError('登录失败，请检查用户名和密码是否正确');

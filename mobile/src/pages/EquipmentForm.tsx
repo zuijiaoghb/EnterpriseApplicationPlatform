@@ -118,9 +118,8 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ visible, onClose, onSucce
         {showDatePicker && (
           <DateTimePicker
             value={lastMaintenance}
-            mode="date"
-            display="default"
             onChange={onChangeDate}
+            mode="date"
           />
         )}
         
