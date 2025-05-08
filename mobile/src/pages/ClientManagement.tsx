@@ -69,7 +69,7 @@ const ClientManagement = () => {
       <Card style={styles.card}>
         <Card.Title 
           title="客户端管理" 
-          left={(props) => <Icon name="safety"  {...props} />}
+          left={(props) => <Icon name="idcard"  {...props} />}
         />
         <Card.Content>
           <Button 

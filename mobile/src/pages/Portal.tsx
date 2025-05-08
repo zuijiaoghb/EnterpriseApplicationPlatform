@@ -1,16 +1,38 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import api from '../api';
+
+interface User {
+  username: string;
+  roles?: string[];
+}
 
 const Portal = () => {
   const navigation = useNavigation();
   
-  const menuItems = [
+  const baseItems = [
     { key: 'Dashboard', label: '仪表盘', icon: 'home' },
     { key: 'EquipmentList', label: '设备管理', icon: 'list' },
-    { key: 'SystemSettings', label: '系统管理', icon: 'settings' },
   ];
+  
+  const [menuItems, setMenuItems] = useState(baseItems);
+  
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await api.get<User>('/auth/info');
+        if (response.data.roles?.some((role: string) => role === 'ADMIN' || role === 'ROLE_ADMIN')) {
+          setMenuItems([...baseItems, { key: 'SystemSettings', label: '系统管理', icon: 'settings' }]);
+        }
+      } catch (error) {
+        console.error('获取用户信息失败', error);
+      }
+    };
+    
+    fetchUserInfo();
+  }, []);
 
   return (
     <View style={styles.container}>

@@ -35,11 +35,11 @@ const App = () => {
         >
           {() => (
             <MainLayout>
-              <Stack.Navigator>
-                <Stack.Screen name="Portal" component={Portal} />
-                <Stack.Screen name="Dashboard" component={Dashboard} />
-                <Stack.Screen name="EquipmentList" component={EquipmentList} />
-                <Stack.Screen name="SystemSettings" component={SystemSettings} />
+              <Stack.Navigator initialRouteName="Portal">
+                <Stack.Screen name="Portal" component={Portal} options={{ title: '工作门户' }} />
+                <Stack.Screen name="Dashboard" component={Dashboard} options={{ title: '仪表盘' }} />
+                <Stack.Screen name="EquipmentList" component={EquipmentList} options={{ title: '设备管理' }}/>
+                <Stack.Screen name="SystemSettings" component={SystemSettings} options={{ title: '系统管理' }} />
               </Stack.Navigator>
             </MainLayout>
           )}

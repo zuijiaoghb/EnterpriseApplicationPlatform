@@ -61,7 +61,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
       <View style={styles.bottomTab}>
         <TouchableOpacity 
           style={styles.portalButton}
-          onPress={() => navigation.navigate('Dashboard' as never)}
+          onPress={() => navigation.navigate('Portal' as never)}
         >
           <Ionicons name="apps" size={28} color="white" />
           <Text style={styles.portalText}>工作门户</Text>
