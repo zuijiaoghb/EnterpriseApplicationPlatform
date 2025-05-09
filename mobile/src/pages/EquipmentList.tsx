@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import api from '../api';
 import EquipmentForm from './EquipmentForm';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Equipment {
   id: number;
@@ -18,12 +19,15 @@ const EquipmentList = () => {
   const [current, setCurrent] = useState<Equipment | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      // 改为使用React Navigation的导航
-      return;
-    }
-    fetchEquipments();
+    const checkToken = async () => {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        // 改为使用React Navigation的导航
+        return;
+      }
+      fetchEquipments();
+    };
+    checkToken();
   }, []);
 
   const fetchEquipments = async () => {
