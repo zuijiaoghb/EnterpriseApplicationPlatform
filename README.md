@@ -16,3 +16,5 @@ npm start
 Expo Go
 ## 打包
 npm run build
+## 构建发布apk
+.\gradlew.bat assembleRelease
