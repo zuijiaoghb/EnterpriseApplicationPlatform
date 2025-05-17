@@ -9,6 +9,7 @@
 # 构建输出
 **/build/
 **/dist/
+*.hprof
 
 # 环境变量文件
 .env*

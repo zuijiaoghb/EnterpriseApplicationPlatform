@@ -3,6 +3,12 @@ apply plugin: 'com.android.application'
 repositories {
     google()
     mavenCentral()
+    maven {
+        url("https://www.jitpack.io")
+    }
+    maven {
+        url("$rootDir/../node_modules/react-native/android")
+    }
 }
 
 android {
@@ -12,12 +18,15 @@ android {
     sourceSets {
         main {
             java.srcDirs = ['src/main/java']
+            manifest.srcFile 'src/main/AndroidManifest.xml'
+            res.srcDirs = ['src/main/res']
+            assets.srcDirs = ['src/main/assets']
         }
     }
     defaultConfig {
         applicationId "com.enterpriseapplicationplatform.mobile"
         namespace "com.enterpriseapplicationplatform.mobile"
-        minSdkVersion rootProject.ext.minSdkVersion
+        minSdkVersion 24
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
@@ -33,15 +42,41 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // 启用JS Bundle打包
+            bundle {
+                language {
+                    enableSplit = true
+                }
+                density {
+                    enableSplit = true
+                }
+                abi {
+                    enableSplit = true
+                }
+            }
+           
         }
         debug {
             signingConfig signingConfigs.release
+            // 启用JS Bundle打包
+            
         }    
     }
     dependencies {
         implementation 'androidx.appcompat:appcompat:1.6.1'
         implementation 'com.google.android.material:material:1.9.0'
+        // 使用最新稳定版React Native
+        implementation 'com.facebook.react:react-android:0.76.9'
+        implementation 'com.facebook.react:hermes-android:0.76.9'
+    }
+    
+    
+    android {
+        defaultConfig {
+            multiDexEnabled true
+        }
     }
 }
