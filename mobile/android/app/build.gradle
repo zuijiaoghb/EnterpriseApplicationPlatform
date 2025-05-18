@@ -57,12 +57,22 @@ android {
                     enableSplit = true
                 }
             }
+            // 确保release构建时生成JS Bundle
+            project.ext.react = [
+                bundleInRelease: true,
+                devDisabledInRelease: true,
+                hermesEnabled: true
+            ]
            
         }
         debug {
             signingConfig signingConfigs.release
             // 启用JS Bundle打包
-            
+            project.ext.react = [
+                bundleInRelease: true,
+                devDisabledInRelease: true,
+                hermesEnabled: true
+            ]
         }    
     }
     dependencies {

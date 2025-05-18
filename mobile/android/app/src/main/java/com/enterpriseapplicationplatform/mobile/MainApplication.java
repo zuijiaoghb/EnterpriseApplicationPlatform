@@ -55,7 +55,7 @@ public class MainApplication extends Application implements ReactApplication {
 
         @Override
         protected List<ReactPackage> getPackages() {
-            return Arrays.asList(
+            return Arrays.<ReactPackage>asList(
                 new MainReactPackage()
             );
         }

@@ -1,0 +1,11 @@
+--------- beginning of kernel
+05-18 11:15:31.199     0     0 I logd    : logdr: UID=2000 GID=2000 PID=12379 b tail=0 logMask=99 pid=0 start=0ns deadline=0ns
+--------- beginning of main
+05-18 11:15:58.972   751   980 D EGL_emulation: app_time_stats: avg=58949.22ms min=58949.22ms max=58949.22ms count=1
+05-18 11:16:00.005  1498  1853 I AiAiEcho: Predicting[0]: 
+05-18 11:16:00.005  1498  1853 I AiAiEcho: Ranked targets strategy: SORT, count: 0, ranking metadata: 
+05-18 11:16:00.006  1498  1853 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0
+05-18 11:16:00.006  1498  1853 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface home with targets# 0
+05-18 11:16:00.007  1498  1853 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface media_data_manager with targets# 0
+05-18 11:16:00.023   751   980 D EGL_emulation: app_time_stats: avg=1050.26ms min=1050.26ms max=1050.26ms count=1
+05-18 11:16:00.026   751   751 D SsMediaDataProvider: Forwarding Smartspace updates []

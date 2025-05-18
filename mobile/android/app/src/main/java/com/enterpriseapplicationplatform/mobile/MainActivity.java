@@ -50,9 +50,21 @@ public class MainActivity extends ReactActivity {
         }
         if (!reactInstanceManager.hasStartedCreatingInitialContext()) {
             reactInstanceManager.createReactContextInBackground();
-        } else if (reactInstanceManager.getCurrentReactContext() == null) {
+        } // 在onCreate方法中添加以下检查
+        if (reactInstanceManager.getCurrentReactContext() == null) {
+            Log.e("MainActivity", "ReactContext未初始化");
             reactInstanceManager.recreateReactContextInBackground();
         }
+        
+        // 添加ReactInstanceManager错误监听
+        reactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
+            @Override
+            public void onReactContextInitialized(ReactContext context) {
+                if (!context.hasActiveCatalystInstance()) {
+                    Log.e("MainActivity", "JS Bundle加载失败");
+                }
+            }
+        });
         
         // 使用最新的React Native初始化方式
         reactInstanceManager.addReactInstanceEventListener(
