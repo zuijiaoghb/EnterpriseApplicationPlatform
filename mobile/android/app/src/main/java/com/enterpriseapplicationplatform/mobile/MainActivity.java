@@ -9,6 +9,8 @@ import com.facebook.react.common.LifecycleState;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.ReactContext;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.io.File;
+import android.content.Intent;
 
 public class MainActivity extends ReactActivity {
     private UncaughtExceptionHandler defaultExceptionHandler;
@@ -16,6 +18,15 @@ public class MainActivity extends ReactActivity {
     @Override
     protected String getMainComponentName() {
         return "EnterpriseApplicationPlatform";
+    }
+    
+    private void showLogView() {
+        File logFile = new File(getExternalFilesDir(null), "crash_log.txt");
+        if (logFile.exists()) {
+            Intent intent = new Intent(this, LogViewActivity.class);
+            intent.putExtra("LOG_FILE_PATH", logFile.getAbsolutePath());
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -26,15 +37,54 @@ public class MainActivity extends ReactActivity {
             @Override
             public void uncaughtException(Thread thread, Throwable ex) {
                 Log.e("MainActivity", "未捕获异常: " + ex.getMessage(), ex);
+                String stackTrace = Log.getStackTraceString(ex);
+                ((MainApplication)getApplication()).writeToLogFile("未捕获异常: " + ex.getMessage() + "\n" + stackTrace);
                 defaultExceptionHandler.uncaughtException(thread, ex);
             }
         });
         
-        if (BuildConfig.DEBUG) {
-            Log.d("MainActivity", "初始化React Native环境");
-            Log.d("MainActivity", "当前线程: " + Thread.currentThread().getName());
+        try {
+            // 初始化Hermes引擎
+            try {
+                SoLoader.init(this, false);
+                if (!SoLoader.isInitialized()) {
+                    throw new RuntimeException("Hermes引擎初始化失败");
+                }
+                
+                if (BuildConfig.DEBUG) {
+                    Log.d("MainActivity", "初始化React Native环境");
+                    Log.d("MainActivity", "当前线程: " + Thread.currentThread().getName());
+                    Log.d("MainActivity", "Hermes引擎状态: " + (SoLoader.isInitialized() ? "已初始化" : "未初始化"));
+                }
+            } catch (Exception e) {
+                Log.e("MainActivity", "Hermes引擎初始化异常: " + e.getMessage(), e);
+                ((MainApplication)getApplication()).writeToLogFile("Hermes引擎初始化异常: " + e.getMessage() + "\n" + Log.getStackTraceString(e));
+                showLogView();
+                finish();
+                return;
+            }
+            
+            // 健壮的空值检查
+            try {
+                if (getReactNativeHost() == null || getReactNativeHost().getReactInstanceManager() == null) {
+                    throw new IllegalStateException("ReactInstanceManager未正确初始化");
+                }
+            } catch (Exception e) {
+                Log.e("MainActivity", "React Native初始化检查异常: " + e.getMessage(), e);
+                ((MainApplication)getApplication()).writeToLogFile("React Native初始化检查异常: " + e.getMessage() + "\n" + Log.getStackTraceString(e));
+                showLogView();
+                finish();
+                return;
+            }
+            
+            super.onCreate(savedInstanceState);
+            
+        } catch (Exception e) {
+            Log.e("MainActivity", "初始化失败: " + e.getMessage(), e);
+            ((MainApplication)getApplication()).writeToLogFile("初始化失败: " + e.getMessage() + "\n" + Log.getStackTraceString(e));
+            showLogView();
+            finish();
         }
-        super.onCreate(savedInstanceState);
         
         // 确保ReactInstanceManager已初始化
         ReactInstanceManager reactInstanceManager = null;

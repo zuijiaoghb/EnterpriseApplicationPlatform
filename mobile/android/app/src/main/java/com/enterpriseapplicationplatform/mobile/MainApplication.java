@@ -3,6 +3,10 @@ package com.enterpriseapplicationplatform.mobile;
 import android.app.Application;
 import android.os.Build;
 import android.util.Log;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Date;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -16,6 +20,21 @@ import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
     private static final String TAG = "MainApplication";
+    private static final String LOG_FILE_NAME = "crash_log.txt";
+    private static final Object FILE_LOCK = new Object();
+    
+    public void writeToLogFile(String message) {
+        synchronized (FILE_LOCK) {
+            try {
+                File logFile = new File(getExternalFilesDir(null), LOG_FILE_NAME);
+                FileWriter writer = new FileWriter(logFile, true);
+                writer.append(new Date().toString()).append(": ").append(message).append("\n");
+                writer.close();
+            } catch (IOException e) {
+                Log.e(TAG, "写入日志文件失败", e);
+            }
+        }
+    }
     public static final int LOG_LEVEL_VERBOSE = 0;
     public static final int LOG_LEVEL_DEBUG = 1;
     public static final int LOG_LEVEL_INFO = 2;
@@ -29,7 +48,20 @@ public class MainApplication extends Application implements ReactApplication {
     public void handleException(Exception e) {
         if (e != null && e.getMessage() != null) {
             if (shouldLog(LOG_LEVEL_ERROR)) {
+                // 添加密钥服务异常处理
+                if (e instanceof java.security.KeyStoreException) {
+                    writeToLogFile("密钥库异常: " + e.getMessage());
+                    Log.e(TAG, "密钥库异常", e);
+                } else if (e instanceof java.security.UnrecoverableKeyException) {
+                    writeToLogFile("密钥不可恢复异常: " + e.getMessage());
+                    Log.e(TAG, "密钥不可恢复异常", e);
+                } else if (e instanceof java.security.NoSuchAlgorithmException) {
+                    writeToLogFile("算法不支持异常: " + e.getMessage());
+                    Log.e(TAG, "算法不支持异常", e);
+                }
                 android.util.Log.e(TAG, "异常: " + e.getMessage(), e);
+                String stackTrace = Log.getStackTraceString(e);
+                writeToLogFile("异常: " + e.getMessage() + "\n" + stackTrace);
                 if (BuildConfig.DEBUG) {
                     android.util.Log.w(TAG, "异常堆栈:", e);
                 }
