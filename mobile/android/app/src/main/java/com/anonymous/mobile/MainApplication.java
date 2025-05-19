@@ -1,4 +1,4 @@
-package com.enterpriseapplicationplatform.mobile;
+package com.anonymous.mobile;
 
 import android.app.Application;
 import android.os.Build;

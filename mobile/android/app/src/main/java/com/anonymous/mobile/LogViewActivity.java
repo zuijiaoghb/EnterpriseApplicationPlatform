@@ -1,4 +1,4 @@
-package com.enterpriseapplicationplatform.mobile;
+package com.anonymous.mobile;
 
 import android.os.Bundle;
 import android.widget.TextView;

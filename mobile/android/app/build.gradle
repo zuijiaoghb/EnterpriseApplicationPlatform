@@ -24,12 +24,12 @@ android {
         }
     }
     defaultConfig {
-        applicationId "com.enterpriseapplicationplatform.mobile"
-        namespace "com.enterpriseapplicationplatform.mobile"
+        applicationId 'com.anonymous.mobile'
+        namespace 'com.anonymous.mobile'
         minSdkVersion 24
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
     }
     signingConfigs {
         release {
@@ -80,7 +80,7 @@ android {
         implementation 'com.google.android.material:material:1.9.0'
         // 使用最新稳定版React Native
         implementation 'com.facebook.react:react-android:0.76.9'
-        implementation 'com.facebook.react:hermes-android:0.76.9'
+        implementation 'com.facebook.react:hermes-android:0.76.9'        
     }
     
     

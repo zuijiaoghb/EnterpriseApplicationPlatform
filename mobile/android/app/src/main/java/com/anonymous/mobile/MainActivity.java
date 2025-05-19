@@ -1,4 +1,4 @@
-package com.enterpriseapplicationplatform.mobile;
+package com.anonymous.mobile;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +11,7 @@ import com.facebook.react.bridge.ReactContext;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.io.File;
 import android.content.Intent;
+import android.app.AlertDialog;
 
 public class MainActivity extends ReactActivity {
     private UncaughtExceptionHandler defaultExceptionHandler;
@@ -46,9 +47,21 @@ public class MainActivity extends ReactActivity {
         try {
             // 初始化Hermes引擎
             try {
+                // 尝试加载Hermes引擎
                 SoLoader.init(this, false);
+                
+                // 检查是否初始化成功
                 if (!SoLoader.isInitialized()) {
-                    throw new RuntimeException("Hermes引擎初始化失败");
+                    // 尝试备用初始化方案
+                    try {
+                        SoLoader.setInTestMode();
+                        SoLoader.init(this, false);
+                        if (!SoLoader.isInitialized()) {
+                            throw new RuntimeException("Hermes引擎初始化失败，尝试备用方案也失败");
+                        }
+                    } catch (Exception fallbackException) {
+                        throw new RuntimeException("Hermes引擎初始化失败: " + fallbackException.getMessage());
+                    }
                 }
                 
                 if (BuildConfig.DEBUG) {
@@ -59,8 +72,18 @@ public class MainActivity extends ReactActivity {
             } catch (Exception e) {
                 Log.e("MainActivity", "Hermes引擎初始化异常: " + e.getMessage(), e);
                 ((MainApplication)getApplication()).writeToLogFile("Hermes引擎初始化异常: " + e.getMessage() + "\n" + Log.getStackTraceString(e));
+                
+                // 显示更友好的错误界面
+                runOnUiThread(() -> {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("初始化失败")
+                           .setMessage("应用初始化失败，请尝试重新启动应用或联系技术支持。")
+                           .setPositiveButton("退出", (dialog, which) -> finish())
+                           .setCancelable(false)
+                           .show();
+                });
+                
                 showLogView();
-                finish();
                 return;
             }
             

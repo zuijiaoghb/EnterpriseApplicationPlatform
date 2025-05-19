@@ -4,9 +4,26 @@
   "expo": {
     "packagerOpts": {
       "config": "metro.config.js",
-      "sourceExts": ["js", "jsx", "ts", "tsx"],
-      "assetExts": ["db", "mp3", "ttf", "obj", "png", "jpg"]
+      "sourceExts": [
+        "js",
+        "jsx",
+        "ts",
+        "tsx"
+      ],
+      "assetExts": [
+        "db",
+        "mp3",
+        "ttf",
+        "obj",
+        "png",
+        "jpg"
+      ]
     },
-    "assetBundlePatterns": ["**/*"]
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "package": "com.anonymous.mobile"
+    }
   }
 }
