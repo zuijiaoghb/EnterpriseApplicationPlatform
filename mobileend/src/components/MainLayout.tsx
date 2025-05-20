@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import api from '../api';
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
@@ -10,11 +10,9 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
     username: string;
     roles?: string[];
   }
-  
-  type Role = 'ADMIN' | 'ROLE_ADMIN' | string;
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [menuItems, setMenuItems] = useState<{key: string; label: string; icon: keyof typeof Ionicons.glyphMap;}[]>([]);
+  const [menuItems, setMenuItems] = useState<{key: string; label: string; icon: string;}[]>([]);
 
 
   const handleLogout = () => {
@@ -37,12 +35,12 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         setCurrentUser(response.data);
 
         const baseItems = [
-          { key: 'Dashboard', label: '仪表盘', icon: 'home' as keyof typeof Ionicons.glyphMap },
-          { key: 'EquipmentList', label: '设备管理', icon: 'list' as keyof typeof Ionicons.glyphMap }
+          { key: 'Dashboard', label: '仪表盘', icon: 'home' },
+          { key: 'EquipmentList', label: '设备管理', icon: 'list' }
         ];
 
-        if (response.data.roles?.some((role: Role) => role === 'ADMIN' || role === 'ROLE_ADMIN')) {
-          baseItems.push({ key: 'SystemSettings', label: '系统管理', icon: 'settings' as keyof typeof Ionicons.glyphMap });
+        if (response.data.roles?.some(role => role === 'ADMIN' || role === 'ROLE_ADMIN')) {
+          baseItems.push({ key: 'SystemSettings', label: '系统管理', icon: 'settings' });
         }
 
         setMenuItems(baseItems);
@@ -65,7 +63,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
           style={styles.portalButton}
           onPress={() => navigation.navigate('Portal' as never)}
         >
-          <Ionicons name="apps" size={28} color="white" />
+          <MaterialIcons name="apps" size={28} color="white" />
           <Text style={styles.portalText}>工作门户</Text>
         </TouchableOpacity>
       </View>

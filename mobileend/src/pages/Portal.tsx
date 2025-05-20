@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import api from '../api';
 
 interface User {
@@ -43,7 +43,7 @@ const Portal = () => {
             style={styles.item}
             onPress={() => navigation.navigate(item.key as never)}
           >
-            <Ionicons name={item.icon as keyof typeof Ionicons.glyphMap} size={48} color="#1890ff" />
+            <MaterialIcons name={item.icon} size={48} color="#1890ff" />
             <Text style={styles.label}>{item.label}</Text>
           </TouchableOpacity>
         ))}
