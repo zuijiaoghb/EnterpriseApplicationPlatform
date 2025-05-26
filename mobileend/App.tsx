@@ -8,16 +8,13 @@ import Dashboard from './src/pages/Dashboard';
 import EquipmentList from './src/pages/EquipmentList';
 import SystemSettings from './src/pages/SystemSettings';
 import UserManagement from './src/pages/UserManagement';
+import RoleManagement from './src/pages/RoleManagement';
+import PermissionManagement from './src/pages/PermissionManagement';
+import ClientManagement from './src/pages/ClientManagement';
 
-type RootStackParamList = {
-  Login: undefined;
-  Dashboard: undefined;
-  EquipmentList: undefined;
-  SystemSettings: undefined;
-  Main: undefined;
-  Portal: undefined;
-  UserManagement: undefined;
-};
+import { RootStackParamList } from './src/navigation/types';
+
+// 移除重复的 RootStackParamList 定义，使用统一的定义
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -32,7 +29,7 @@ const App = () => {
         />
         
         <Stack.Screen 
-          name="Main" 
+          name="Portal" 
           options={{ headerShown: false }}
         >
           {() => (
@@ -43,6 +40,9 @@ const App = () => {
                 <Stack.Screen name="EquipmentList" component={EquipmentList} options={{ title: '设备管理' }}/>
                 <Stack.Screen name="SystemSettings" component={SystemSettings} options={{ title: '系统管理' }} />
                 <Stack.Screen name="UserManagement" component={UserManagement} options={{ title: '用户管理' }} />
+                <Stack.Screen name="RoleManagement" component={RoleManagement} options={{ title: '角色管理' }} />
+                <Stack.Screen name="PermissionManagement" component={PermissionManagement} options={{ title: '权限管理' }} />
+                <Stack.Screen name="ClientManagement" component={ClientManagement} options={{ title: '客户端管理' }} />
               </Stack.Navigator>
             </MainLayout>
           )}

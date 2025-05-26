@@ -3,10 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { LoginScreenNavigationProp } from '../navigation/types';
 import api from '../api';
 import Icon from 'react-native-vector-icons/AntDesign';
-import axios from 'axios';
+import { RootStackParamList } from '../navigation/types';
 // 提取公共的 name 和 size 值，避免多次指定
 const DEFAULT_ICON_NAME = "user";
 const DEFAULT_ICON_SIZE = 20;
@@ -26,12 +25,9 @@ const Login = () => {
   const [loginError, setLoginError] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  
-  type RootStackParamList = {
-    Login: undefined;
-    Dashboard: undefined;
-    Main: undefined;
-  };
+    
+
+  // 移除重复的 RootStackParamList 定义，使用统一的定义
 
   type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -68,7 +64,7 @@ const Login = () => {
       // 设置API默认请求头
       api.defaults.headers.common['Authorization'] = `Bearer ${normalizedToken}`;
       
-      navigation.navigate('Main');
+      navigation.navigate('Portal');
     } catch (error: any) {
       console.error('登录错误:', error);
       setLoginError('登录失败，请检查用户名和密码是否正确');

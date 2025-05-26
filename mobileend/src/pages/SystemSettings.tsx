@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import UserManagement from './UserManagement';
-import RoleManagement from './RoleManagement';
-import PermissionManagement from './PermissionManagement';
-import ClientManagement from './ClientManagement';
 import api from '../api';
 import Toast from 'react-native-toast-message';
 
@@ -19,6 +15,8 @@ const SystemSettings = () => {
     { key: 'PermissionManagement', label: '权限管理', icon: 'lock' },
     { key: 'ClientManagement', label: '客户端管理', icon: 'devices' }
   ];
+
+  const [menuItems, setMenuItems] = useState(baseItems);
 
   useEffect(() => {
     checkUserRole();
@@ -53,7 +51,7 @@ const SystemSettings = () => {
   return (
     <View style={styles.container}>
       <View style={styles.grid}>
-        {baseItems.map(item => (
+        {menuItems.map(item => (
           <TouchableOpacity
             key={item.key}
             style={styles.item}
