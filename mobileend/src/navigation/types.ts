@@ -4,7 +4,10 @@ export type RootStackParamList = {
   Dashboard: undefined;
   Login: undefined;
   Main: undefined;
-  // 添加其他屏幕的路由参数类型
+  UserManagement: undefined;
+  RoleManagement: undefined;
+  PermissionManagement: undefined;
+  ClientManagement: undefined;
 };
 
 export type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;

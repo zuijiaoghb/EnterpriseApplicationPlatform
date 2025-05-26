@@ -7,6 +7,7 @@ import Portal from './src/pages/Portal';
 import Dashboard from './src/pages/Dashboard';
 import EquipmentList from './src/pages/EquipmentList';
 import SystemSettings from './src/pages/SystemSettings';
+import UserManagement from './src/pages/UserManagement';
 
 type RootStackParamList = {
   Login: undefined;
@@ -15,6 +16,7 @@ type RootStackParamList = {
   SystemSettings: undefined;
   Main: undefined;
   Portal: undefined;
+  UserManagement: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -40,6 +42,7 @@ const App = () => {
                 <Stack.Screen name="Dashboard" component={Dashboard} options={{ title: '仪表盘' }} />
                 <Stack.Screen name="EquipmentList" component={EquipmentList} options={{ title: '设备管理' }}/>
                 <Stack.Screen name="SystemSettings" component={SystemSettings} options={{ title: '系统管理' }} />
+                <Stack.Screen name="UserManagement" component={UserManagement} options={{ title: '用户管理' }} />
               </Stack.Navigator>
             </MainLayout>
           )}

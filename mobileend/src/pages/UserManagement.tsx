@@ -181,28 +181,39 @@ const [users, setUsers] = useState<User[]>([]);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 10,
+    backgroundColor: '#f5f5f5',
   },
   card: {
     flex: 1,
+    margin: 10,
+    borderRadius: 10,
+    elevation: 3,
   },
   addButton: {
     marginBottom: 16,
+    alignSelf: 'flex-end',
   },
   userItem: {
-    padding: 16,
+    padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: '#e0e0e0',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: 'white',
+    marginVertical: 4,
+    borderRadius: 8,
   },
   userName: {
     fontSize: 16,
     fontWeight: 'bold',
+    flex: 1,
   },
   userEmail: {
     color: '#666',
+    fontSize: 14,
+    flex: 1,
   },
   actions: {
     flexDirection: 'row',
@@ -210,35 +221,39 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    padding: 24,
+    padding: 20,
     justifyContent: 'center',
+    backgroundColor: 'white',
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 24,
+    marginBottom: 20,
     textAlign: 'center',
   },
   input: {
-    height: 40,
+    height: 45,
     borderColor: '#d9d9d9',
     borderWidth: 1,
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    marginBottom: 16,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    marginBottom: 15,
+    backgroundColor: 'white',
   },
   buttonGroup: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 24,
+    marginTop: 20,
   },
   submitButton: {
     flex: 1,
     marginRight: 8,
+    borderRadius: 8,
   },
   cancelButton: {
     flex: 1,
     marginLeft: 8,
+    borderRadius: 8,
   },
 });
 
