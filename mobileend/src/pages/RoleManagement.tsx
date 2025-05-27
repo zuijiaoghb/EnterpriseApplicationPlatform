@@ -28,7 +28,10 @@ const RoleManagement = () => {
   const fetchRoles = async () => {
     try {
       const { data } = await api.get<Role[]>('/api/roles');
+      console.log('获取到的角色数量:', data.length);
+      console.log('准备设置的角色数据:', data);
       setRoles(data);
+      console.log('当前状态中的角色数据:', roles);
     } catch (error) {
       console.error('获取角色列表失败', error);
     }
@@ -88,6 +91,10 @@ const RoleManagement = () => {
           </Button>
 
           <FlatList
+            initialNumToRender={20}
+            maxToRenderPerBatch={10}
+            windowSize={21}
+            ListFooterComponent={() => <View style={{ height: 25 }} />}
             data={roles}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (

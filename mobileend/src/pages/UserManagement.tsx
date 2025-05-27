@@ -110,6 +110,8 @@ const [users, setUsers] = useState<User[]>([]);
           <FlatList
             data={users}
             keyExtractor={(item) => item.id.toString()}
+            initialNumToRender={20}
+            ListFooterComponent={() => <View style={{ height: 25 }} />}
             renderItem={({ item }) => (
               <View style={styles.userItem}>
                 <Text style={styles.userName}>{item.username}</Text>

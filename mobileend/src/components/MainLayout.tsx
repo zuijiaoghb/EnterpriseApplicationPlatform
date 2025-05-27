@@ -53,7 +53,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={{...styles.container, paddingBottom: 80 }}>
       <View style={styles.content}>
         {children}
       </View>
@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 15,
+    paddingBottom: 90,
   },
   bottomTab: {
     flexDirection: 'row',

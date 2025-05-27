@@ -84,6 +84,7 @@ const EquipmentList = () => {
         data={equipments}
         renderItem={renderItem}
         keyExtractor={item => item.id.toString()}
+        ListFooterComponent={() => <View style={{ height: 25 }} />}
       />
       <EquipmentForm 
         visible={visible}
