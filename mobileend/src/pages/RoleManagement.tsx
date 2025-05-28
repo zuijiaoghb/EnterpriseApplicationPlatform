@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal } from 'react-native';
 import { Button, Card } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/AntDesign';
 import api from '../api';
@@ -90,15 +90,9 @@ const RoleManagement = () => {
             新增角色
           </Button>
 
-          <FlatList
-            initialNumToRender={20}
-            maxToRenderPerBatch={10}
-            windowSize={21}
-            ListFooterComponent={() => <View style={{ height: 25 }} />}
-            data={roles}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.roleItem}>
+          <ScrollView style={{ height: 150 }}>
+            {roles.map((item) => (
+              <View style={styles.roleItem} key={item.id.toString()}> 
                 <View>
                   <Text style={styles.roleName}>{item.name}</Text>
                   <Text style={styles.roleCode}>{item.code}</Text>
@@ -112,8 +106,8 @@ const RoleManagement = () => {
                   </TouchableOpacity>
                 </View>
               </View>
-            )}
-          />
+            ))}
+          </ScrollView>
         </Card.Content>
       </Card>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal } from 'react-native';
 import { Button, Card } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/AntDesign';
 import api from '../api';
@@ -87,11 +87,9 @@ const PermissionManagement = () => {
             新增权限
           </Button>
 
-          <FlatList
-            data={permissions}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.permissionItem}>
+          <ScrollView style={{ height: 150 }}>
+            {permissions.map((item) => (
+              <View style={styles.permissionItem} key={item.id.toString()}>
                 <View>
                   <Text style={styles.permissionName}>{item.name}</Text>
                   <Text style={styles.permissionCode}>{item.code}</Text>
@@ -105,8 +103,8 @@ const PermissionManagement = () => {
                   </TouchableOpacity>
                 </View>
               </View>
-            )}
-          />
+            ))}
+          </ScrollView>
         </Card.Content>
       </Card>
 

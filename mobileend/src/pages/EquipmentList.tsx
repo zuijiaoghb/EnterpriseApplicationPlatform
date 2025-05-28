@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import api from '../api';
 import EquipmentForm from './EquipmentForm';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -80,12 +80,30 @@ const EquipmentList = () => {
         title="新增设备" 
         onPress={() => { setCurrent(null); setVisible(true); }}
       />
-      <FlatList
-        data={equipments}
-        renderItem={renderItem}
-        keyExtractor={item => item.id.toString()}
-        ListFooterComponent={() => <View style={{ height: 25 }} />}
-      />
+      <ScrollView style={{ height: 150 }}>
+        {equipments.map((item) => (
+          <View style={styles.itemContainer} key={item.id.toString()}>
+            <Text>ID: {item.id}</Text>
+            <Text>名称: {item.name}</Text>
+            <Text>型号: {item.model}</Text>
+            <Text>状态: {item.status}</Text>
+            <Text>二维码: {item.qrCode}</Text>
+            <Text>最后维护: {item.lastMaintenance}</Text>
+            <View style={styles.buttonContainer}>
+              <Button 
+                title="编辑" 
+                onPress={() => { setCurrent(item); setVisible(true); }} 
+              />
+              <Button 
+                title="删除" 
+                onPress={() => handleDelete(item.id)}
+                color="red"
+              />
+            </View>
+          </View>
+        ))}
+        <View style={{ height: 25 }} />
+      </ScrollView>
       <EquipmentForm 
         visible={visible}
         onClose={() => setVisible(false)}

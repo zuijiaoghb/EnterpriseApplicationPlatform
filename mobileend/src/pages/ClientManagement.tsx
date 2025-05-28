@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal } from 'react-native';
 import { Button, Card } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/AntDesign';
 import api from '../api';
@@ -83,11 +83,9 @@ const ClientManagement = () => {
             新增客户端
           </Button>
 
-          <FlatList
-            data={clients}
-            keyExtractor={(item) => item.clientId}
-            renderItem={({ item }) => (
-              <View style={styles.clientItem}>
+          <ScrollView style={{ height: 150 }}>
+            {clients.map((item) => (
+              <View style={styles.clientItem} key={item.clientId}>
                 <View>
                   <Text style={styles.clientName}>{item.clientName}</Text>
                   <Text style={styles.clientId}>{item.clientId}</Text>
@@ -101,8 +99,8 @@ const ClientManagement = () => {
                   </TouchableOpacity>
                 </View>
               </View>
-            )}
-          />
+            ))}
+          </ScrollView>
         </Card.Content>
       </Card>
 

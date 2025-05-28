@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal } from 'react-native';
 import { Button, Card } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/AntDesign';
 import api from '../api';
@@ -32,15 +32,17 @@ const [users, setUsers] = useState<User[]>([]);
     password: '',
     roleIds: [] as number[]
   });
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10);
 
   useEffect(() => {
     fetchUsers();
     fetchRoles();
-  }, []);
+  }, [page]);
 
   const fetchUsers = async () => {
     try {
-      const { data } = await api.get<ApiResponse<User>>('/api/users');
+      const { data } = await api.get<ApiResponse<User>>(`/api/users?page=${page}&size=${size}`);
       setUsers(data.content || []);
     } catch (error) {
       console.error('获取用户列表失败', error);
@@ -107,26 +109,26 @@ const [users, setUsers] = useState<User[]>([]);
             新增用户
           </Button>
 
-          <FlatList
-            data={users}
-            keyExtractor={(item) => item.id.toString()}
-            initialNumToRender={20}
-            ListFooterComponent={() => <View style={{ height: 25 }} />}
-            renderItem={({ item }) => (
-              <View style={styles.userItem}>
+          <ScrollView style={{ height: 150 }}>
+            {users.map((item) => (
+              <View style={styles.userItem} key={item.id.toString()}> 
                 <Text style={styles.userName}>{item.username}</Text>
                 <Text style={styles.userEmail}>{item.email}</Text>
-                <View style={styles.actions}>
-                  <TouchableOpacity onPress={() => handleEditUser(item)}>
-                    <Icon name="edit" size={20} color="#1890ff" />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => handleDelete(item.id)}>
-                    <Icon name="delete" size={20} color="#ff4d4f" />
-                  </TouchableOpacity>
-                </View>
+                <View style={styles.actions}> 
+                  <TouchableOpacity onPress={() => handleEditUser(item)}> 
+                    <Icon name="edit" size={20} color="#1890ff" /> 
+                  </TouchableOpacity> 
+                  <TouchableOpacity onPress={() => handleDelete(item.id)}> 
+                    <Icon name="delete" size={20} color="#ff4d4f" /> 
+                  </TouchableOpacity> 
+                </View> 
               </View>
-            )}
-          />
+            ))}
+          </ScrollView>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 2, paddingBottom: 20 }}>
+            <Button onPress={() => page > 0 && setPage(page - 1)}>上一页</Button>
+            <Button onPress={() => setPage(page + 1)}>下一页</Button>
+          </View>
         </Card.Content>
       </Card>
 
