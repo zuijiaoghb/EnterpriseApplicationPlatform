@@ -81,6 +81,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         // 使用具体的前端地址
         config.setAllowedOriginPatterns(Arrays.asList(            
+            "http://oa.jiangte.com.cn:3001",
             "http://188.188.1.25:3001",
             "http://192.168.21.175:3001",
             "http://localhost:3001"

@@ -8,7 +8,7 @@ import { LoginScreenNavigationProp } from './navigation/types';
 // 根据运行环境设置基础URL
 const baseURL = Platform.OS === 'web' 
   ? process.env.REACT_APP_API_URL 
-  : process.env.API_URL || 'http://192.168.21.175:8081';
+  : process.env.API_URL || 'http://oa.jiangte.com.cn:8081';
 
 const api = axios.create({
   baseURL,
@@ -37,7 +37,7 @@ api.interceptors.request.use(
       // 如果没有token且不是登录请求，重定向到登录
       if (!config.url.includes('/auth/login')) {
         const navigation = useNavigation<LoginScreenNavigationProp>();
-        navigation.navigate('Login');
+        navigation.navigate('Login', { param1: '', param2: 0 });
       }
     }
     return config;
@@ -62,7 +62,7 @@ api.interceptors.response.use(
       // 导航到登录页面
       if (error.response.config.url.includes('/auth/login')) {
         const navigation = useNavigation<LoginScreenNavigationProp>();
-        navigation.navigate('Login');
+        navigation.navigate('Login', { param1: '', param2: 0 });
       }
     }
     // 修改错误处理，确保返回完整响应

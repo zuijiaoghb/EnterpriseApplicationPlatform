@@ -11,6 +11,56 @@
 npm install
 ## 运行
 npm start
+# 运行时可指定端口
+PORT=3001 npm start
+## 打包
+npm run build
+## 打包后，将build录下的文件上传到服务器即可
+## centos8环境下使用 Nginx 部署frontend项目
+## 安装nginx
+yum install nginx
+## 启动nginx
+systemctl start nginx
+## 停止nginx
+systemctl stop nginx
+## 重启nginx
+systemctl restart nginx
+## 配置nginx
+vim /etc/nginx/nginx.conf
+## 配置文件内容
+server {
+    listen       3001 default_server;
+    listen       [::]:3001 default_server;
+    server_name  localhost;
+    root         /app/frontend/build;
+    index        index.html index.htm;
+
+    # Load configuration files for the default server block.
+    include /etc/nginx/default.d/*.conf;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    error_page 404 /404.html;
+        location = /40x.html {
+    }
+
+    error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+    }
+}
+## 重启nginx
+systemctl restart nginx
+## 查看nginx状态
+systemctl status nginx
+## 查看nginx日志
+tail -f /var/log/nginx/access.log
+tail -f /var/log/nginx/error.log
+## 查看nginx配置文件
+vim /etc/nginx/nginx.conf
+## 查看nginx版本
+nginx -v   
 
 ## mobile项目
 ## 打包生成index.android.bundle bundle文件

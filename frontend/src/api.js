@@ -1,7 +1,8 @@
 import axios from 'axios';
 
+const isExternal = window.location.hostname!== '192.168.21.175';
 const api = axios.create({
-  baseURL: 'http://192.168.21.175:8081',
+  baseURL: isExternal? 'http://oa.jiangte.com.cn:8081' : 'http://192.168.21.175:8081',
   timeout: 10000,
   withCredentials: true, // 必须与后端setAllowCredentials(true)对应
   headers: {
