@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import api from '../api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const navigation = useNavigation();
@@ -20,7 +21,8 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
       // 清除token和用户信息
       setCurrentUser(null);
       setMenuItems([]);
-      
+      // 使用AsyncStorage清除token
+      AsyncStorage.removeItem('token');
       // 跳转到登录页面
       navigation.navigate('Login' as never);
     } catch (error) {
@@ -66,6 +68,9 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
           <MaterialIcons name="apps" size={28} color="white" />
           <Text style={styles.portalText}>工作门户</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>退出</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -99,6 +104,16 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 12,
     marginTop: 5,
+  },
+  logoutButton: {
+    padding: 10,
+    backgroundColor: '#ff4444',
+    borderRadius: 5,
+    margin: 10,
+  },
+  logoutText: {
+    color: 'white',
+    textAlign: 'center',
   },
 });
 
