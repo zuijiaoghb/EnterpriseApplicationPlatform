@@ -2,9 +2,12 @@ package com.enterprise.platform.user.service.impl;
 
 import com.enterprise.platform.user.service.AuditService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Set;
 
 @Service
+@Transactional(transactionManager = "mysqlTransactionManager")
 public class AuditServiceImpl implements AuditService {
     @Override
     public void logPermissionChange(String operator, Long roleId, Set<Long> permissionIds) {

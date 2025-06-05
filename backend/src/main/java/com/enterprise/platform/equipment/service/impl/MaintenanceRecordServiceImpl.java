@@ -2,6 +2,7 @@ package com.enterprise.platform.equipment.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.enterprise.platform.equipment.model.MaintenanceRecordWithBLOBs;
 import com.enterprise.platform.equipment.repository.MaintenanceRecordRepository;
@@ -12,9 +13,10 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
 @Service
+@Transactional(transactionManager = "mysqlTransactionManager")
 public class MaintenanceRecordServiceImpl implements MaintenanceRecordService {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "mysqlEntityManagerFactory")
     private EntityManager entityManager;
 
     @Autowired

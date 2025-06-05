@@ -70,7 +70,7 @@ private static final Logger logger = LoggerFactory.getLogger(MaintenanceRecordCo
     }
 
     @GetMapping("/equipment/{equipmentId}")
-    @Transactional  // 添加事务注解
+    @Transactional(transactionManager = "mysqlTransactionManager")  // 添加事务注解
     public ResponseEntity<List<MaintenanceRecordWithBLOBs>> getRecordsByEquipmentId(
             @PathVariable String equipmentId) {
         try {

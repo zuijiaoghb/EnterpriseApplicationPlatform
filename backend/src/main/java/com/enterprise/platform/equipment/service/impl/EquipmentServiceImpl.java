@@ -2,6 +2,7 @@ package com.enterprise.platform.equipment.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.enterprise.platform.equipment.enums.EquipmentStatus;
 import com.enterprise.platform.equipment.model.Equipment;
@@ -11,6 +12,7 @@ import com.enterprise.platform.equipment.service.EquipmentService;
 import java.util.List;
 
 @Service
+@Transactional(transactionManager = "mysqlTransactionManager")
 public class EquipmentServiceImpl implements EquipmentService {
 
     @Autowired

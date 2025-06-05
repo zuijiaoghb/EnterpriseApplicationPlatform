@@ -6,6 +6,7 @@ import com.enterprise.platform.user.service.PermissionService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(transactionManager = "mysqlTransactionManager")
 @RequiredArgsConstructor
 public class PermissionServiceImpl implements PermissionService {    
     

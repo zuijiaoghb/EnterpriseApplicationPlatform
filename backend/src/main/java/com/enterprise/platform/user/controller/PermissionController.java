@@ -5,6 +5,7 @@ import com.enterprise.platform.user.model.Permission;
 import com.enterprise.platform.user.service.PermissionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class PermissionController {
     }
 
     @GetMapping("/tree")
+    @Transactional(transactionManager = "mysqlTransactionManager")
     public ResponseEntity<List<PermissionTreeDTO>> getPermissionTree() {
         List<Permission> permissions = permissionService.findAllRootPermissions();
         List<PermissionTreeDTO> tree = permissions.stream()
@@ -45,6 +47,7 @@ public class PermissionController {
         return ResponseEntity.ok(tree);
     }
 
+    @Transactional(transactionManager = "mysqlTransactionManager")
     private PermissionTreeDTO convertToTreeDTO(Permission permission) {
         PermissionTreeDTO dto = new PermissionTreeDTO();
         dto.setId(permission.getId());

@@ -9,12 +9,14 @@ import com.enterprise.platform.user.service.AuditService;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Service
+@Transactional(transactionManager = "mysqlTransactionManager")
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;

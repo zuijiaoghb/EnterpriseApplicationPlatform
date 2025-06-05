@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional(readOnly = true, transactionManager = "mysqlTransactionManager")
 public class OAuth2ClientService {
     private static final Logger logger = LoggerFactory.getLogger(OAuth2ClientService.class);
     
@@ -30,7 +30,7 @@ public class OAuth2ClientService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional
+    @Transactional(transactionManager = "mysqlTransactionManager")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public OAuth2Client createClient(OAuth2Client client) {
         if (repository.existsById(client.getClientId())) {
@@ -53,7 +53,7 @@ public class OAuth2ClientService {
         return repository.findByActiveTrue();
     }
 
-    @Transactional
+    @Transactional(transactionManager = "mysqlTransactionManager")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void disableClient(String clientId) {
         OAuth2Client client = repository.findById(clientId)
@@ -64,7 +64,7 @@ public class OAuth2ClientService {
         repository.save(client);
     }
 
-    @Transactional
+    @Transactional(transactionManager = "mysqlTransactionManager")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public OAuth2Client updateClient(OAuth2Client client) {
         OAuth2Client existing = repository.findById(client.getClientId())
@@ -76,7 +76,7 @@ public class OAuth2ClientService {
         return repository.save(existing);
     }
 
-    @Transactional
+    @Transactional(transactionManager = "mysqlTransactionManager")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public OAuth2Client resetClientSecret(String clientId) {
         OAuth2Client client = repository.findById(clientId)
@@ -101,7 +101,7 @@ public class OAuth2ClientService {
         return repository.findAllClients();
     }
 
-    @Transactional
+    @Transactional(transactionManager = "mysqlTransactionManager")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public OAuth2Client enableClient(String clientId) {
         OAuth2Client client = repository.findById(clientId)

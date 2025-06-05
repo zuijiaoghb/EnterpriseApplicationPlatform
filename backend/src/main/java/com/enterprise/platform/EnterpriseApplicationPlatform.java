@@ -14,13 +14,8 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
     "com.enterprise.platform.user.model",  // Add user model package
     "com.enterprise.platform.system.model"
 })
-@EnableJpaRepositories(basePackages = {
-    "com.enterprise.platform.equipment.repository",
-    "com.enterprise.platform.user.repository",  // Add user repository package
-    "com.enterprise.platform.system.repository"
-})
 public class EnterpriseApplicationPlatform {
-    public static void main(String[] args) {
+    public static void main(String[] args) {       
         ConfigurableApplicationContext ctx = SpringApplication.run(EnterpriseApplicationPlatform.class, args);
         
         // 验证JWT编码器配置

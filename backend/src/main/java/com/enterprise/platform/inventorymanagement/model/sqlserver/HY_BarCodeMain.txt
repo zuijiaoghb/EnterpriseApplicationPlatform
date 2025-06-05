@@ -1,0 +1,161 @@
+USE [UFDATA_001_2017]
+GO
+
+/****** Object:  Table [dbo].[HY_BarCodeMain]    Script Date: 06/03/2025 16:30:51 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[HY_BarCodeMain](
+	[BarCode] [nvarchar](300) NOT NULL,
+	[BarCodeRule] [nvarchar](20) NULL,
+	[cInvCode] [nvarchar](60) NULL,
+	[cVenCode] [nvarchar](20) NULL,
+	[cWhCode] [nvarchar](10) NULL,
+	[cPosCode] [nvarchar](20) NULL,
+	[iInvSaleCost] [float] NULL,
+	[dMdate] [datetime] NULL,
+	[dVdate] [datetime] NULL,
+	[iMassdate] [int] NULL,
+	[cMassUnit] [smallint] NULL,
+	[cChkItemCode] [nvarchar](30) NULL,
+	[cOther] [nvarchar](50) NULL,
+	[cHoldItem] [nvarchar](50) NULL,
+	[cSHoldItem] [nvarchar](50) NULL,
+	[cSilvItem] [nvarchar](50) NULL,
+	[cFree1] [nvarchar](40) NULL,
+	[cFree2] [nvarchar](40) NULL,
+	[cFree3] [nvarchar](40) NULL,
+	[cFree4] [nvarchar](40) NULL,
+	[cFree5] [nvarchar](40) NULL,
+	[cFree6] [nvarchar](40) NULL,
+	[cFree7] [nvarchar](40) NULL,
+	[cFree8] [nvarchar](40) NULL,
+	[cFree9] [nvarchar](40) NULL,
+	[cFree10] [nvarchar](40) NULL,
+	[qty] [decimal](38, 6) NULL,
+	[iNum] [decimal](38, 6) NULL,
+	[pLot] [nvarchar](60) NULL,
+	[ichangerate] [decimal](38, 6) NULL,
+	[cInvSN] [nvarchar](30) NULL,
+	[cDefine1] [nvarchar](20) NULL,
+	[cDefine2] [nvarchar](20) NULL,
+	[cDefine3] [nvarchar](20) NULL,
+	[cDefine4] [datetime] NULL,
+	[cDefine5] [int] NULL,
+	[cDefine6] [datetime] NULL,
+	[cDefine7] [float] NULL,
+	[cDefine8] [nvarchar](4) NULL,
+	[cDefine9] [nvarchar](8) NULL,
+	[cDefine10] [nvarchar](60) NULL,
+	[cDefine11] [nvarchar](120) NULL,
+	[cDefine12] [nvarchar](120) NULL,
+	[cDefine13] [nvarchar](120) NULL,
+	[cDefine14] [nvarchar](120) NULL,
+	[cDefine15] [int] NULL,
+	[cDefine16] [float] NULL,
+	[cDefine22] [nvarchar](60) NULL,
+	[cDefine23] [nvarchar](60) NULL,
+	[cDefine24] [nvarchar](60) NULL,
+	[cDefine25] [nvarchar](60) NULL,
+	[cDefine26] [float] NULL,
+	[cDefine27] [float] NULL,
+	[cDefine28] [nvarchar](120) NULL,
+	[cDefine29] [nvarchar](120) NULL,
+	[cDefine30] [nvarchar](120) NULL,
+	[cDefine31] [nvarchar](120) NULL,
+	[cDefine32] [nvarchar](120) NULL,
+	[cDefine33] [nvarchar](120) NULL,
+	[cDefine34] [int] NULL,
+	[cDefine35] [int] NULL,
+	[cDefine36] [datetime] NULL,
+	[cDefine37] [datetime] NULL,
+	[CreateDate] [datetime] NULL,
+	[CreateTime] [datetime] NULL,
+	[dBusDate] [datetime] NULL,
+	[cBarcodeDefine1] [nvarchar](120) NULL,
+	[cBarcodeDefine2] [nvarchar](120) NULL,
+	[cBarcodeDefine3] [nvarchar](120) NULL,
+	[cBarcodeDefine4] [nvarchar](120) NULL,
+	[cBarcodeDefine5] [nvarchar](120) NULL,
+	[cBarcodeDefine6] [nvarchar](120) NULL,
+	[cBarcodeDefine7] [nvarchar](120) NULL,
+	[cBarcodeDefine8] [nvarchar](120) NULL,
+	[cBarcodeDefine9] [nvarchar](120) NULL,
+	[cBarcodeDefine10] [nvarchar](120) NULL,
+	[cComUnitCode] [nvarchar](40) NULL,
+	[cComAddUnitCode] [nvarchar](40) NULL,
+	[cSrcCode] [nvarchar](30) NULL,
+	[cSrcVouchType] [nvarchar](30) NULL,
+	[cSrcSubID] [int] NULL,
+	[cBarMainID] [int] NULL,
+	[cBarMainAutoID] [int] NULL,
+	[cMaker] [nvarchar](50) NULL,
+	[cGuid] [nvarchar](50) NULL,
+	[cLabelCode] [nvarchar](10) NULL,
+	[supBarCode] [nvarchar](120) NULL,
+	[iPrtCount] [int] NULL,
+	[iBarCodeState] [varchar](3) NULL,
+	[bExpSub] [int] NULL,
+	[cNoUseMaker] [nvarchar](50) NULL,
+	[dNoUseTime] [datetime] NULL,
+	[bUseLs] [smallint] NULL,
+	[cInvBarCode] [nvarchar](20) NULL,
+	[cinvcBarCode] [nvarchar](20) NULL,
+	[cWhBarCode] [nvarchar](20) NULL,
+	[cPosBarCode] [nvarchar](20) NULL,
+	[cVenBarCode] [nvarchar](20) NULL,
+	[cSaleUnitCode] [nvarchar](40) NULL,
+	[iSaleQty] [decimal](38, 6) NULL,
+	[iSalePrice] [decimal](38, 6) NULL,
+	[iExpiratDateCalcu] [smallint] NULL,
+	[cExpirationdate] [nvarchar](10) NULL,
+	[dExpirationdate] [datetime] NULL,
+	[cBatchProperty1] [decimal](38, 6) NULL,
+	[cBatchProperty2] [decimal](38, 6) NULL,
+	[cBatchProperty3] [decimal](38, 6) NULL,
+	[cBatchProperty4] [decimal](38, 6) NULL,
+	[cBatchProperty5] [decimal](38, 6) NULL,
+	[cBatchProperty6] [nvarchar](120) NULL,
+	[cBatchProperty7] [nvarchar](120) NULL,
+	[cBatchProperty8] [nvarchar](120) NULL,
+	[cBatchProperty9] [nvarchar](120) NULL,
+	[cBatchProperty10] [datetime] NULL,
+	[irowno] [int] NULL,
+	[ufts] [timestamp] NULL,
+	[iRelAutoid] [int] NULL,
+	[cCusCode] [varchar](50) NULL,
+	[idemandtype] [tinyint] NULL,
+	[cdemandcode] [varchar](30) NULL,
+	[idemandseq] [int] NULL,
+	[cdemandid] [varchar](30) NULL,
+	[clastscantype] [varchar](30) NULL,
+	[vt_id] [int] NULL,
+	[UBarCode] [nvarchar](300) NULL,
+	[iPrtPerson] [nvarchar](30) NULL,
+ CONSTRAINT [PK_HY_BarCodeMain] PRIMARY KEY CLUSTERED 
+(
+	[BarCode] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+ALTER TABLE [dbo].[HY_BarCodeMain] ADD  DEFAULT (0) FOR [iPrtCount]
+GO
+
+ALTER TABLE [dbo].[HY_BarCodeMain] ADD  DEFAULT (0) FOR [iBarCodeState]
+GO
+
+ALTER TABLE [dbo].[HY_BarCodeMain] ADD  DEFAULT (0) FOR [bExpSub]
+GO
+
+

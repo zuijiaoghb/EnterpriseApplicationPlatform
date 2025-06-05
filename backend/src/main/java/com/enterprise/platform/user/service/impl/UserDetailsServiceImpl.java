@@ -1,6 +1,7 @@
 package com.enterprise.platform.user.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.enterprise.platform.user.model.Role;
 import com.enterprise.platform.user.model.User;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Transactional(transactionManager = "mysqlTransactionManager")
 public class UserDetailsServiceImpl implements UserDetailsService {
     
     @Autowired

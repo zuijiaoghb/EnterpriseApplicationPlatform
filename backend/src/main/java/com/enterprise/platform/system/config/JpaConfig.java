@@ -11,7 +11,7 @@ public class JpaConfig {
     public HibernatePropertiesCustomizer hibernatePropertiesCustomizer() {
         return props -> {
             props.put("hibernate.temp.use_jdbc_metadata_defaults", "false");
-            props.put("hibernate.jdbc.time_zone", "UTC");
+            props.put("hibernate.jdbc.time_zone", "UTC");            
         };
     }
 }

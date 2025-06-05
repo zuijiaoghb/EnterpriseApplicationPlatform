@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
+    @Transactional(transactionManager = "mysqlTransactionManager")
     public User createUser(User user) {
         // 检查密码是否为空
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional  
+    @Transactional(transactionManager = "mysqlTransactionManager")  
     public User updateUser(Long id, User user) {
         User existingUser = userRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -97,13 +97,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
+    @Transactional(transactionManager = "mysqlTransactionManager")
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
 
     @Override
-    @Transactional
+    @Transactional(transactionManager = "mysqlTransactionManager")
     public User updateUserRoles(Long id, Set<Long> roleIds) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("用户不存在"));
