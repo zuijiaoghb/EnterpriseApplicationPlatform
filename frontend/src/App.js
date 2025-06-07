@@ -3,6 +3,7 @@ import MainLayout from './components/MainLayout';
 import Login from './system/pages/Login';
 import EquipmentList from './equipment/pages/EquipmentList';
 import SystemSettings from './system/pages/SystemSettings';
+import InventoryManagement from './inventorymanagement/pages/InventoryManagement';
 import Dashboard from './dashboard/pages/Dashboard';
 import AuthGuard from './components/AuthGuard';
 import { message } from 'antd';
@@ -24,6 +25,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/equipments" element={<EquipmentList />} />
           <Route path="/system" element={<SystemSettings />} />
+          <Route path="/inventorymanagement" element={<InventoryManagement />} />
         </Route>
       </Routes>
     </BrowserRouter>

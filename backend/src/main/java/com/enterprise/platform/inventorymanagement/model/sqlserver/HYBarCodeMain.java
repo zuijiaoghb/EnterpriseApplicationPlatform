@@ -4,16 +4,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import org.springframework.context.annotation.Primary;
-import org.springframework.beans.factory.annotation.Qualifier;
 import lombok.Data;
 import java.util.Date;
 
 @Entity
 @Table(name = "HY_BarCodeMain")
 @Data
-@Primary
-@Qualifier("sqlServerDataSource")
 public class HYBarCodeMain {
     @Id    
     @Column(name = "BarCode", length = 300, nullable = false)

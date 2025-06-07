@@ -2,18 +2,11 @@ package com.enterprise.platform;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
 @SpringBootApplication
-@EntityScan(basePackages = {
-    "com.enterprise.platform.equipment.model",
-    "com.enterprise.platform.user.model",  // Add user model package
-    "com.enterprise.platform.system.model"
-})
 public class EnterpriseApplicationPlatform {
     public static void main(String[] args) {       
         ConfigurableApplicationContext ctx = SpringApplication.run(EnterpriseApplicationPlatform.class, args);

@@ -6,7 +6,8 @@ import {
   UserOutlined,
   DashboardOutlined,
   ToolOutlined,
-  SettingOutlined
+  SettingOutlined,
+  InboxOutlined
 } from '@ant-design/icons';
 import api from '../api';
 import './MainLayout.css';
@@ -33,7 +34,7 @@ const MainLayout = () => {
         console.log('User Info:', response.data);
 
         // 根据用户角色设置菜单项
-        const baseItems = [
+        const baseItems = [          
           {
             key: 'dashboard',
             icon: <DashboardOutlined />,
@@ -43,6 +44,11 @@ const MainLayout = () => {
             key: 'equipments',
             icon: <ToolOutlined />,
             label: '设备管理',
+          },
+          {
+            key: 'inventorymanagement',
+            icon: <InboxOutlined />,
+            label: '库存管理'
           }
         ];
         

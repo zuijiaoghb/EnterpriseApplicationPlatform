@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/permissions")
 @PreAuthorize("hasRole('ROLE_ADMIN')")
+@Transactional(transactionManager = "mysqlTransactionManager")
 public class PermissionController {
     
     private final PermissionService permissionService;
@@ -38,7 +39,6 @@ public class PermissionController {
     }
 
     @GetMapping("/tree")
-    @Transactional(transactionManager = "mysqlTransactionManager")
     public ResponseEntity<List<PermissionTreeDTO>> getPermissionTree() {
         List<Permission> permissions = permissionService.findAllRootPermissions();
         List<PermissionTreeDTO> tree = permissions.stream()
@@ -47,7 +47,7 @@ public class PermissionController {
         return ResponseEntity.ok(tree);
     }
 
-    @Transactional(transactionManager = "mysqlTransactionManager")
+    
     private PermissionTreeDTO convertToTreeDTO(Permission permission) {
         PermissionTreeDTO dto = new PermissionTreeDTO();
         dto.setId(permission.getId());

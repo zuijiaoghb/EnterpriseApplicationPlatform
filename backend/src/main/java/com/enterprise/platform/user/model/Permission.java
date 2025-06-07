@@ -53,7 +53,7 @@ public class Permission {
     @JsonIgnore  // 避免父权限序列化时循环引用
     private Permission parent;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Permission> children = new HashSet<>();
 
     // 添加父权限设置方法
