@@ -38,7 +38,8 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
 
         const baseItems = [
           { key: 'Dashboard', label: '仪表盘', icon: 'home' },
-          { key: 'EquipmentList', label: '设备管理', icon: 'list' }
+          { key: 'EquipmentList', label: '设备管理', icon: 'list' },
+          { key: 'InventoryManagement', label: '库存管理', icon: 'inventory' }
         ];
 
         if (response.data.roles?.some(role => role === 'ADMIN' || role === 'ROLE_ADMIN')) {

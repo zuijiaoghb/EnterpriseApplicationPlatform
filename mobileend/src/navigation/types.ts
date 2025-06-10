@@ -10,6 +10,9 @@ export type RootStackParamList = {
   Portal: undefined;
   EquipmentList: { param1: string; param2: number };
   SystemSettings: { param1: string; param2: number };
+  InventoryManagement: { param1: string; param2: number };
+  BarcodeManagement: { param1: string; param2: number };
+  ScanInOut: { param1: string; param2: number };
 };
 
 export type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;

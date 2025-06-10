@@ -15,6 +15,7 @@ const Portal = () => {
   const baseItems = [
     { key: 'Dashboard', label: '仪表盘', icon: 'home' },
     { key: 'EquipmentList', label: '设备管理', icon: 'list' },
+    { key: 'InventoryManagement', label: '库存管理', icon: 'inventory' },
   ];
   
   const [menuItems, setMenuItems] = useState(baseItems);

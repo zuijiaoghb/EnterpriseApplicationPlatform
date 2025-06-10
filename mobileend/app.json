@@ -1,4 +1,7 @@
 {
   "name": "mobileend",
-  "displayName": "企业应用平台"
+  "displayName": "企业应用平台",
+  "plugins": [
+    "react-native-permissions"
+  ]
 }
