@@ -29,8 +29,7 @@
     "react-native-toast-message": "^2.3.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-viewpager": "^0.2.13",
-    "react-native-vision-camera": "^4.6.4",
-    "vision-camera-code-scanner": "^0.2.0"
+    "react-native-vision-camera": "^4.6.4"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

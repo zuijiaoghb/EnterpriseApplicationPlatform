@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Alert, Button } from 'react-native';
-import { Camera, useCameraDevices } from 'react-native-vision-camera';
-import { useScanBarcodes, BarcodeFormat } from 'vision-camera-code-scanner';
+import { Camera, useCameraDevices, useCodeScanner } from 'react-native-vision-camera';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 const ScanInOut = () => {
@@ -10,8 +9,20 @@ const ScanInOut = () => {
   const devices = useCameraDevices();
   const device = devices.find(device => device.position === 'back');
 
-  const [frameProcessor, barcodes] = useScanBarcodes([BarcodeFormat.QR_CODE, BarcodeFormat.CODE_128, BarcodeFormat.EAN_13], {
-    checkInverted: true
+  const codeScanner = useCodeScanner({
+    codeTypes: ['qr', 'ean-13', 'code-128'],
+    onCodeScanned: (codes) => {
+      if (codes.length > 0 && !scanned) {
+        setScanned(true);
+        Alert.alert(
+          '条码扫描结果',
+          `类型: ${codes[0].type}\n数据: ${codes[0].value}`,
+          [
+            { text: '确定', onPress: () => setScanned(false) }
+          ]
+        );
+      }
+    }
   });
 
   useEffect(() => {
@@ -21,20 +32,6 @@ const ScanInOut = () => {
       setHasPermission(status === 'authorized');
     })();
   }, []);
-
-  useEffect(() => {
-    if (barcodes && barcodes.length > 0 && !scanned) {
-      const barcode = barcodes[0];
-      setScanned(true);
-      Alert.alert(
-        '条码扫描结果',
-        `类型: ${barcode.format}\n数据: ${barcode.displayValue}`,
-        [
-          { text: '确定', onPress: () => setScanned(false) }
-        ]
-      );
-    }
-  }, [barcodes, scanned]);
 
   if (hasPermission === null) {
     return <Text>请求相机权限...</Text>;
@@ -52,7 +49,7 @@ const ScanInOut = () => {
         style={StyleSheet.absoluteFill}
         device={device}
         isActive={!scanned}
-        frameProcessor={frameProcessor as any}
+        codeScanner={codeScanner}
       />
       {scanned && (
         <Button title={'再次扫描'} onPress={() => setScanned(false)} />
