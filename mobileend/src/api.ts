@@ -8,7 +8,7 @@ import { LoginScreenNavigationProp } from './navigation/types';
 // 根据运行环境设置基础URL
 const baseURL = Platform.OS === 'web' 
   ? process.env.REACT_APP_API_URL 
-  : process.env.API_URL || 'http://oa.jiangte.com.cn:8081';
+  : process.env.API_URL || 'http://192.168.21.175:8081';
 
 const api = axios.create({
   baseURL,
