@@ -80,7 +80,7 @@ android {
     namespace "com.mobileend"
     defaultConfig {
         applicationId "com.mobileend"
-        minSdkVersion rootProject.ext.minSdkVersion
+        minSdkVersion rootProject.ext.minSdkVersion        
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
@@ -116,5 +116,7 @@ dependencies {
         implementation("com.facebook.react:hermes-android")
     } else {
         implementation jscFlavor
-    }    
+    }   
+
+    implementation 'com.google.mlkit:barcode-scanning:17.2.0' 
 }
