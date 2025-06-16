@@ -84,7 +84,7 @@ public class HYBarCodeMainServiceImpl implements HYBarCodeMainService {
 
     @Override
     public Optional<HYBarCodeMain> getBarCodeMainById(String barCode) {
-        return repository.findById(barCode);
+        return repository.findByBarcode(barCode);
     }
 
     @Override
@@ -94,6 +94,6 @@ public class HYBarCodeMainServiceImpl implements HYBarCodeMainService {
 
     @Override
     public void deleteBarCodeMain(String barCode) {
-        repository.deleteById(barCode);
+        repository.deleteByBarcode(barCode);
     }
 }

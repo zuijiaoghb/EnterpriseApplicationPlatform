@@ -1,8 +1,14 @@
 package com.enterprise.platform.inventorymanagement.repository.sqlserver;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import com.enterprise.platform.inventorymanagement.model.sqlserver.HYBarCodeMain;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface HYBarCodeMainRepository extends JpaRepository<HYBarCodeMain, String> {
+import java.util.Optional;
+
+@Repository
+public interface HYBarCodeMainRepository extends JpaRepository<HYBarCodeMain, Integer> {
+    Optional<HYBarCodeMain> findByBarcode(String barcode);
+    Optional<HYBarCodeMain> findByCsrccodeAndIrowno(String csrccode, Integer irowno);
+    void deleteByBarcode(String barcode);
 }

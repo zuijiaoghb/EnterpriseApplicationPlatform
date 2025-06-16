@@ -1,0 +1,252 @@
+/****** Object:  Table [dbo].[PO_Podetails]     ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[PO_Podetails](
+	[ID] [int] NOT NULL,
+	[cPOID] [nvarchar](30) NULL,
+	[cInvCode] [nvarchar](60) NOT NULL,
+	[iQuantity] [decimal](30, 10) NULL,
+	[iNum] [decimal](30, 10) NULL,
+	[iQuotedPrice] [decimal](30, 10) NULL,
+	[iUnitPrice] [decimal](30, 10) NULL,
+	[iMoney] [money] NULL,
+	[iTax] [money] NULL,
+	[iSum] [money] NULL,
+	[iDisCount] [money] NULL,
+	[iNatUnitPrice] [decimal](30, 10) NULL,
+	[iNatMoney] [money] NULL,
+	[iNatTax] [money] NULL,
+	[iNatSum] [money] NULL,
+	[iNatDisCount] [money] NULL,
+	[dArriveDate] [datetime] NULL,
+	[iReceivedQTY] [decimal](30, 10) NULL,
+	[iReceivedNum] [decimal](30, 10) NULL,
+	[iReceivedMoney] [money] NULL,
+	[iInvQTY] [decimal](30, 10) NULL,
+	[iInvNum] [decimal](30, 10) NULL,
+	[iInvMoney] [money] NULL,
+	[cFree1] [nvarchar](20) NULL,
+	[cFree2] [nvarchar](20) NULL,
+	[iNatInvMoney] [money] NULL,
+	[iOriTotal] [money] NULL,
+	[iTotal] [money] NULL,
+	[iPerTaxRate] [dbo].[userdecimal] NULL,
+	[cDefine22] [nvarchar](60) NULL,
+	[cDefine23] [nvarchar](60) NULL,
+	[cDefine24] [nvarchar](60) NULL,
+	[cDefine25] [nvarchar](60) NULL,
+	[cDefine26] [float] NULL,
+	[cDefine27] [float] NULL,
+	[iflag] [tinyint] NULL,
+	[cItemCode] [nvarchar](60) NULL,
+	[cItem_class] [nvarchar](10) NULL,
+	[PPCIds] [int] NULL,
+	[cItemName] [nvarchar](255) NULL,
+	[cFree3] [nvarchar](20) NULL,
+	[cFree4] [nvarchar](20) NULL,
+	[cFree5] [nvarchar](20) NULL,
+	[cFree6] [nvarchar](20) NULL,
+	[cFree7] [nvarchar](20) NULL,
+	[cFree8] [nvarchar](20) NULL,
+	[cFree9] [nvarchar](20) NULL,
+	[cFree10] [nvarchar](20) NULL,
+	[bGsp] [tinyint] NULL,
+	[POID] [int] NULL,
+	[cUnitID] [nvarchar](35) NULL,
+	[iTaxPrice] [dbo].[userdecimal] NULL,
+	[iArrQTY] [dbo].[userdecimal] NULL,
+	[iArrNum] [dbo].[userdecimal] NULL,
+	[iArrMoney] [money] NULL,
+	[iNatArrMoney] [money] NULL,
+	[iAppIds] [int] NULL,
+	[cDefine28] [nvarchar](120) NULL,
+	[cDefine29] [nvarchar](120) NULL,
+	[cDefine30] [nvarchar](120) NULL,
+	[cDefine31] [nvarchar](120) NULL,
+	[cDefine32] [nvarchar](120) NULL,
+	[cDefine33] [nvarchar](120) NULL,
+	[cDefine34] [int] NULL,
+	[cDefine35] [int] NULL,
+	[cDefine36] [datetime] NULL,
+	[cDefine37] [datetime] NULL,
+	[iSOsID] [int] NULL,
+	[bTaxCost] [bit] NULL,
+	[cSource] [nvarchar](10) NULL,
+	[cbCloser] [nvarchar](20) NULL,
+	[iPPartId] [int] NULL,
+	[iPQuantity] [dbo].[userdecimal] NULL,
+	[iPTOSeq] [int] NULL,
+	[SoType] [tinyint] NULL,
+	[SoDId] [nvarchar](50) NULL,
+	[ContractRowGUID] [uniqueidentifier] NULL,
+	[cupsocode] [nvarchar](64) NULL,
+	[iInvMPCost] [decimal](20, 6) NULL,
+	[ContractCode] [nvarchar](128) NULL,
+	[ContractRowNo] [nvarchar](150) NULL,
+	[fPoValidQuantity] [dbo].[userdecimal] NULL,
+	[fPoValidNum] [dbo].[userdecimal] NULL,
+	[fPoArrQuantity] [dbo].[userdecimal] NULL,
+	[fPoArrNum] [dbo].[userdecimal] NULL,
+	[fPoRetQuantity] [dbo].[userdecimal] NULL,
+	[fPoRetNum] [dbo].[userdecimal] NULL,
+	[fPoRefuseQuantity] [dbo].[userdecimal] NULL,
+	[fPoRefuseNum] [dbo].[userdecimal] NULL,
+	[dUfts] [timestamp] NULL,
+	[iorderdid] [int] NULL,
+	[iordertype] [tinyint] NULL,
+	[csoordercode] [nvarchar](50) NULL,
+	[iorderseq] [int] NULL,
+	[cbCloseTime] [datetime] NULL,
+	[cbCloseDate] [datetime] NULL,
+	[cBG_ItemCode] [nvarchar](50) NULL,
+	[cBG_ItemName] [nvarchar](100) NULL,
+	[cBG_CaliberKey1] [nvarchar](50) NULL,
+	[cBG_CaliberKeyName1] [nvarchar](100) NULL,
+	[cBG_CaliberKey2] [nvarchar](50) NULL,
+	[cBG_CaliberKeyName2] [nvarchar](100) NULL,
+	[cBG_CaliberKey3] [nvarchar](50) NULL,
+	[cBG_CaliberKeyName3] [nvarchar](100) NULL,
+	[cBG_CaliberCode1] [nvarchar](90) NULL,
+	[cBG_CaliberName1] [nvarchar](100) NULL,
+	[cBG_CaliberCode2] [nvarchar](90) NULL,
+	[cBG_CaliberName2] [nvarchar](100) NULL,
+	[cBG_CaliberCode3] [nvarchar](90) NULL,
+	[cBG_CaliberName3] [nvarchar](100) NULL,
+	[iBG_Ctrl] [tinyint] NULL,
+	[cBG_Auditopinion] [nvarchar](100) NULL,
+	[fexquantity] [dbo].[userdecimal] NULL,
+	[fexnum] [dbo].[userdecimal] NULL,
+	[ivouchrowno] [int] NULL,
+	[cBG_CaliberKey4] [nvarchar](50) NULL,
+	[cBG_CaliberKeyName4] [nvarchar](100) NULL,
+	[cBG_CaliberKey5] [nvarchar](50) NULL,
+	[cBG_CaliberKeyName5] [nvarchar](100) NULL,
+	[cBG_CaliberKey6] [nvarchar](50) NULL,
+	[cBG_CaliberKeyName6] [nvarchar](100) NULL,
+	[cBG_CaliberCode4] [nvarchar](90) NULL,
+	[cBG_CaliberName4] [nvarchar](100) NULL,
+	[cBG_CaliberCode5] [nvarchar](90) NULL,
+	[cBG_CaliberName5] [nvarchar](100) NULL,
+	[cBG_CaliberCode6] [nvarchar](90) NULL,
+	[cBG_CaliberName6] [nvarchar](100) NULL,
+	[csocode] [nvarchar](40) NULL,
+	[irowno] [int] NULL,
+	[freceivedqty] [dbo].[userdecimal] NULL,
+	[freceivednum] [dbo].[userdecimal] NULL,
+	[cxjspdids] [nvarchar](60) NULL,
+	[cbMemo] [nvarchar](255) NULL,
+	[cbsysbarcode] [nvarchar](80) NULL,
+	[planlotnumber] [nvarchar](40) NULL,
+	[bgift] [smallint] NULL,
+ CONSTRAINT [aaaaaPO_Podetails_PK] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  CONSTRAINT [DF__PO_Podeta__cDefi__0B287117]  DEFAULT (0) FOR [cDefine26]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  CONSTRAINT [DF__PO_Podeta__cDefi__0C1C9550]  DEFAULT (0) FOR [cDefine27]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  CONSTRAINT [DF_PO_Podetails_bGsp]  DEFAULT (0) FOR [bGsp]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  CONSTRAINT [DF__po_podeta__bTaxC__6EF71214]  DEFAULT (0) FOR [bTaxCost]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_ItemCode]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_ItemName]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberKey1]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberKeyName1]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberKey2]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberKeyName2]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberKey3]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberKeyName3]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberCode1]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberName1]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberCode2]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberName2]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberCode3]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberName3]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (0) FOR [iBG_Ctrl]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_Auditopinion]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberKey4]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberKeyName4]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberKey5]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberKeyName5]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberKey6]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberKeyName6]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberCode4]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberName4]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberCode5]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberName5]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberCode6]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (N'') FOR [cBG_CaliberName6]
+GO
+
+ALTER TABLE [dbo].[PO_Podetails] ADD  DEFAULT (0) FOR [bgift]
+GO
+
+

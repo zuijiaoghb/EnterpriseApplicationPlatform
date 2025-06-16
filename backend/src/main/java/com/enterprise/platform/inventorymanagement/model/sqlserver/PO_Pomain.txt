@@ -1,0 +1,168 @@
+/****** Object:  Table [dbo].[PO_Pomain]   ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[PO_Pomain](
+	[cPOID] [nvarchar](30) NULL,
+	[dPODate] [datetime] NOT NULL,
+	[cVenCode] [nvarchar](20) NULL,
+	[cDepCode] [nvarchar](12) NULL,
+	[cPersonCode] [nvarchar](20) NULL,
+	[cPTCode] [nvarchar](2) NULL,
+	[cArrivalPlace] [nvarchar](255) NULL,
+	[cSCCode] [nvarchar](2) NULL,
+	[cexch_name] [nvarchar](8) NULL,
+	[nflat] [float] NULL,
+	[iTaxRate] [float] NULL,
+	[cPayCode] [nvarchar](3) NULL,
+	[iCost] [money] NULL,
+	[iBargain] [money] NULL,
+	[cMemo] [nvarchar](255) NULL,
+	[cState] [tinyint] NULL,
+	[cPeriod] [nvarchar](12) NULL,
+	[cMaker] [nvarchar](20) NULL,
+	[cVerifier] [nvarchar](20) NULL,
+	[cCloser] [nvarchar](20) NULL,
+	[cDefine1] [nvarchar](20) NULL,
+	[cDefine2] [nvarchar](20) NULL,
+	[cDefine3] [nvarchar](20) NULL,
+	[cDefine4] [datetime] NULL,
+	[cDefine5] [int] NULL,
+	[cDefine6] [datetime] NULL,
+	[cDefine7] [float] NULL,
+	[cDefine8] [nvarchar](4) NULL,
+	[cDefine9] [nvarchar](8) NULL,
+	[cDefine10] [nvarchar](60) NULL,
+	[POID] [int] NOT NULL,
+	[iVTid] [int] NOT NULL,
+	[ufts] [timestamp] NULL,
+	[cChanger] [nvarchar](20) NULL,
+	[cBusType] [nvarchar](8) NULL,
+	[cDefine11] [nvarchar](120) NULL,
+	[cDefine12] [nvarchar](120) NULL,
+	[cDefine13] [nvarchar](120) NULL,
+	[cDefine14] [nvarchar](120) NULL,
+	[cDefine15] [int] NULL,
+	[cDefine16] [float] NULL,
+	[cLocker] [nvarchar](20) NULL,
+	[iDiscountTaxType] [tinyint] NULL,
+	[iverifystateex] [int] NULL,
+	[ireturncount] [int] NULL,
+	[IsWfControlled] [bit] NULL,
+	[cmaketime] [datetime] NULL,
+	[cModifyTime] [datetime] NULL,
+	[cAuditTime] [datetime] NULL,
+	[cAuditDate] [datetime] NULL,
+	[cModifyDate] [datetime] NULL,
+	[cReviser] [nvarchar](40) NULL,
+	[cVenPUOMProtocol] [nvarchar](20) NULL,
+	[cChangVerifier] [nvarchar](40) NULL,
+	[cChangAuditTime] [datetime] NULL,
+	[cChangAuditDate] [datetime] NULL,
+	[iBG_OverFlag] [smallint] NULL,
+	[cBG_Auditor] [nvarchar](20) NULL,
+	[cBG_AuditTime] [nvarchar](20) NULL,
+	[ControlResult] [smallint] NULL,
+	[iflowid] [int] NULL,
+	[iPrintCount] [int] NULL,
+	[dCloseDate] [datetime] NULL,
+	[dCloseTime] [datetime] NULL,
+	[ccleanver] [nvarchar](50) NULL,
+	[cContactCode] [nvarchar](60) NULL,
+	[cVenPerson] [nvarchar](100) NULL,
+	[cVenBank] [nvarchar](200) NULL,
+	[cVenAccount] [nvarchar](100) NULL,
+	[cappcode] [nvarchar](64) NULL,
+	[csysbarcode] [nvarchar](60) NULL,
+	[cCurrentAuditor] [nvarchar](200) NULL,
+ CONSTRAINT [PK_PO_POMain] PRIMARY KEY CLUSTERED 
+(
+	[POID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[PO_Pomain]  WITH CHECK ADD  CONSTRAINT [FK__PO_Pomain__cDepC__36C6FC33] FOREIGN KEY([cDepCode])
+REFERENCES [dbo].[Department] ([cDepCode])
+GO
+
+ALTER TABLE [dbo].[PO_Pomain] CHECK CONSTRAINT [FK__PO_Pomain__cDepC__36C6FC33]
+GO
+
+ALTER TABLE [dbo].[PO_Pomain]  WITH CHECK ADD  CONSTRAINT [FK__PO_Pomain__cexch__54575F1A] FOREIGN KEY([cexch_name])
+REFERENCES [dbo].[foreigncurrency] ([cexch_name])
+GO
+
+ALTER TABLE [dbo].[PO_Pomain] CHECK CONSTRAINT [FK__PO_Pomain__cexch__54575F1A]
+GO
+
+ALTER TABLE [dbo].[PO_Pomain]  WITH CHECK ADD  CONSTRAINT [FK__PO_Pomain__cPayC__05EEBAAE] FOREIGN KEY([cPayCode])
+REFERENCES [dbo].[PayCondition] ([cPayCode])
+GO
+
+ALTER TABLE [dbo].[PO_Pomain] CHECK CONSTRAINT [FK__PO_Pomain__cPayC__05EEBAAE]
+GO
+
+ALTER TABLE [dbo].[PO_Pomain]  WITH CHECK ADD  CONSTRAINT [FK__PO_Pomain__cPers__143CDA05] FOREIGN KEY([cPersonCode])
+REFERENCES [dbo].[Person] ([cPersonCode])
+GO
+
+ALTER TABLE [dbo].[PO_Pomain] CHECK CONSTRAINT [FK__PO_Pomain__cPers__143CDA05]
+GO
+
+ALTER TABLE [dbo].[PO_Pomain]  WITH CHECK ADD  CONSTRAINT [FK__PO_Pomain__cPTCo__3C4ACB5F] FOREIGN KEY([cPTCode])
+REFERENCES [dbo].[PurchaseType] ([cPTCode])
+GO
+
+ALTER TABLE [dbo].[PO_Pomain] CHECK CONSTRAINT [FK__PO_Pomain__cPTCo__3C4ACB5F]
+GO
+
+ALTER TABLE [dbo].[PO_Pomain]  WITH CHECK ADD  CONSTRAINT [FK__PO_Pomain__cSCCo__560A9D62] FOREIGN KEY([cSCCode])
+REFERENCES [dbo].[ShippingChoice] ([cSCCode])
+GO
+
+ALTER TABLE [dbo].[PO_Pomain] CHECK CONSTRAINT [FK__PO_Pomain__cSCCo__560A9D62]
+GO
+
+ALTER TABLE [dbo].[PO_Pomain]  WITH CHECK ADD  CONSTRAINT [FK__PO_Pomain__cVenC__5F94079C] FOREIGN KEY([cVenCode])
+REFERENCES [dbo].[Vendor] ([cVenCode])
+GO
+
+ALTER TABLE [dbo].[PO_Pomain] CHECK CONSTRAINT [FK__PO_Pomain__cVenC__5F94079C]
+GO
+
+ALTER TABLE [dbo].[PO_Pomain] ADD  CONSTRAINT [DF__PO_POMain__POID__6CCED280]  DEFAULT (0) FOR [POID]
+GO
+
+ALTER TABLE [dbo].[PO_Pomain] ADD  CONSTRAINT [DF__PO_POMain__iVTid__6EB71AF2]  DEFAULT (0) FOR [iVTid]
+GO
+
+ALTER TABLE [dbo].[PO_Pomain] ADD  CONSTRAINT [DF__PO_POMain__cBusT__6FAB3F2B]  DEFAULT ('普通采购') FOR [cBusType]
+GO
+
+ALTER TABLE [dbo].[PO_Pomain] ADD  DEFAULT (0) FOR [iDiscountTaxType]
+GO
+
+ALTER TABLE [dbo].[PO_Pomain] ADD  DEFAULT (0) FOR [IsWfControlled]
+GO
+
+ALTER TABLE [dbo].[PO_Pomain] ADD  DEFAULT (getdate()) FOR [cmaketime]
+GO
+
+ALTER TABLE [dbo].[PO_Pomain] ADD  DEFAULT (0) FOR [iBG_OverFlag]
+GO
+
+ALTER TABLE [dbo].[PO_Pomain] ADD  DEFAULT (N'') FOR [cBG_Auditor]
+GO
+
+ALTER TABLE [dbo].[PO_Pomain] ADD  DEFAULT (N'') FOR [cBG_AuditTime]
+GO
+
+ALTER TABLE [dbo].[PO_Pomain] ADD  DEFAULT (0) FOR [iPrintCount]
+GO
+
+

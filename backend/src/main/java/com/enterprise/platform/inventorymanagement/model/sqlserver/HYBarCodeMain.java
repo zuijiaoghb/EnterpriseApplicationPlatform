@@ -4,6 +4,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinColumns;
 import lombok.Data;
 import java.util.Date;
 
@@ -13,7 +16,7 @@ import java.util.Date;
 public class HYBarCodeMain {
     @Id    
     @Column(name = "BarCode", length = 300, nullable = false)
-    private String barCode;
+    private String barcode;
 
     @Column(name = "BarCodeRule", length = 20)
     private String barCodeRule;
@@ -247,7 +250,7 @@ public class HYBarCodeMain {
     private String cComAddUnitCode;
 
     @Column(name = "cSrcCode", length = 30)
-    private String cSrcCode;
+    private String csrccode;
 
     @Column(name = "cSrcVouchType", length = 30)
     private String cSrcVouchType;
@@ -356,6 +359,13 @@ public class HYBarCodeMain {
 
     @Column(name = "irowno")
     private Integer irowno;
+
+    @ManyToOne
+    @JoinColumns({
+        @JoinColumn(name = "csrccode", referencedColumnName = "cPOID"),
+        @JoinColumn(name = "irowno", referencedColumnName = "irowno")
+    })
+    private PO_Podetails poPodetails;
 
     @Column(name = "ufts")
     private byte[] ufts;
