@@ -13,6 +13,10 @@ export type RootStackParamList = {
   InventoryManagement: { param1: string; param2: number };
   BarcodeManagement: { param1: string; param2: number };
   ScanInOut: { param1: string; param2: number };
+  PurchaseIn: undefined;
+  ProductIn: undefined;
+  SalesOut: undefined;
+  MaterialOut: undefined;
 };
 
 export type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;

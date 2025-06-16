@@ -1,115 +1,76 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Alert, Button, ScrollView } from 'react-native';
-import { Camera, useCameraDevices, useCodeScanner, Code } from 'react-native-vision-camera';
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import React from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, ImageBackground } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const ScanInOut = () => {
-  const [hasPermission, setHasPermission] = useState(false);
-  const [scanned, setScanned] = useState(false);
-  const [scannedData, setScannedData] = useState<Code | null>(null); // 修复类型定义
-  const devices = useCameraDevices();
-  const device = devices.find(device => device.position === 'back');
+  const navigation = useNavigation();
 
-  const codeScanner = useCodeScanner({
-    codeTypes: ['qr', 'ean-13', 'code-128', 'code-39', 'ean-8', 'upc-a', 'upc-e'],
-    onCodeScanned: (codes) => {
-      console.log('扫描到的条码数据:', JSON.stringify(codes));
-      if (codes.length > 0 && !scanned) {
-        setScanned(true);
-        setScannedData(codes[0]); // 存储扫描结果
-      }
+  // 导航菜单数据
+  const menuItems = [
+    {
+      title: '采购入库',
+      screen: 'PurchaseIn',
+      color: '#2196F3',
+      icon: '📦',
+      description: '扫描物料条码进行采购入库操作'
+    },
+    {
+      title: '产成品入库',
+      screen: 'ProductIn',
+      color: '#4CAF50',
+      icon: '🏭',
+      description: '扫描成品条码进行生产入库操作'
+    },
+    {
+      title: '销售出库',
+      screen: 'SalesOut',
+      color: '#f44336',
+      icon: '🚚',
+      description: '扫描订单条码进行销售出库操作'
+    },
+    {
+      title: '材料出库',
+      screen: 'MaterialOut',
+      color: '#FF9800',
+      icon: '🔧',
+      description: '扫描材料条码进行生产领料操作'
     }
-  });
+  ];
 
-  useEffect(() => {
-    (async () => {
-      const checkPermission = async () => {
-        const status = await check(PERMISSIONS.ANDROID.CAMERA);
-        if (status === RESULTS.GRANTED) return true;
-        const requestStatus = await request(PERMISSIONS.ANDROID.CAMERA);
-        return requestStatus === RESULTS.GRANTED;
-      };
-
-      const permissionGranted = await checkPermission();
-      setHasPermission(permissionGranted);
-      if (!permissionGranted) {
-        Alert.alert('权限不足', '请在应用设置中启用相机权限');
-      }
-    })();
-  }, []);
-
-  // 重置扫描状态
-  const resetScan = () => {
-    setScanned(false);
-    setScannedData(null);
+  const navigateToScreen = (screenName: string) => {
+    navigation.navigate(screenName as never);
   };
 
-  if (device == null) {
-    return <Text>正在加载相机...</Text>;
-  }
 
   return (
     <View style={styles.container}>
-      {/* 上半部分：扫码区域 */}
-      <View style={styles.cameraContainer}>
-        <Camera
-          style={StyleSheet.absoluteFill}
-          device={device}
-          isActive={!scanned}
-          codeScanner={codeScanner}
-          enableZoomGesture={true}
-          onError={(error) => {
-            console.error('相机错误:', error);
-            Alert.alert('相机初始化失败', `错误信息: ${error.message}\n请确保条码模块已正确下载并配置`);
-          }}
-        />
-        {/* 扫描框指示器 */}
-        {!scanned && (
-          <View style={styles.scanFrame}>
-            <View style={[styles.scanCorner, styles.topLeft]}></View>
-            <View style={[styles.scanCorner, styles.topRight]}></View>
-            <View style={[styles.scanCorner, styles.bottomLeft]}></View>
-            <View style={[styles.scanCorner, styles.bottomRight]}></View>
-          </View>
-        )}
-      </View>
-
-      {/* 下半部分：结果显示区域 */}
-      <View style={styles.resultContainer}>
-        <ScrollView style={styles.resultScroll}>
-          {scannedData ? (
-            <View style={styles.resultCard}>
-              <Text style={styles.resultTitle}>扫描结果</Text>
-              <View style={styles.resultItem}>
-                <Text style={styles.resultLabel}>条码类型:</Text>
-                <Text style={styles.resultValue}>{scannedData.type}</Text>
-              </View>
-              <View style={styles.resultItem}>
-                <Text style={styles.resultLabel}>条码数据:</Text>
-                <Text style={styles.resultValue}>{scannedData.value}</Text>
-              </View>
-              <View style={styles.resultItem}>
-                <Text style={styles.resultLabel}>扫描时间:</Text>
-                <Text style={styles.resultValue}>{new Date().toLocaleString()}</Text>
-              </View>
-            </View>
-          ) : (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>请对准条码进行扫描</Text>
-              <Text style={styles.hintText}>支持QR码、EAN-13、Code-128等多种格式</Text>
-            </View>
-          )}
-        </ScrollView>
-
-        {/* 操作按钮 */}
-        <View style={styles.buttonContainer}>
-          <Button
-            title={scanned ? '再次扫描' : '取消扫描'}
-            onPress={resetScan}
-            color={scanned ? '#2196F3' : '#f44336'}
-          />
+      <ImageBackground
+        source={require('../../assets/login-bg.png')}
+        style={styles.backgroundImage}
+        imageStyle={styles.backgroundImageStyle}
+      >
+        <View style={styles.overlay} />
+        <View style={styles.header}>
+          <Text style={styles.title}>出入库管理系统</Text>
+          <Text style={styles.subtitle}>请选择操作类型</Text>
         </View>
-      </View>
+
+        <ScrollView style={styles.menuContainer}>
+          <View style={styles.menuGrid}>
+            {menuItems.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[styles.menuCard, { backgroundColor: item.color }]}
+                onPress={() => navigateToScreen(item.screen)}
+              >
+                <Text style={styles.menuIcon}>{item.icon}</Text>
+                <Text style={styles.menuTitle}>{item.title}</Text>
+                <Text style={styles.menuDescription}>{item.description}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+      </ImageBackground>      
     </View>
   );
 };
@@ -119,6 +80,72 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     backgroundColor: '#f5f5f5',
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  backgroundImageStyle: {
+    resizeMode: 'cover',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  header: {
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 8,
+    textShadowColor: '#000',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.9)',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  menuContainer: {
+    padding: 16,
+  },
+  menuGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  menuCard: {
+    width: '48%',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+    alignItems: 'center',
+    elevation: 3,
+  },
+  menuIcon: {
+    fontSize: 32,
+    marginBottom: 8,
+    color: '#fff',
+  },
+  menuTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  menuDescription: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.9)',
+    textAlign: 'center',
   },
   cameraContainer: {
     flex: 2, // 上半部分占2/3高度

@@ -14,6 +14,10 @@ import ClientManagement from './src/pages/ClientManagement';
 import InventoryManagement from './src/pages/InventoryManagement';
 import BarcodeManagement from './src/pages/BarcodeManagement';
 import ScanInOut from './src/pages/ScanInOut';
+import PurchaseIn from './src/pages/PurchaseIn';
+import ProductIn from './src/pages/ProductIn';
+import SalesOut from './src/pages/SalesOut';
+import MaterialOut from './src/pages/MaterialOut';
 
 import { RootStackParamList } from './src/navigation/types';
 
@@ -48,7 +52,11 @@ const App = () => {
                 <Stack.Screen name="ClientManagement" component={ClientManagement} options={{ title: '客户端管理' }} />
                 <Stack.Screen name="InventoryManagement" component={InventoryManagement} options={{ title: '库存管理' }} />
                 <Stack.Screen name="BarcodeManagement" component={BarcodeManagement} options={{ title: '条码管理' }} />
-                <Stack.Screen name="ScanInOut" component={ScanInOut} options={{ title: '扫码出入库' }} />
+                <Stack.Screen name="ScanInOut" component={ScanInOut} options={{ title: '出入库扫描' }} />
+                <Stack.Screen name="PurchaseIn" component={PurchaseIn} options={{ title: '采购入库' }} />
+                <Stack.Screen name="ProductIn" component={ProductIn} options={{ title: '产成品入库' }} />
+                <Stack.Screen name="SalesOut" component={SalesOut} options={{ title: '销售出库' }} />
+                <Stack.Screen name="MaterialOut" component={MaterialOut} options={{ title: '材料出库' }} />
               </Stack.Navigator>
             </MainLayout>
           )}
