@@ -255,8 +255,8 @@ public class HYBarCodeMain {
     @Column(name = "cSrcVouchType", length = 30)
     private String cSrcVouchType;
 
-    @Column(name = "cSrcSubID")
-    private Integer cSrcSubID;
+    @Column(name = "cSrcSubID", insertable = false, updatable = false)
+    private Integer csrcsubid;
 
     @Column(name = "cBarMainID")
     private Integer cBarMainID;
@@ -357,13 +357,13 @@ public class HYBarCodeMain {
     @Column(name = "cBatchProperty10")
     private Date cBatchProperty10;
 
-    @Column(name = "irowno")
+    @Column(name = "irowno", insertable = false, updatable = false)
     private Integer irowno;
 
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "csrccode", referencedColumnName = "cPOID"),
-        @JoinColumn(name = "irowno", referencedColumnName = "irowno")
+        @JoinColumn(name = "cSrcSubID", referencedColumnName = "id")
     })
     private PO_Podetails poPodetails;
 

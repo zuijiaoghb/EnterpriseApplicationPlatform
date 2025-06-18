@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface HYBarCodeMainRepository extends JpaRepository<HYBarCodeMain, Integer> {
-    Optional<HYBarCodeMain> findByBarcode(String barcode);
-    Optional<HYBarCodeMain> findByCsrccodeAndIrowno(String csrccode, Integer irowno);
+    Optional<HYBarCodeMain> findByBarcode(String barcode);    
+    Optional<HYBarCodeMain> findByCsrccodeAndCsrcsubid(String csrccode, Integer csrcsubid);
     void deleteByBarcode(String barcode);
 }

@@ -6,7 +6,6 @@ import com.enterprise.platform.inventorymanagement.model.sqlserver.PO_Podetails;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.PO_Pomain;
 import com.enterprise.platform.inventorymanagement.model.vo.ResultVO;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.HYBarCodeMainRepository;
-import com.enterprise.platform.inventorymanagement.repository.sqlserver.PO_PodetailsRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.PO_PomainRepository;
 import com.enterprise.platform.inventorymanagement.service.PurchaseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +24,6 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Autowired
     private PO_PomainRepository poPomainRepository;
 
-    @Autowired
-    private PO_PodetailsRepository poPodetailsRepository;
-
     @Override
     @Transactional
     public ResultVO<PurchaseScanDTO> scanPurchaseIn(String barcode) {
@@ -41,7 +37,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
 
         // 3. 根据csrccode和irowno查询采购订单明细
-        Optional<HYBarCodeMain> codeMainOptional = hyBarCodeMainRepository.findByCsrccodeAndIrowno(barCodeMain.getCsrccode(), barCodeMain.getIrowno());
+        Optional<HYBarCodeMain> codeMainOptional = hyBarCodeMainRepository.findByCsrccodeAndCsrcsubid(barCodeMain.getCsrccode(), barCodeMain.getCsrcsubid());
         if (!codeMainOptional.isPresent()) {
             return ResultVO.fail("未找到对应的采购订单明细");
         }
@@ -53,9 +49,9 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
 
         // 5. 查询采购订单子表信息
-        Integer irowno = codeMainOptional.get().getIrowno();
+        Integer cSrcSubID = codeMainOptional.get().getCsrcsubid();
         PO_Podetails poPodetails = poPomain.getPoPodetailsList().stream()
-                .filter(item -> item.getIrowno().equals(irowno))
+                .filter(item -> item.getId().equals(cSrcSubID))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("未找到对应的采购订单子表记录"));
         if (poPodetails == null) {
