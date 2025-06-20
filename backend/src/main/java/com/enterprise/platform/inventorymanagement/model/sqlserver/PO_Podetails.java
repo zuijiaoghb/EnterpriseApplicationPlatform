@@ -283,7 +283,7 @@ public class PO_Podetails {
     @Column(name = "fPoRefuseNum")
     private BigDecimal fPoRefuseNum;
 
-    @Column(name = "dUfts")
+    @Column(name = "dUfts", insertable = false,updatable = false)
     private byte[] dUfts;
 
     @Column(name = "iorderdid")

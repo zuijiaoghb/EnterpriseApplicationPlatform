@@ -46,9 +46,4 @@ public class HYBarCodeMainController {
         return new ResponseEntity<>(savedBarCodeMain, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{barCode}")
-    public ResponseEntity<Void> deleteBarCodeMain(@PathVariable String barCode) {
-        service.deleteBarCodeMain(barCode);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
 }

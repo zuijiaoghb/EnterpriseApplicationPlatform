@@ -1,9 +1,9 @@
 package com.enterprise.platform.inventorymanagement.controller;
 
 import com.enterprise.platform.inventorymanagement.model.dto.PurchaseScanDTO;
-import com.enterprise.platform.inventorymanagement.model.vo.ResultVO;
 import com.enterprise.platform.inventorymanagement.service.PurchaseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,8 +19,8 @@ public class PurchaseController {
      * @return 入库结果
      */
     @GetMapping("/scan-in")
-    public ResultVO<PurchaseScanDTO> scanPurchaseIn(@RequestParam String barcode) {
-        return purchaseService.scanPurchaseIn(barcode);
+    public ResponseEntity<PurchaseScanDTO> scanPurchaseIn(@RequestParam String barcode) {
+        return ResponseEntity.ok(purchaseService.scanPurchaseIn(barcode));
     }
 
     /**
@@ -29,7 +29,7 @@ public class PurchaseController {
      * @return 订单详情
      */
     @GetMapping("/order/{cPOID}")
-    public ResultVO<PurchaseScanDTO> getPurchaseOrderByCode(@PathVariable String cPOID) {
-        return purchaseService.getPurchaseOrderByCode(cPOID);
+    public ResponseEntity<PurchaseScanDTO> getPurchaseOrderByCode(@PathVariable String cPOID) {
+        return ResponseEntity.ok(purchaseService.getPurchaseOrderByCode(cPOID));
     }
 }

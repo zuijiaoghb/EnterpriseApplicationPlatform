@@ -249,7 +249,7 @@ public class HYBarCodeMain {
     @Column(name = "cComAddUnitCode", length = 40)
     private String cComAddUnitCode;
 
-    @Column(name = "cSrcCode", length = 30)
+    @Column(name = "cSrcCode", length = 30, insertable = false, updatable = false)
     private String csrccode;
 
     @Column(name = "cSrcVouchType", length = 30)
@@ -367,7 +367,7 @@ public class HYBarCodeMain {
     })
     private PO_Podetails poPodetails;
 
-    @Column(name = "ufts")
+    @Column(name = "ufts", insertable = false, updatable = false)
     private byte[] ufts;
 
     @Column(name = "iRelAutoid")

@@ -1,0 +1,244 @@
+
+
+/****** Object:  Table [dbo].[rdrecords01]    Script Date: 06/18/2025 11:47:12 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[rdrecords01](
+	[AutoID] [bigint] NOT NULL,
+	[ID] [bigint] NOT NULL,
+	[cInvCode] [nvarchar](60) NOT NULL,
+	[iNum] [decimal](30, 10) NULL,
+	[iQuantity] [decimal](30, 10) NULL,
+	[iUnitCost] [decimal](30, 10) NULL,
+	[iPrice] [money] NULL,
+	[iAPrice] [money] NULL,
+	[iPUnitCost] [decimal](30, 10) NULL,
+	[iPPrice] [money] NULL,
+	[cBatch] [nvarchar](60) NULL,
+	[cVouchCode] [bigint] NULL,
+	[cInVouchCode] [nvarchar](30) NULL,
+	[cinvouchtype] [nvarchar](2) NULL,
+	[iSOutQuantity] [decimal](30, 10) NULL,
+	[iSOutNum] [decimal](30, 10) NULL,
+	[cFree1] [nvarchar](20) NULL,
+	[cFree2] [nvarchar](20) NULL,
+	[iFlag] [tinyint] NOT NULL,
+	[dSDate] [datetime] NULL,
+	[iTax] [money] NULL,
+	[iSQuantity] [decimal](30, 10) NULL,
+	[iSNum] [decimal](30, 10) NULL,
+	[iMoney] [money] NULL,
+	[iFNum] [decimal](30, 10) NULL,
+	[iFQuantity] [decimal](30, 10) NULL,
+	[dVDate] [datetime] NULL,
+	[cPosition] [nvarchar](20) NULL,
+	[cDefine22] [nvarchar](60) NULL,
+	[cDefine23] [nvarchar](60) NULL,
+	[cDefine24] [nvarchar](60) NULL,
+	[cDefine25] [nvarchar](60) NULL,
+	[cDefine26] [float] NULL,
+	[cDefine27] [float] NULL,
+	[cItem_class] [nvarchar](10) NULL,
+	[cItemCode] [nvarchar](60) NULL,
+	[iPOsID] [bigint] NULL,
+	[fACost] [decimal](30, 10) NULL,
+	[cName] [nvarchar](255) NULL,
+	[cItemCName] [nvarchar](20) NULL,
+	[cFree3] [nvarchar](20) NULL,
+	[cFree4] [nvarchar](20) NULL,
+	[cFree5] [nvarchar](20) NULL,
+	[cFree6] [nvarchar](20) NULL,
+	[cFree7] [nvarchar](20) NULL,
+	[cFree8] [nvarchar](20) NULL,
+	[cFree9] [nvarchar](20) NULL,
+	[cFree10] [nvarchar](20) NULL,
+	[cBarCode] [nvarchar](200) NULL,
+	[iNQuantity] [decimal](30, 10) NULL,
+	[iNNum] [decimal](30, 10) NULL,
+	[cAssUnit] [nvarchar](35) NULL,
+	[dMadeDate] [datetime] NULL,
+	[iMassDate] [int] NULL,
+	[cDefine28] [nvarchar](120) NULL,
+	[cDefine29] [nvarchar](120) NULL,
+	[cDefine30] [nvarchar](120) NULL,
+	[cDefine31] [nvarchar](120) NULL,
+	[cDefine32] [nvarchar](120) NULL,
+	[cDefine33] [nvarchar](120) NULL,
+	[cDefine34] [int] NULL,
+	[cDefine35] [int] NULL,
+	[cDefine36] [datetime] NULL,
+	[cDefine37] [datetime] NULL,
+	[iCheckIds] [bigint] NULL,
+	[cBVencode] [nvarchar](20) NULL,
+	[chVencode] [nvarchar](20) NULL,
+	[bGsp] [bit] NULL,
+	[cGspState] [nvarchar](20) NULL,
+	[iArrsId] [bigint] NULL,
+	[cCheckCode] [nvarchar](30) NULL,
+	[iCheckIdBaks] [bigint] NULL,
+	[cRejectCode] [nvarchar](30) NULL,
+	[iRejectIds] [bigint] NULL,
+	[cCheckPersonCode] [nvarchar](20) NULL,
+	[dCheckDate] [datetime] NULL,
+	[iOriTaxCost] [decimal](20, 6) NULL,
+	[iOriCost] [decimal](20, 6) NULL,
+	[iOriMoney] [money] NULL,
+	[iOriTaxPrice] [money] NULL,
+	[ioriSum] [money] NULL,
+	[iTaxRate] [decimal](20, 6) NULL,
+	[iTaxPrice] [money] NULL,
+	[iSum] [money] NULL,
+	[bTaxCost] [bit] NULL,
+	[cPOID] [nvarchar](30) NULL,
+	[cMassUnit] [smallint] NULL,
+	[iMaterialFee] [money] NULL,
+	[iProcessCost] [decimal](30, 10) NULL,
+	[iProcessFee] [money] NULL,
+	[dMSDate] [datetime] NULL,
+	[iSMaterialFee] [money] NULL,
+	[iSProcessFee] [money] NULL,
+	[iOMoDID] [int] NULL,
+	[strContractId] [nvarchar](64) NULL,
+	[strCode] [nvarchar](150) NULL,
+	[bChecked] [bit] NULL,
+	[bRelated] [bit] NULL,
+	[iOMoMID] [bigint] NULL,
+	[iMatSettleState] [int] NOT NULL,
+	[iBillSettleCount] [int] NOT NULL,
+	[bLPUseFree] [bit] NULL,
+	[iOriTrackID] [bigint] NULL,
+	[coritracktype] [nvarchar](2) NULL,
+	[cbaccounter] [nvarchar](30) NULL,
+	[dbKeepDate] [datetime] NULL,
+	[bCosting] [bit] NULL,
+	[iSumBillQuantity] [decimal](30, 10) NULL,
+	[bVMIUsed] [bit] NULL,
+	[iVMISettleQuantity] [decimal](30, 10) NULL,
+	[iVMISettleNum] [decimal](30, 10) NULL,
+	[cvmivencode] [nvarchar](20) NULL,
+	[iInvSNCount] [int] NULL,
+	[cwhpersoncode] [nvarchar](20) NULL,
+	[cwhpersonname] [nvarchar](50) NULL,
+	[impcost] [decimal](30, 10) NULL,
+	[iIMOSID] [int] NULL,
+	[iIMBSID] [int] NULL,
+	[cbarvcode] [nvarchar](30) NULL,
+	[dbarvdate] [nvarchar](30) NULL,
+	[iinvexchrate] [decimal](30, 10) NULL,
+	[corufts] [varchar](16) NULL,
+	[comcode] [nvarchar](30) NULL,
+	[strContractGUID] [uniqueidentifier] NULL,
+	[iExpiratDateCalcu] [smallint] NULL
+) ON [PRIMARY]
+SET ANSI_PADDING OFF
+ALTER TABLE [dbo].[rdrecords01] ADD [cExpirationdate] [varchar](10) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [dExpirationdate] [datetime] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [cciqbookcode] [nvarchar](20) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [iBondedSumQty] [decimal](34, 8) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [iordertype] [tinyint] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [iorderdid] [int] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [iordercode] [nvarchar](30) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [iorderseq] [int] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [isodid] [nvarchar](40) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [isotype] [tinyint] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [csocode] [nvarchar](40) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [isoseq] [int] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [cBatchProperty1] [decimal](38, 8) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [cBatchProperty2] [decimal](38, 8) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [cBatchProperty3] [decimal](38, 8) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [cBatchProperty4] [decimal](38, 8) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [cBatchProperty5] [decimal](38, 8) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [cBatchProperty6] [nvarchar](120) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [cBatchProperty7] [nvarchar](120) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [cBatchProperty8] [nvarchar](120) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [cBatchProperty9] [nvarchar](120) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [cBatchProperty10] [datetime] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [cbMemo] [nvarchar](255) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [iFaQty] [decimal](38, 6) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [isTax] [decimal](38, 6) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [irowno] [int] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [strowguid] [uniqueidentifier] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [rowufts] [timestamp] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [ipreuseqty] [decimal](38, 8) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [ipreuseinum] [decimal](38, 8) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [iDebitIDs] [int] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [OutCopiedQuantity] [decimal](30, 10) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [iOldPartId] [int] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [fOldQuantity] [decimal](30, 10) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [cbsysbarcode] [nvarchar](80) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [bmergecheck] [bit] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [iMergeCheckAutoId] [int] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [bnoitemused] [tinyint] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [cReworkMOCode] [nvarchar](30) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [iReworkMODetailsid] [int] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [iProductType] [int] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [cMainInvCode] [nvarchar](30) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [iMainMoDetailsID] [int] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [iShareMaterialFee] [decimal](38, 6) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [cplanlotcode] [nvarchar](80) NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [bgift] [smallint] NULL
+ALTER TABLE [dbo].[rdrecords01] ADD [iposflag] [smallint] NULL
+/****** Object:  Index [aaaaaRdRecords01_PK]    Script Date: 06/18/2025 11:47:12 ******/
+ALTER TABLE [dbo].[rdrecords01] ADD  CONSTRAINT [aaaaaRdRecords01_PK] PRIMARY KEY CLUSTERED 
+(
+	[AutoID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+ALTER TABLE [dbo].[rdrecords01] ADD  DEFAULT (0) FOR [iFlag]
+GO
+
+ALTER TABLE [dbo].[rdrecords01] ADD  DEFAULT (0) FOR [iTaxRate]
+GO
+
+ALTER TABLE [dbo].[rdrecords01] ADD  DEFAULT (0) FOR [iMatSettleState]
+GO
+
+ALTER TABLE [dbo].[rdrecords01] ADD  DEFAULT (0) FOR [iBillSettleCount]
+GO
+
+ALTER TABLE [dbo].[rdrecords01] ADD  DEFAULT (0) FOR [bLPUseFree]
+GO
+
+ALTER TABLE [dbo].[rdrecords01] ADD  DEFAULT (0) FOR [iOriTrackID]
+GO
+
+ALTER TABLE [dbo].[rdrecords01] ADD  DEFAULT (N'') FOR [cbaccounter]
+GO
+
+ALTER TABLE [dbo].[rdrecords01] ADD  DEFAULT (0) FOR [iSumBillQuantity]
+GO
+
+ALTER TABLE [dbo].[rdrecords01] ADD  DEFAULT (0) FOR [bVMIUsed]
+GO
+
+ALTER TABLE [dbo].[rdrecords01] ADD  DEFAULT (0) FOR [iVMISettleQuantity]
+GO
+
+ALTER TABLE [dbo].[rdrecords01] ADD  DEFAULT (0) FOR [iVMISettleNum]
+GO
+
+ALTER TABLE [dbo].[rdrecords01] ADD  DEFAULT ('') FOR [corufts]
+GO
+
+ALTER TABLE [dbo].[rdrecords01] ADD  DEFAULT (0) FOR [iordertype]
+GO
+
+ALTER TABLE [dbo].[rdrecords01] ADD  DEFAULT (0) FOR [bgift]
+GO
+
+ALTER TABLE [dbo].[rdrecords01] ADD  DEFAULT (0) FOR [iposflag]
+GO
+
+

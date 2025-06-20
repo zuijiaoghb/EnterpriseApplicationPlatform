@@ -1,29 +1,122 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Alert, Button, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Alert, Button, ScrollView, TextInput } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import BarcodeScannerComponent from '../components/BarcodeScannerComponent';
 import { Code } from 'react-native-vision-camera';
+import api from '../api';
 
 const PurchaseIn = () => {
   const [scanned, setScanned] = useState(false);
   const [scannedData, setScannedData] = useState<Code | null>(null);
+  const [warehouses, setWarehouses] = useState([{ code: '', name: '请选择仓库' }]);
+  const [selectedWarehouse, setSelectedWarehouse] = useState('');
+  const [poQuantity, setPoQuantity] = useState(0);
+  const [inboundQuantity, setInboundQuantity] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  // 获取仓库列表（前端硬编码）
+  useEffect(() => {
+    const warehousesData = [
+      { code: '019', name: '半成品仓（建机）' },
+      { code: '018', name: '半成品仓（专用）' },
+      { code: '035', name: '成品库（建机）' },
+      { code: '034', name: '成品库（专用）' },
+      { code: '015', name: '原材料仓（建机）' },
+      { code: '014', name: '原材料仓（专用）' }
+    ];
+    setWarehouses([{ code: '', name: '请选择仓库' }, ...warehousesData]);
+  }, []);
+
+  // 扫描后获取采购订单信息
+  useEffect(() => {
+    if (scannedData) {
+      fetchPOInfo();
+    }
+  }, [scannedData]);
+
+  const fetchPOInfo = async () => {
+    if (!scannedData) return;
+
+    setLoading(true);
+    try {
+      const response = await api.get(`/api/inventory/purchase/scan-in?barcode=${scannedData.value}`);
+      setPoQuantity(response.data.quantity);
+      // 默认选中第一个仓库
+      if (warehouses.length > 1) {
+        setSelectedWarehouse(warehouses[1].code);
+      }
+    } catch (error) {
+      console.error('获取采购订单信息失败:', error);
+      Alert.alert('错误', '获取采购订单信息失败');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCodeScanned = (code: Code) => {
     console.log('采购入库扫描结果:', code);
     setScanned(true);
     setScannedData(code);
-    // 这里可以添加采购入库的业务逻辑处理
   };
 
   const resetScan = () => {
     setScanned(false);
     setScannedData(null);
+    setInboundQuantity('');
+    setPoQuantity(0);
   };
 
-  const handleConfirm = () => {
+  const validateInput = () => {
+    if (!selectedWarehouse) {
+      Alert.alert('错误', '请选择仓库');
+      return false;
+    }
+
+    if (!inboundQuantity || isNaN(Number(inboundQuantity))) {
+      Alert.alert('错误', '请输入有效的入库数量');
+      return false;
+    }
+
+    const quantity = Number(inboundQuantity);
+    if (quantity <= 0) {
+      Alert.alert('错误', '入库数量必须大于0');
+      return false;
+    }
+
+    if (quantity > poQuantity) {
+      Alert.alert('错误', `入库数量不能大于采购订单数量(${poQuantity})`);
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleConfirm = async () => {
     if (!scannedData) return;
-    // 采购入库确认逻辑
-    Alert.alert('成功', `采购入库已确认\n条码: ${scannedData.value}`);
-    resetScan();
+    if (!validateInput()) return;
+
+    setLoading(true);
+    try {
+      const response = await api.post('/api/inventory/inbound/barcode', null, {
+        params: {
+          barcode: scannedData.value,
+          warehouseCode: selectedWarehouse,
+          quantity: Number(inboundQuantity)
+        }
+      });
+
+      if (response.status === 201) {
+        Alert.alert('成功', `采购入库已确认\n入库单号: ${response.data.id}`);
+        resetScan();
+      } else {
+        Alert.alert('错误', '入库失败，请重试');
+      }
+    } catch (error) {
+      console.error('入库操作失败:', error);
+      Alert.alert('错误', '网络异常，请重试');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -43,7 +136,11 @@ const PurchaseIn = () => {
       {/* 结果显示区域 */}
       <View style={styles.resultContainer}>
         <ScrollView style={styles.resultScroll}>
-          {scannedData ? (
+          {loading ? (
+            <View style={styles.loadingState}>
+              <Text style={styles.loadingText}>加载中...</Text>
+            </View>
+          ) : scannedData ? (
             <View style={styles.resultCard}>
               <Text style={styles.resultTitle}>扫描结果</Text>
               <View style={styles.resultItem}>
@@ -55,6 +152,32 @@ const PurchaseIn = () => {
                 <Text style={styles.resultValue}>{scannedData.value}</Text>
               </View>
               <View style={styles.resultItem}>
+                <Text style={styles.resultLabel}>采购订单数量:</Text>
+                <Text style={styles.resultValue}>{poQuantity} 件</Text>
+              </View>
+              <View style={styles.resultItem}>
+                <Text style={styles.resultLabel}>选择仓库:</Text>
+                <Picker
+                  selectedValue={selectedWarehouse}
+                  style={styles.picker}
+                  onValueChange={(itemValue) => setSelectedWarehouse(itemValue)}
+                >
+                  {warehouses.map(warehouse => (
+                    <Picker.Item key={warehouse.code} label={warehouse.name} value={warehouse.code} />
+                  ))}
+                </Picker>
+              </View>
+              <View style={styles.resultItem}>
+                <Text style={styles.resultLabel}>入库数量:</Text>
+                <TextInput
+                  style={styles.input}
+                  keyboardType="numeric"
+                  value={inboundQuantity}
+                  onChangeText={setInboundQuantity}
+                  placeholder={`请输入(1-${poQuantity})`}
+                />
+              </View>
+              <View style={styles.resultItem}>
                 <Text style={styles.resultLabel}>扫描时间:</Text>
                 <Text style={styles.resultValue}>{new Date().toLocaleString()}</Text>
               </View>
@@ -63,6 +186,7 @@ const PurchaseIn = () => {
                   title="确认入库"
                   onPress={handleConfirm}
                   color="#4CAF50"
+                  disabled={loading}
                 />
               </View>
             </View>
@@ -158,6 +282,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  loadingState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#666',
+  },
   emptyText: {
     fontSize: 16,
     color: '#666',
@@ -174,6 +307,18 @@ const styles = StyleSheet.create({
   },
   actionButtons: {
     marginTop: 16,
+  },
+  input: {
+    height: 40,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    width: '65%',
+  },
+  picker: {
+    width: '65%',
+    height: 40,
   },
 });
 

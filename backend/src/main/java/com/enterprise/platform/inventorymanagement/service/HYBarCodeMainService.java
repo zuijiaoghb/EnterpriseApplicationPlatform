@@ -12,6 +12,5 @@ public interface HYBarCodeMainService {
     List<HYBarCodeMain> getAllBarCodeMains();
     Page<HYBarCodeMain> getAllBarCodeMains(Pageable pageable);
     Optional<HYBarCodeMain> getBarCodeMainById(String barCode);
-    HYBarCodeMain saveBarCodeMain(HYBarCodeMain barCodeMain);
-    void deleteBarCodeMain(String barCode);
+    HYBarCodeMain saveBarCodeMain(HYBarCodeMain barCodeMain);    
 }

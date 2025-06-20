@@ -92,8 +92,5 @@ public class HYBarCodeMainServiceImpl implements HYBarCodeMainService {
         return repository.save(barCodeMain);
     }
 
-    @Override
-    public void deleteBarCodeMain(String barCode) {
-        repository.deleteByBarcode(barCode);
-    }
+    
 }
