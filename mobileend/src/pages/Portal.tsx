@@ -84,13 +84,14 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
+    flexDirection: 'column',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     padding: 20,
   },
   header: {
-    marginTop: 60,
-    marginBottom: 40,
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   welcomeText: {
     color: 'rgba(255, 255, 255, 0.9)',
@@ -106,6 +107,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 2,
   },
   grid: {
+    flex: 4,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',

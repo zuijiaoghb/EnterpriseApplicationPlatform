@@ -40,7 +40,7 @@ const PurchaseIn = () => {
     setLoading(true);
     try {
       const response = await api.get(`/api/inventory/purchase/scan-in?barcode=${scannedData.value}`);
-      setPoQuantity(response.data.quantity);
+      setPoQuantity(response.data.iQuantity);
       // 默认选中第一个仓库
       if (warehouses.length > 1) {
         setSelectedWarehouse(warehouses[1].code);
@@ -230,11 +230,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   cameraContainer: {
-    flex: 2,
+    flex: 1,
     position: 'relative',
   },
   resultContainer: {
-    flex: 1,
+    flex: 2,
     padding: 16,
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,

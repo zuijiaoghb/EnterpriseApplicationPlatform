@@ -138,20 +138,51 @@ public class RdRecordServiceImpl implements RdRecordService {
         inboundDetail.setITaxRate(poPodetails.getiPerTaxRate()); // 税率
         inboundDetail.setITaxPrice(poPodetails.getiTax()); // 税额
         inboundDetail.setISum(poPodetails.getiSum()); // 价税合计
-        inboundDetail.setBTaxCost(true); // 税额计算方式
+        inboundDetail.setBTaxCost(poPodetails.getbTaxCost()); // 税额计算方式
         inboundDetail.setCPOID(poCode); // 采购订单号
         inboundDetail.setIrowno(1); // 行号
         inboundDetail.setIFlag((byte) 0);
         inboundDetail.setIMatSettleState(0);
         inboundDetail.setIBillSettleCount(0);
+        inboundDetail.setBCosting(true);    // 单据是否核算
+        inboundDetail.setISQuantity(new BigDecimal(0)); // 累计结算数量
+        inboundDetail.setISNum(new BigDecimal(0));  //累计结算辅计量数量 
+        inboundDetail.setIMoney(new BigDecimal(0)); 
+        inboundDetail.setCDefine30(poPodetails.getcDefine30());
+        inboundDetail.setCDefine31(poPodetails.getcDefine31());
+        inboundDetail.setCDefine32(poPodetails.getcDefine32());
+        inboundDetail.setBLPUseFree(false);
+        inboundDetail.setIOriTrackID(0L);
+        inboundDetail.setIExpiratDateCalcu((short) 0);
+        inboundDetail.setIordertype(poPodetails.getIordertype());
+        inboundDetail.setIorderdid(poPodetails.getIorderdid());
+        inboundDetail.setIordercode(poPodetails.getCsoordercode());
+        inboundDetail.setIorderseq(poPodetails.getIorderseq());
+        inboundDetail.setIsodid(poPodetails.getSoDId());
+        inboundDetail.setIsotype(poPodetails.getSoType());
+        inboundDetail.setIsoseq(poPodetails.getIorderseq());
+        inboundDetail.setCplanlotcode(poPodetails.getPlanlotnumber());
+        inboundDetail.setBgift(poPodetails.getBgift());
         rdRecords01Repository.save(inboundDetail);        
 
         // 更新对应的采购订单子表PO_Podetails的累计到货数量iReceivedQTY和累计原币到货金额iReceivedMoney
+        BigDecimal iQuantity = Optional.ofNullable(poPodetails.getiQuantity()).orElse(BigDecimal.ZERO);
+        BigDecimal iMoney = Optional.ofNullable(poPodetails.getiMoney()).orElse(BigDecimal.ZERO);
         BigDecimal receivedQTY = Optional.ofNullable(poPodetails.getiReceivedQTY()).orElse(BigDecimal.ZERO);
-        poPodetails.setiReceivedQTY(receivedQTY.add(new BigDecimal(quantity)));
+        BigDecimal newReceivedQTY = receivedQTY.add(new BigDecimal(quantity));
+        if (newReceivedQTY.compareTo(iQuantity) > 0) {
+            throw new IllegalArgumentException("累计到货数量不能超过订单数量: " + iQuantity);
+        }
+        poPodetails.setiReceivedQTY(newReceivedQTY);
+        
         BigDecimal receivedMoney = Optional.ofNullable(poPodetails.getiReceivedMoney()).orElse(BigDecimal.ZERO);
         BigDecimal unitPrice = Optional.ofNullable(poPodetails.getiUnitPrice()).orElse(BigDecimal.ZERO);
-        poPodetails.setiReceivedMoney(receivedMoney.add(unitPrice.multiply(new BigDecimal(quantity))));
+        BigDecimal addMoney = unitPrice.multiply(new BigDecimal(quantity));
+        BigDecimal newReceivedMoney = receivedMoney.add(addMoney);
+        if (newReceivedMoney.compareTo(iMoney) > 0) {
+            throw new IllegalArgumentException("累计到货金额不能超过订单金额: " + iMoney);
+        }
+        poPodetails.setiReceivedMoney(newReceivedMoney);
         poPodetailsRepository.save(poPodetails);
 
         return inboundMain;

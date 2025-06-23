@@ -1,0 +1,12 @@
+CREATE TRIGGER trg_currentstock_after_insert
+ON currentstock
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE c
+    SET fInQuantity = 0
+    FROM currentstock c
+    INNER JOIN inserted i ON c.AutoID = i.AutoID
+    WHERE c.fInQuantity < 0;
+END;
