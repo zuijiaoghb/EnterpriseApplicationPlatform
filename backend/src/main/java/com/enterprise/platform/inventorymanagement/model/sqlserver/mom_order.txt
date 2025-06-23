@@ -1,0 +1,55 @@
+
+
+/****** Object:  Table [dbo].[mom_order]    Script Date: 06/23/2025 16:54:56 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[mom_order](
+	[MoId] [int] NOT NULL,
+	[MoCode] [nvarchar](30) NOT NULL,
+	[CreateDate] [datetime] NULL,
+	[CreateUser] [nvarchar](20) NULL,
+	[ModifyDate] [datetime] NULL,
+	[ModifyUser] [nvarchar](20) NULL,
+	[UpdCount] [int] NULL,
+	[Ufts] [timestamp] NULL,
+	[Define1] [nvarchar](20) NULL,
+	[Define2] [nvarchar](20) NULL,
+	[Define3] [nvarchar](20) NULL,
+	[Define4] [datetime] NULL,
+	[Define5] [int] NULL,
+	[Define6] [datetime] NULL,
+	[Define7] [float] NULL,
+	[Define8] [nvarchar](4) NULL,
+	[Define9] [nvarchar](8) NULL,
+	[Define10] [nvarchar](60) NULL,
+	[Define11] [nvarchar](120) NULL,
+	[Define12] [nvarchar](120) NULL,
+	[Define13] [nvarchar](120) NULL,
+	[Define14] [nvarchar](120) NULL,
+	[Define15] [int] NULL,
+	[Define16] [float] NULL,
+	[VTid] [int] NULL,
+	[CreateTime] [datetime] NULL,
+	[ModifyTime] [datetime] NULL,
+	[iPrintCount] [int] NULL,
+	[RelsVTid] [int] NULL,
+	[cSysBarCode] [nvarchar](60) NULL,
+ CONSTRAINT [PK_mom_order] PRIMARY KEY NONCLUSTERED 
+(
+	[MoId] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[mom_order] ADD  CONSTRAINT [DF__mom_order__UpdCo__3D491139]  DEFAULT (0) FOR [UpdCount]
+GO
+
+ALTER TABLE [dbo].[mom_order] ADD  DEFAULT (0) FOR [iPrintCount]
+GO
+
+

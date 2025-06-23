@@ -1,0 +1,247 @@
+
+
+/****** Object:  Table [dbo].[mom_orderdetail]    Script Date: 06/23/2025 16:56:07 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[mom_orderdetail](
+	[MoDId] [int] NOT NULL,
+	[MoId] [int] NOT NULL,
+	[SortSeq] [int] NOT NULL,
+	[MoClass] [tinyint] NULL,
+	[MoTypeId] [int] NULL,
+	[Qty] [dbo].[Udt_QTY] NULL,
+	[MrpQty] [dbo].[Udt_QTY] NULL,
+	[AuxUnitCode] [nvarchar](35) NULL,
+	[AuxQty] [dbo].[Udt_QTY] NULL,
+	[ChangeRate] [dbo].[Udt_ChangeRate] NULL,
+	[MoLotCode] [nvarchar](60) NULL,
+	[WhCode] [nvarchar](10) NULL,
+	[MDeptCode] [nvarchar](12) NULL,
+	[SoType] [tinyint] NULL,
+	[SoDId] [nvarchar](30) NULL,
+	[SoCode] [nvarchar](30) NULL,
+	[SoSeq] [int] NULL,
+	[DeclaredQty] [dbo].[Udt_QTY] NULL,
+	[QualifiedInQty] [dbo].[Udt_QTY] NULL,
+	[Status] [tinyint] NULL,
+	[OrgStatus] [tinyint] NULL,
+	[BomId] [int] NULL,
+	[RoutingId] [int] NULL,
+	[CustBomId] [int] NULL,
+	[DemandId] [int] NULL,
+	[PlanCode] [nvarchar](20) NULL,
+	[PartId] [int] NULL,
+	[InvCode] [nvarchar](60) NULL,
+	[Free1] [nvarchar](20) NULL,
+	[Free2] [nvarchar](20) NULL,
+	[Free3] [nvarchar](20) NULL,
+	[Free4] [nvarchar](20) NULL,
+	[Free5] [nvarchar](20) NULL,
+	[Free6] [nvarchar](20) NULL,
+	[Free7] [nvarchar](20) NULL,
+	[Free8] [nvarchar](20) NULL,
+	[Free9] [nvarchar](20) NULL,
+	[Free10] [nvarchar](20) NULL,
+	[SfcFlag] [bit] NULL,
+	[CrpFlag] [bit] NULL,
+	[QcFlag] [bit] NULL,
+	[RelsDate] [datetime] NULL,
+	[RelsUser] [nvarchar](20) NULL,
+	[CloseDate] [datetime] NULL,
+	[OrgClsDate] [datetime] NULL,
+	[Ufts] [timestamp] NULL,
+	[Define22] [nvarchar](60) NULL,
+	[Define23] [nvarchar](60) NULL,
+	[Define24] [nvarchar](60) NULL,
+	[Define25] [nvarchar](60) NULL,
+	[Define26] [float] NULL,
+	[Define27] [float] NULL,
+	[Define28] [nvarchar](120) NULL,
+	[Define29] [nvarchar](120) NULL,
+	[Define30] [nvarchar](120) NULL,
+	[Define31] [nvarchar](120) NULL,
+	[Define32] [nvarchar](120) NULL,
+	[Define33] [nvarchar](120) NULL,
+	[Define34] [int] NULL,
+	[Define35] [int] NULL,
+	[Define36] [datetime] NULL,
+	[Define37] [datetime] NULL,
+	[LeadTime] [int] NULL,
+	[OpScheduleType] [tinyint] NULL,
+	[OrdFlag] [bit] NULL,
+	[WIPType] [tinyint] NULL,
+	[SupplyWhCode] [nvarchar](10) NULL,
+	[ReasonCode] [nvarchar](10) NULL,
+	[IsWFControlled] [tinyint] NULL,
+	[iVerifyState] [int] NULL,
+	[iReturnCount] [int] NULL,
+	[Remark] [nvarchar](255) NULL,
+	[SourceMoCode] [nvarchar](30) NULL,
+	[SourceMoSeq] [int] NULL,
+	[SourceMoId] [int] NULL,
+	[SourceMoDId] [int] NULL,
+	[SourceQCCode] [nvarchar](30) NULL,
+	[SourceQCId] [int] NULL,
+	[SourceQCDId] [int] NULL,
+	[CostItemCode] [nvarchar](60) NULL,
+	[CostItemName] [nvarchar](255) NULL,
+	[RelsTime] [datetime] NULL,
+	[CloseUser] [nvarchar](20) NULL,
+	[CloseTime] [datetime] NULL,
+	[OrgClsTime] [datetime] NULL,
+	[AuditStatus] [tinyint] NULL,
+	[PAllocateId] [int] NULL,
+	[DemandCode] [nvarchar](30) NULL,
+	[CollectiveFlag] [tinyint] NULL,
+	[OrderType] [tinyint] NULL,
+	[OrderDId] [int] NULL,
+	[OrderCode] [nvarchar](30) NULL,
+	[OrderSeq] [int] NULL,
+	[ManualCode] [nvarchar](30) NULL,
+	[ReformFlag] [bit] NULL,
+	[SourceQCVouchType] [tinyint] NULL,
+	[OrgQty] [dbo].[Udt_QTY] NULL,
+	[FmFlag] [bit] NULL,
+	[MinSN] [nvarchar](200) NULL,
+	[MaxSN] [nvarchar](200) NULL,
+	[SourceSvcCode] [nvarchar](30) NULL,
+	[SourceSvcId] [nvarchar](80) NULL,
+	[SourceSvcDId] [nvarchar](80) NULL,
+	[BomType] [tinyint] NULL,
+	[RoutingType] [tinyint] NULL,
+	[BusFlowId] [int] NULL,
+	[RunCardFlag] [bit] NULL,
+	[RequisitionFlag] [bit] NULL,
+	[AlloVTid] [int] NULL,
+	[RelsAlloVTid] [int] NULL,
+	[iPrintCount] [int] NULL,
+	[cbSysBarCode] [nvarchar](80) NULL,
+	[cCurrentAuditor] [nvarchar](200) NULL,
+	[CustCode] [nvarchar](20) NULL,
+	[LPlanCode] [nvarchar](40) NULL,
+	[SourceSvcVouchType] [tinyint] NULL,
+ CONSTRAINT [PK_mom_orderdetail] PRIMARY KEY NONCLUSTERED 
+(
+	[MoDId] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail]  WITH CHECK ADD  CONSTRAINT [FK_mom_orderdetail] FOREIGN KEY([MoId])
+REFERENCES [dbo].[mom_order] ([MoId])
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] CHECK CONSTRAINT [FK_mom_orderdetail]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  CONSTRAINT [DF__mom_order__SortS__40257DE4]  DEFAULT (0) FOR [SortSeq]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  CONSTRAINT [DF__mom_order__MoCla__4119A21D]  DEFAULT (1) FOR [MoClass]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  CONSTRAINT [DF__mom_order__SoTyp__420DC656]  DEFAULT (0) FOR [SoType]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  CONSTRAINT [DF__mom_order__SoSeq__43F60EC8]  DEFAULT (0) FOR [SoSeq]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  CONSTRAINT [DF__mom_order__Statu__44EA3301]  DEFAULT (1) FOR [Status]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  CONSTRAINT [DF__mom_order__OrgSt__45DE573A]  DEFAULT (1) FOR [OrgStatus]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  CONSTRAINT [DF__mom_order__SfcFl__46D27B73]  DEFAULT (0) FOR [SfcFlag]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  CONSTRAINT [DF__mom_order__CrpFl__47C69FAC]  DEFAULT (0) FOR [CrpFlag]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  CONSTRAINT [DF__mom_order__QcFla__48BAC3E5]  DEFAULT (0) FOR [QcFlag]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  CONSTRAINT [DF__mom_order__LeadT__49AEE81E]  DEFAULT (0) FOR [LeadTime]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  CONSTRAINT [DF__mom_order__OpSch__4AA30C57]  DEFAULT (1) FOR [OpScheduleType]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  CONSTRAINT [DF__mom_order__OrdFl__4B973090]  DEFAULT (0) FOR [OrdFlag]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (5) FOR [WIPType]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  CONSTRAINT [DF__mom_order__IsWFC__24CEA241]  DEFAULT (0) FOR [IsWFControlled]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [iVerifyState]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [iReturnCount]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [SourceMoId]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [SourceMoDId]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [SourceQCId]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [SourceQCDId]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (1) FOR [AuditStatus]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [PAllocateId]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [CollectiveFlag]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [OrderType]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [OrderDId]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [OrderSeq]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [ReformFlag]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [SourceQCVouchType]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [FmFlag]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [BomType]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [RoutingType]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [RunCardFlag]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [RequisitionFlag]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [iPrintCount]
+GO
+
+ALTER TABLE [dbo].[mom_orderdetail] ADD  DEFAULT (0) FOR [SourceSvcVouchType]
+GO
+
+

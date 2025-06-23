@@ -1,0 +1,146 @@
+
+
+/****** Object:  Table [dbo].[rdrecord10]    Script Date: 06/23/2025 16:57:01 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[rdrecord10](
+	[ID] [bigint] NOT NULL,
+	[bRdFlag] [tinyint] NOT NULL,
+	[cVouchType] [nvarchar](2) NOT NULL,
+	[cBusType] [nvarchar](12) NULL,
+	[cSource] [nvarchar](50) NOT NULL,
+	[cBusCode] [nvarchar](30) NULL,
+	[cWhCode] [nvarchar](10) NOT NULL,
+	[dDate] [datetime] NOT NULL,
+	[cCode] [nvarchar](30) NOT NULL,
+	[cRdCode] [nvarchar](5) NULL,
+	[cDepCode] [nvarchar](12) NULL,
+	[cPersonCode] [nvarchar](20) NULL,
+	[cPTCode] [nvarchar](2) NULL,
+	[cSTCode] [nvarchar](2) NULL,
+	[cCusCode] [nvarchar](20) NULL,
+	[cVenCode] [nvarchar](20) NULL,
+	[cOrderCode] [nvarchar](30) NULL,
+	[cARVCode] [nvarchar](30) NULL,
+	[cBillCode] [bigint] NULL,
+	[cDLCode] [bigint] NULL,
+	[cProBatch] [nvarchar](60) NULL,
+	[cHandler] [nvarchar](20) NULL,
+	[cMemo] [nvarchar](255) NULL,
+	[bTransFlag] [bit] NOT NULL,
+	[cAccounter] [nvarchar](20) NULL,
+	[cMaker] [nvarchar](20) NULL,
+	[cDefine1] [nvarchar](20) NULL,
+	[cDefine2] [nvarchar](20) NULL,
+	[cDefine3] [nvarchar](20) NULL,
+	[cDefine4] [datetime] NULL,
+	[cDefine5] [int] NULL,
+	[cDefine6] [datetime] NULL,
+	[cDefine7] [float] NULL,
+	[cDefine8] [nvarchar](4) NULL,
+	[cDefine9] [nvarchar](8) NULL,
+	[cDefine10] [nvarchar](60) NULL,
+	[dKeepDate] [nvarchar](5) NULL,
+	[dVeriDate] [datetime] NULL,
+	[bpufirst] [bit] NULL,
+	[biafirst] [bit] NULL,
+	[iMQuantity] [float] NULL,
+	[dARVDate] [datetime] NULL,
+	[cChkCode] [nvarchar](30) NULL,
+	[dChkDate] [datetime] NULL,
+	[cChkPerson] [nvarchar](40) NULL,
+	[VT_ID] [int] NULL,
+	[bIsSTQc] [bit] NOT NULL,
+	[cDefine11] [nvarchar](120) NULL,
+	[cDefine12] [nvarchar](120) NULL,
+	[cDefine13] [nvarchar](120) NULL,
+	[cDefine14] [nvarchar](120) NULL,
+	[cDefine15] [int] NULL,
+	[cDefine16] [float] NULL,
+	[cMPoCode] [nvarchar](30) NULL,
+	[gspcheck] [nvarchar](10) NULL,
+	[ipurorderid] [bigint] NULL,
+	[iproorderid] [bigint] NULL,
+	[ufts] [timestamp] NULL,
+	[iExchRate] [float] NULL,
+	[cExch_Name] [nvarchar](8) NULL,
+	[bOMFirst] [bit] NULL,
+	[bFromPreYear] [bit] NULL,
+	[bIsLsQuery] [bit] NULL,
+	[bIsComplement] [smallint] NULL,
+	[iDiscountTaxType] [tinyint] NULL,
+	[ireturncount] [int] NULL,
+	[iverifystate] [int] NULL,
+	[iswfcontrolled] [int] NULL,
+	[cModifyPerson] [nvarchar](50) NULL,
+	[dModifyDate] [datetime] NULL,
+	[dnmaketime] [datetime] NULL,
+	[dnmodifytime] [datetime] NULL,
+	[dnverifytime] [datetime] NULL,
+	[bredvouch] [int] NULL,
+	[iFlowId] [int] NULL,
+	[cPZID] [nvarchar](30) NULL,
+	[cSourceLs] [nvarchar](4) NULL,
+	[cSourceCodeLs] [nvarchar](20) NULL,
+	[iPrintCount] [int] NULL,
+	[csysbarcode] [nvarchar](60) NULL,
+	[cCurrentAuditor] [nvarchar](200) NULL,
+	[outid] [uniqueidentifier] NULL,
+ CONSTRAINT [aaaaardrecord10_PK] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[rdrecord10]  WITH NOCHECK ADD  CONSTRAINT [rdrecord10_cvouchtype] CHECK  (([cvouchtype] = '10'))
+GO
+
+ALTER TABLE [dbo].[rdrecord10] CHECK CONSTRAINT [rdrecord10_cvouchtype]
+GO
+
+ALTER TABLE [dbo].[rdrecord10] ADD  DEFAULT (0) FOR [bTransFlag]
+GO
+
+ALTER TABLE [dbo].[rdrecord10] ADD  DEFAULT (0) FOR [bpufirst]
+GO
+
+ALTER TABLE [dbo].[rdrecord10] ADD  DEFAULT (0) FOR [biafirst]
+GO
+
+ALTER TABLE [dbo].[rdrecord10] ADD  DEFAULT (0) FOR [bIsSTQc]
+GO
+
+ALTER TABLE [dbo].[rdrecord10] ADD  DEFAULT (0) FOR [bFromPreYear]
+GO
+
+ALTER TABLE [dbo].[rdrecord10] ADD  DEFAULT (0) FOR [bIsComplement]
+GO
+
+ALTER TABLE [dbo].[rdrecord10] ADD  DEFAULT (0) FOR [iDiscountTaxType]
+GO
+
+ALTER TABLE [dbo].[rdrecord10] ADD  DEFAULT (0) FOR [ireturncount]
+GO
+
+ALTER TABLE [dbo].[rdrecord10] ADD  DEFAULT (0) FOR [iverifystate]
+GO
+
+ALTER TABLE [dbo].[rdrecord10] ADD  DEFAULT (0) FOR [iswfcontrolled]
+GO
+
+ALTER TABLE [dbo].[rdrecord10] ADD  DEFAULT (N'') FOR [cModifyPerson]
+GO
+
+ALTER TABLE [dbo].[rdrecord10] ADD  DEFAULT (0) FOR [bredvouch]
+GO
+
+ALTER TABLE [dbo].[rdrecord10] ADD  DEFAULT (0) FOR [iPrintCount]
+GO
+
+

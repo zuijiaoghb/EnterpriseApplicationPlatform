@@ -1,0 +1,34 @@
+
+
+/****** Object:  Table [dbo].[mom_morder]    Script Date: 06/23/2025 16:53:31 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[mom_morder](
+	[MoDId] [int] NOT NULL,
+	[StartDate] [datetime] NULL,
+	[DueDate] [datetime] NULL,
+	[Ufts] [timestamp] NULL,
+	[MoId] [int] NULL,
+ CONSTRAINT [PK_mom_morder] PRIMARY KEY CLUSTERED 
+(
+	[MoDId] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[mom_morder]  WITH CHECK ADD  CONSTRAINT [FK_mom_morder] FOREIGN KEY([MoDId])
+REFERENCES [dbo].[mom_orderdetail] ([MoDId])
+GO
+
+ALTER TABLE [dbo].[mom_morder] CHECK CONSTRAINT [FK_mom_morder]
+GO
+
+ALTER TABLE [dbo].[mom_morder] ADD  DEFAULT (0) FOR [MoId]
+GO
+
+
