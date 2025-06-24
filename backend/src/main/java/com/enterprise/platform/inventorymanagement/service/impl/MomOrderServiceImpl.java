@@ -42,7 +42,8 @@ public class MomOrderServiceImpl implements MomOrderService {
 
     @Override
     public MomOrder getOrderByCode(String moCode) {
-        return momOrderRepository.findByMoCode(moCode);
+        return momOrderRepository.findByMoCode(moCode)
+                .orElseThrow(() -> new RuntimeException("生产订单不存在: " + moCode));
     }
 
     @Override
@@ -79,7 +80,7 @@ public class MomOrderServiceImpl implements MomOrderService {
     @Override
     public Optional<MomOrder> getOrderByBarcode(String barcode) {
         return hyBarCodeMainRepository.findByBarcode(barcode)
-                .map(hyBarCodeMain -> momOrderRepository.findByMoCode(hyBarCodeMain.getCsrccode()));
+                .flatMap(hyBarCodeMain -> momOrderRepository.findByMoCode(hyBarCodeMain.getCsrccode()));
     }
 
     @Override

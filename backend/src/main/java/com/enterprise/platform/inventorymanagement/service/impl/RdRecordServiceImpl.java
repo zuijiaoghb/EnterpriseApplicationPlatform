@@ -4,6 +4,9 @@ import com.enterprise.platform.inventorymanagement.model.sqlserver.*;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.*;
 import com.enterprise.platform.inventorymanagement.service.RdRecordService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -83,7 +86,11 @@ public class RdRecordServiceImpl implements RdRecordService {
         // 组合成完整入库单号
         inboundMain.setCCode("smcgrk" + yearMonth + serialNumber);
         inboundMain.setCWhCode(warehouseCode);
-        inboundMain.setCMaker("admin"); // 临时使用默认用户，需根据实际认证系统调整
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            throw new RuntimeException("当前用户未登录，无法创建产成品入库单");
+        }
+        inboundMain.setCMaker(authentication.getName()); // 根据实际认证系统
         inboundMain.setCSource("采购订单");
         inboundMain.setBRdFlag((byte) 1);
         inboundMain.setCVouchType("01");
