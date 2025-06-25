@@ -43,7 +43,7 @@ export default function BarcodeManagement() {
       
       const formattedData = response.data.content.map((item: any, index: number) => {
         console.log(`第${index}条原始数据:`, JSON.stringify(item, null, 2));
-        console.log(`条码${item.barCode}字段值:`, {
+        console.log(`条码${item.barcode}字段值:`, {
           cinvSN: item.cinvSN,
           cinvCode: item.cinvCode,
           cfree1: item.cfree1,
@@ -54,7 +54,7 @@ export default function BarcodeManagement() {
         });
         
         return {
-          barCode: item.barCode || '未知条码',
+          barCode: item.barcode || '未知条码',
           barCodeRule: item.barCodeRule || '未知规则',
           cinvSN: item.cinvSN !== undefined ? item.cinvSN : '无序列号',
           cinvCode: item.cinvCode !== undefined ? item.cinvCode : '无产品编码',

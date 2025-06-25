@@ -1,6 +1,8 @@
 package com.enterprise.platform.inventorymanagement.model.sqlserver;
 
 import lombok.Data;
+import lombok.ToString;
+
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -17,6 +19,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
+@ToString(exclude = "momOrder")
 @Entity
 @Table(name = "mom_orderdetail")
 @DynamicInsert

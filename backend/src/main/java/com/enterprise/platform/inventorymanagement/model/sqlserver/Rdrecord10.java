@@ -9,9 +9,12 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.TableGenerator;
 import jakarta.persistence.Version;
 
 @Data
@@ -20,6 +23,15 @@ import jakarta.persistence.Version;
 public class Rdrecord10 {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "rd_record10_generator")
+    @TableGenerator(
+        name = "rd_record10_generator",
+        table = "sequence_table",
+        pkColumnName = "sequence_name",
+        valueColumnName = "sequence_value",
+        pkColumnValue = "rd_record10_seq",
+        allocationSize = 1
+    )
     @Column(name = "ID")
     private Long id;
 

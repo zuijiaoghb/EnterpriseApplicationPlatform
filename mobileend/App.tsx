@@ -36,7 +36,7 @@ const App = () => {
         />
         
         <Stack.Screen 
-          name="Portal" 
+          name="PortalContainer" 
           options={{ headerShown: false }}
         >
           {() => (

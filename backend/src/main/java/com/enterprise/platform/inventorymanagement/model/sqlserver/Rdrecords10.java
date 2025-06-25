@@ -7,10 +7,13 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.TableGenerator;
 import jakarta.persistence.Version;
 
 @Data
@@ -19,6 +22,15 @@ import jakarta.persistence.Version;
 public class Rdrecords10 {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "rd_records10_generator")
+    @TableGenerator(
+        name = "rd_records10_generator",
+        table = "sequence_table",
+        pkColumnName = "sequence_name",
+        valueColumnName = "sequence_value",
+        pkColumnValue = "rd_records10_seq",
+        allocationSize = 1
+    )
     @Column(name = "AutoID")
     private Long autoId;
 

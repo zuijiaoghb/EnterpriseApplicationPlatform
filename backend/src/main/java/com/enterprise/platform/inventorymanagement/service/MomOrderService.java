@@ -1,9 +1,8 @@
 package com.enterprise.platform.inventorymanagement.service;
 
+import com.enterprise.platform.inventorymanagement.model.dto.MomOrderdetailDTO;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.MomMorder;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.MomOrder;
-import com.enterprise.platform.inventorymanagement.model.sqlserver.MomOrderdetail;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +17,7 @@ public interface MomOrderService {
     Optional<MomOrder> getOrderByBarcode(String barcode);
 
     // 根据条码查询订单明细
-    Optional<MomOrderdetail> getOrderDetailByBarcode(String barcode);
+    Optional<MomOrderdetailDTO> getOrderDetailByBarcode(String barcode);
 
     // 根据条码查询生产订单(mom_morder)
     Optional<MomMorder> getMomMorderByBarcode(String barcode);

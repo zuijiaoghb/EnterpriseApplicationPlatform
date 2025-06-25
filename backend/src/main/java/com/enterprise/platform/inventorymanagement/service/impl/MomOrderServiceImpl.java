@@ -1,8 +1,8 @@
 package com.enterprise.platform.inventorymanagement.service.impl;
 
+import com.enterprise.platform.inventorymanagement.model.dto.MomOrderdetailDTO;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.MomMorder;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.MomOrder;
-import com.enterprise.platform.inventorymanagement.model.sqlserver.MomOrderdetail;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.MomMorderRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.HYBarCodeMainRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.MomOrderRepository;
@@ -84,11 +84,18 @@ public class MomOrderServiceImpl implements MomOrderService {
     }
 
     @Override
-    public Optional<MomOrderdetail> getOrderDetailByBarcode(String barcode) {
+    public Optional<MomOrderdetailDTO> getOrderDetailByBarcode(String barcode) {
         return hyBarCodeMainRepository.findByBarcode(barcode)
                 .filter(hyBarCodeMain -> hyBarCodeMain.getCsrcsubid() != null)
-                .map(hyBarCodeMain -> momOrderdetailRepository.findByMoDId(hyBarCodeMain.getCsrcsubid()))
-                .orElse(Optional.empty());
+                .flatMap(hyBarCodeMain -> momOrderdetailRepository.findByMoDId(hyBarCodeMain.getCsrcsubid()))
+                .map(orderDetail -> {
+                    MomOrderdetailDTO dto = new MomOrderdetailDTO();
+                    dto.setMoDId(orderDetail.getMoDId());
+                    dto.setIQuantity(orderDetail.getQty());
+                    dto.setInvCode(orderDetail.getInvCode());
+                    dto.setMoLotCode(orderDetail.getMoLotCode());
+                    return dto;
+                });
     }
 
     @Override

@@ -5,11 +5,9 @@ import com.enterprise.platform.inventorymanagement.model.sqlserver.Rdrecords10;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.HYBarCodeMain;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.MomOrder;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.MomOrderdetail;
-import com.enterprise.platform.inventorymanagement.model.sqlserver.MomMorder;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.HYBarCodeMainRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.MomOrderRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.MomOrderdetailRepository;
-import com.enterprise.platform.inventorymanagement.repository.sqlserver.MomMorderRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.Rdrecord10Repository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.Rdrecords10Repository;
 import com.enterprise.platform.inventorymanagement.service.Rdrecord10Service;
@@ -49,8 +47,7 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
     private final Rdrecords10Repository rdrecords10Repository;
     private final HYBarCodeMainRepository hyBarcodeMainRepository;
     private final MomOrderRepository momOrderRepository;
-    private final MomOrderdetailRepository momOrderdetailRepository;
-    private final MomMorderRepository momMorderRepository;
+    private final MomOrderdetailRepository momOrderdetailRepository;    
     
 
     @Override
@@ -82,8 +79,8 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
         MomOrderdetail orderDetail = momOrderdetailRepository.findByMoDId(barcodeMain.getCsrcsubid())
                 .orElseThrow(() -> new RuntimeException("订单明细不存在: " + barcodeMain.getCsrcsubid()));
 
-        MomMorder morder = momMorderRepository.findByMoDId(barcodeMain.getCsrcsubid())
-                .orElseThrow(() -> new RuntimeException("生产订单明细不存在: " + barcodeMain.getCsrcsubid()));
+        //MomMorder morder = momMorderRepository.findByMoDId(barcodeMain.getCsrcsubid())
+                //.orElseThrow(() -> new RuntimeException("生产订单明细不存在: " + barcodeMain.getCsrcsubid()));
 
         // 3. 创建入库单主表记录
         Rdrecord10 inbound = new Rdrecord10();
@@ -95,38 +92,82 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
         String serialNumber = String.format("%05d", getMaxInboundSerial(yearMonth) + 1);
         // 组合成完整入库单号
         inbound.setCCode("smscrk" + yearMonth + serialNumber); 
+        inbound.setBRdFlag((byte) 1);
         inbound.setCVouchType("10"); // 产成品入库单类型
+        inbound.setCBusType("成品入库");
         inbound.setCSource("生产订单");
         inbound.setCBusCode(momOrder.getMoCode());
         inbound.setCWhCode(cwhcode); // 使用前端传入的仓库编码
-        inbound.setDDate(LocalDate.now().atStartOfDay());       
+        inbound.setDDate(LocalDate.now().atStartOfDay());
+        inbound.setCRdCode("201");    
+        inbound.setCDepCode(orderDetail.getMDeptCode());                   
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication.getName() == null) {
             throw new RuntimeException("当前用户未登录，无法创建产成品入库单");
         }
         inbound.setCMaker(authentication.getName());
         inbound.setBTransFlag(false);
+        inbound.setBpufirst(false);
+        inbound.setBiafirst(false);
+        inbound.setVtId(63);
         inbound.setBIsSTQc(false);
-        // 设置其他必要字段...
+        inbound.setIproorderid(momOrder.getMoId().longValue());
+        inbound.setBFromPreYear(false);
+        inbound.setBIsComplement((short)0);
+        inbound.setIDiscountTaxType((byte)0);
+        inbound.setIreturncount(0);
+        inbound.setIverifystate(0);
+        inbound.setIswfcontrolled(0);
+        inbound.setDnmaketime(now);
+        inbound.setBredvouch(0);
+        inbound.setIPrintCount(0);
+        inbound.setCsysbarcode("||st10|"+"smscrk" + yearMonth + serialNumber);               
 
         // 4. 保存主表
         Rdrecord10 savedInbound = rdrecord10Repository.save(inbound);
 
         // 5. 创建入库单明细记录
         Rdrecords10 inboundDetail = new Rdrecords10();
-        inboundDetail.setRdrecord10(savedInbound);
+        inboundDetail.setRdrecord10(savedInbound);             
         inboundDetail.setCInvCode(orderDetail.getInvCode());
         // 验证传入的数量参数
         if (iQuantity == null || iQuantity <= 0) {
             throw new RuntimeException("入库数量必须大于0");
+        }
+        // 验证传入的数量参数要小于对应的生产订单mom_orderdetail的数量
+        if (iQuantity > orderDetail.getQty().intValue()) {
+            throw new RuntimeException("传入的入库数量不能大于生产订单明细中的数量");
         }
         inboundDetail.setIQuantity(new BigDecimal(iQuantity));
         inboundDetail.setINum(new BigDecimal(0));
         inboundDetail.setCBatch(barcodeMain.getPLot());
         inboundDetail.setCBarCode(barcode);
         inboundDetail.setIFlag((byte) 0);
-        // 设置其他必要字段...
-
+        inboundDetail.setCDefine22(orderDetail.getDefine22());
+        inboundDetail.setCDefine27(orderDetail.getDefine27());
+        inboundDetail.setINQuantity(new BigDecimal(iQuantity));
+        inboundDetail.setCDefine28(orderDetail.getDefine28());
+        inboundDetail.setCDefine29(orderDetail.getDefine29());
+        inboundDetail.setCDefine30(orderDetail.getDefine30());
+        inboundDetail.setIMPoIds(orderDetail.getMoDId().longValue());
+        inboundDetail.setBRelated(false);
+        inboundDetail.setBLPUseFree(false);
+        inboundDetail.setIRSRowNO(0);
+        inboundDetail.setIOriTrackID(0L);
+        inboundDetail.setBCosting(true);
+        inboundDetail.setCmocode(momOrder.getMoCode());
+        inboundDetail.setImoseq(orderDetail.getSortSeq());
+        inboundDetail.setIExpiratDateCalcu((short)0);
+        inboundDetail.setIorderdid(orderDetail.getOrderDId());
+        inboundDetail.setIordertype(orderDetail.getOrderType());
+        inboundDetail.setIordercode(orderDetail.getOrderCode());
+        inboundDetail.setIorderseq(orderDetail.getOrderSeq());
+        inboundDetail.setIsodid(orderDetail.getSoDId());
+        inboundDetail.setIsotype(orderDetail.getSoType());
+        inboundDetail.setCsocode(orderDetail.getSoCode());
+        inboundDetail.setIsoseq(orderDetail.getSoSeq());
+        inboundDetail.setCplanlotcode(orderDetail.getLPlanCode());
+        
         // 6. 保存明细
         rdrecords10Repository.save(inboundDetail);
 

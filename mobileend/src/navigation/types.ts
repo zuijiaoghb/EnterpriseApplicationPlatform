@@ -17,6 +17,7 @@ export type RootStackParamList = {
   ProductIn: undefined;
   SalesOut: undefined;
   MaterialOut: undefined;
+  PortalContainer: undefined;
 };
 
 export type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;

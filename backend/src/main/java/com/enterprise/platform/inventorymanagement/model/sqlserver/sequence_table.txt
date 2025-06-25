@@ -8,3 +8,7 @@ INSERT INTO sequence_table (sequence_name, sequence_value)
 VALUES ('rd_record01_seq', 1);
 INSERT INTO sequence_table (sequence_name, sequence_value) 
 VALUES ('rd_records01_seq', 1);
+INSERT INTO sequence_table (sequence_name, sequence_value) 
+VALUES ('rd_record10_seq', 1);
+INSERT INTO sequence_table (sequence_name, sequence_value) 
+VALUES ('rd_records10_seq', 1);

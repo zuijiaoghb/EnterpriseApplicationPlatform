@@ -64,7 +64,7 @@ const Login = () => {
       // 设置API默认请求头
       api.defaults.headers.common['Authorization'] = `Bearer ${normalizedToken}`;
       
-      navigation.navigate('Portal');
+      navigation.navigate('PortalContainer');
     } catch (error: any) {
       console.error('登录错误:', error);
       setLoginError('登录失败，请检查用户名和密码是否正确');

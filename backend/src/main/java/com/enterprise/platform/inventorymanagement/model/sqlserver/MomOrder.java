@@ -1,6 +1,8 @@
 package com.enterprise.platform.inventorymanagement.model.sqlserver;
 
 import lombok.Data;
+import lombok.ToString;
+
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -17,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
+@ToString(exclude = {"orderDetails", "morders"})
 @Entity
 @Table(name = "mom_order")
 @DynamicInsert
@@ -116,7 +119,7 @@ public class MomOrder {
     private String cSysBarCode;
 
     // 关联订单子表
-    @OneToMany(mappedBy = "momOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "momOrder", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<MomOrderdetail> orderDetails;
 
     // 关联生产订单表

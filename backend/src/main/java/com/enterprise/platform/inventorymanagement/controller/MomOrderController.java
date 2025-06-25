@@ -2,7 +2,7 @@ package com.enterprise.platform.inventorymanagement.controller;
 
 import com.enterprise.platform.inventorymanagement.model.sqlserver.MomMorder;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.MomOrder;
-import com.enterprise.platform.inventorymanagement.model.sqlserver.MomOrderdetail;
+import com.enterprise.platform.inventorymanagement.model.dto.MomOrderdetailDTO;
 import com.enterprise.platform.inventorymanagement.service.MomOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,8 +48,8 @@ public class MomOrderController {
 
     // 根据条码查询订单明细
     @GetMapping("/barcode/detail/{barcode}")
-    public ResponseEntity<MomOrderdetail> getOrderDetailByBarcode(@PathVariable String barcode) {
-        Optional<MomOrderdetail> orderDetail = momOrderService.getOrderDetailByBarcode(barcode);
+    public ResponseEntity<MomOrderdetailDTO> getOrderDetailByBarcode(@PathVariable String barcode) {
+        Optional<MomOrderdetailDTO> orderDetail = momOrderService.getOrderDetailByBarcode(barcode);
         return orderDetail.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

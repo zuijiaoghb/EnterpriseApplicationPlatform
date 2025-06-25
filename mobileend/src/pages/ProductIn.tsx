@@ -1,29 +1,81 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Alert, Button, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Alert, Button, ScrollView, TextInput } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import BarcodeScannerComponent from '../components/BarcodeScannerComponent';
 import { Code } from 'react-native-vision-camera';
+import api from '../api';
 
 const ProductIn = () => {
   const [scanned, setScanned] = useState(false);
   const [scannedData, setScannedData] = useState<Code | null>(null);
+  const [orderQuantity, setOrderQuantity] = useState<number | null>(null);
+  const [cwhcode, setCwhcode] = useState('');
+  const [iQuantity, setIQuantity] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [warehouses, setWarehouses] = useState([{ code: '', name: '请选择仓库' }]);
 
-  const handleCodeScanned = (code: Code) => {
+  // 初始化仓库列表
+  useEffect(() => {
+    const warehousesData = [
+      { code: '019', name: '半成品仓（建机）' },
+      { code: '018', name: '半成品仓（专用）' },
+      { code: '035', name: '成品库（建机）' },
+      { code: '034', name: '成品库（专用）' },
+      { code: '015', name: '原材料仓（建机）' },
+      { code: '014', name: '原材料仓（专用）' }
+    ];
+    setWarehouses([{ code: '', name: '请选择仓库' }, ...warehousesData]);    
+  }, []);
+
+  const handleCodeScanned = async (code: Code) => {
     console.log('产成品入库扫描结果:', code);
     setScanned(true);
     setScannedData(code);
-    // 这里可以添加产成品入库的业务逻辑处理
+    
+    try {
+      const response = await api.get(`/api/mom-orders/barcode/detail/${code.value}`);
+      setOrderQuantity(response.data.iquantity);      
+    } catch (error) {
+      console.error('获取订单明细失败:', error);
+      Alert.alert('错误', '无法获取订单数量信息');
+    }
   };
 
   const resetScan = () => {
     setScanned(false);
     setScannedData(null);
+    setCwhcode('');
+    setIQuantity('');
   };
 
-  const handleConfirm = () => {
-    if (!scannedData) return;
-    // 产成品入库确认逻辑
-    Alert.alert('成功', `产成品入库已确认\n条码: ${scannedData.value}`);
-    resetScan();
+  const handleConfirm = async () => {
+    if (!scannedData || !cwhcode || !iQuantity.trim()) {
+      Alert.alert('错误', '请选择仓库并输入有效的入库数量');
+      return;
+    }
+
+    const quantity = parseInt(iQuantity, 10);
+    if (isNaN(quantity) || quantity <= 0) {
+      Alert.alert('错误', '请输入有效的入库数量');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await api.post('/api/inventory/products/barcode/generate/' + scannedData.value, null, {
+        params: {
+          cwhcode: cwhcode,
+          iQuantity: quantity
+        }
+      });
+      Alert.alert('成功', `产成品入库已确认\n入库单号: ${response.data.id}`);
+      resetScan();
+    } catch (error) {
+      console.error('入库失败:', error);
+      Alert.alert('失败', '生成入库单失败，请重试');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -54,15 +106,48 @@ const ProductIn = () => {
                 <Text style={styles.resultLabel}>产品编码:</Text>
                 <Text style={styles.resultValue}>{scannedData.value}</Text>
               </View>
+              {orderQuantity !== null && (
+                <View style={styles.resultItem}>
+                  <Text style={styles.resultLabel}>订单数量:</Text>
+                  <Text style={styles.resultValue}>{orderQuantity}</Text>
+                </View>
+              )}
               <View style={styles.resultItem}>
                 <Text style={styles.resultLabel}>扫描时间:</Text>
                 <Text style={styles.resultValue}>{new Date().toLocaleString()}</Text>
               </View>
+              <View style={styles.formGroup}>
+                <Text style={styles.formLabel}>仓库选择:</Text>
+                <Picker
+                  style={styles.picker}
+                  selectedValue={cwhcode}
+                  onValueChange={(itemValue) => setCwhcode(itemValue)}
+                >
+                  {warehouses.map((warehouse, index) => (
+                    <Picker.Item
+                      key={index}
+                      label={warehouse.name}
+                      value={warehouse.code}
+                    />
+                  ))}
+                </Picker>
+              </View>
+              <View style={styles.formGroup}>
+                <Text style={styles.formLabel}>入库数量:</Text>
+                <TextInput
+                  style={styles.formInput}
+                  value={iQuantity}
+                  onChangeText={setIQuantity}
+                  placeholder="请输入入库数量"
+                  keyboardType="numeric"
+                />
+              </View>
               <View style={styles.actionButtons}>
                 <Button
-                  title="确认入库"
+                  title={loading ? "处理中..." : "确认入库"}
                   onPress={handleConfirm}
                   color="#4CAF50"
+                  disabled={loading}
                 />
               </View>
             </View>
@@ -106,11 +191,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   cameraContainer: {
-    flex: 2,
+    flex: 1,
     position: 'relative',
   },
   resultContainer: {
-    flex: 1,
+    flex: 2,
     padding: 16,
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
@@ -152,6 +237,30 @@ const styles = StyleSheet.create({
     color: '#333',
     width: '65%',
     flexWrap: 'wrap',
+  },
+  formGroup: {
+    marginBottom: 16,
+  },
+  formLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+    fontWeight: '500',
+  },
+  formInput: {
+    height: 40,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    fontSize: 14,
+  },
+  picker: {
+    height: 40,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 6,
+    fontSize: 14,
   },
   emptyState: {
     flex: 1,
