@@ -9,6 +9,8 @@ const ProductIn = () => {
   const [scanned, setScanned] = useState(false);
   const [scannedData, setScannedData] = useState<Code | null>(null);
   const [orderQuantity, setOrderQuantity] = useState<number | null>(null);
+  const [qualifiedInQty, setQualifiedInQty] = useState<number | null>(null);
+  const [remainingQuantity, setRemainingQuantity] = useState<number | null>(null);
   const [cwhcode, setCwhcode] = useState('');
   const [iQuantity, setIQuantity] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,7 +26,7 @@ const ProductIn = () => {
       { code: '015', name: '原材料仓（建机）' },
       { code: '014', name: '原材料仓（专用）' }
     ];
-    setWarehouses([{ code: '', name: '请选择仓库' }, ...warehousesData]);    
+    setWarehouses([{ code: '', name: '请选择仓库' }, ...warehousesData]);        
   }, []);
 
   const handleCodeScanned = async (code: Code) => {
@@ -34,10 +36,12 @@ const ProductIn = () => {
     
     try {
       const response = await api.get(`/api/mom-orders/barcode/detail/${code.value}`);
-      setOrderQuantity(response.data.iquantity);      
+      setOrderQuantity(response.data.iquantity);
+      setQualifiedInQty(response.data.qualifiedInQty);
+      setRemainingQuantity(response.data.iquantity - response.data.qualifiedInQty);
     } catch (error) {
       console.error('获取订单明细失败:', error);
-      Alert.alert('错误', '无法获取订单数量信息');
+      Alert.alert('错误', '无法获取订单信息');
     }
   };
 
@@ -57,6 +61,16 @@ const ProductIn = () => {
     const quantity = parseInt(iQuantity, 10);
     if (isNaN(quantity) || quantity <= 0) {
       Alert.alert('错误', '请输入有效的入库数量');
+      return;
+    }
+
+    if (orderQuantity === null || qualifiedInQty === null || remainingQuantity === null) {
+      Alert.alert('错误', '订单信息不完整，请重新扫描');
+      return;
+    }
+
+    if (quantity > remainingQuantity) {
+      Alert.alert('错误', `入库数量不能超过剩余可入库数量: ${remainingQuantity}`);
       return;
     }
 
@@ -138,9 +152,14 @@ const ProductIn = () => {
                   style={styles.formInput}
                   value={iQuantity}
                   onChangeText={setIQuantity}
-                  placeholder="请输入入库数量"
+                  placeholder={`请输入入库数量 (最大可入库: ${remainingQuantity || 0})`}
                   keyboardType="numeric"
                 />
+                {remainingQuantity !== null && (
+                  <Text style={styles.quantityHint}>
+                    剩余可入库数量: {remainingQuantity}
+                  </Text>
+                )}
               </View>
               <View style={styles.actionButtons}>
                 <Button
@@ -256,7 +275,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   picker: {
-    height: 40,
+    height: 60,
     borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 6,
@@ -284,6 +303,12 @@ const styles = StyleSheet.create({
   actionButtons: {
     marginTop: 16,
   },
+  quantityHint: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 4,
+    fontStyle: 'italic'
+  }
 });
 
 export default ProductIn;

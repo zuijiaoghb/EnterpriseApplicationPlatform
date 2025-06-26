@@ -9,4 +9,5 @@ public class MomOrderdetailDTO {
     private BigDecimal iQuantity;
     private String invCode;
     private String moLotCode;
+    private BigDecimal qualifiedInQty;
 }

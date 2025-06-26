@@ -171,6 +171,9 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
         // 6. 保存明细
         rdrecords10Repository.save(inboundDetail);
 
+        // 仅更新生产订单明细的已入库数量字段，避免修改其他字段
+        momOrderdetailRepository.updateQualifiedInQty(orderDetail.getMoDId(), new BigDecimal(iQuantity));
+
         return savedInbound;
     }
     

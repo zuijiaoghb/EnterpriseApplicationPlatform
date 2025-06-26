@@ -94,6 +94,7 @@ public class MomOrderServiceImpl implements MomOrderService {
                     dto.setIQuantity(orderDetail.getQty());
                     dto.setInvCode(orderDetail.getInvCode());
                     dto.setMoLotCode(orderDetail.getMoLotCode());
+                    dto.setQualifiedInQty(orderDetail.getQualifiedInQty());
                     return dto;
                 });
     }

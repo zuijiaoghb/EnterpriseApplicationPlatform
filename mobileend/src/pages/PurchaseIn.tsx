@@ -317,8 +317,9 @@ const styles = StyleSheet.create({
     width: '65%',
   },
   picker: {
-    width: '65%',
-    height: 40,
+    height: 60,
+    width: '100%',
+    color: '#333',
   },
 });
 
