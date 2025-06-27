@@ -5,6 +5,54 @@
 - 后端: Spring Boot 3.x
 - 数据库: MySQL
 - 构建工具: Gradle  .\gradlew.bat clean build    .\gradlew.bat bootRun
+- 运行：java -jar enterprise-platform-backend-0.0.1-SNAPSHOT.jar
+- centos8部署并创建自启服务：
+1. 创建服务配置文件：
+```
+sudo vi /etc/systemd/system/enterpriseapplicationplatform.service
+```
+2. 添加以下内容（根据实际情况修改路径和参数）：
+```
+[Unit]
+Description=EnterpriseApplicationPlatform
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/app
+ExecStart=/usr/bin/java -jar /app/enterprise-platform-backend-0.0.1-SNAPSHOT.jar
+SuccessExitStatus=143
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+### 三、配置服务自启动
+1. 重新加载systemd配置：
+```
+sudo systemctl daemon-reload
+```
+2. 设置开机自启：
+```
+sudo systemctl enable enterpriseapplicationplatform.service
+```
+3. 启动服务并验证状态：
+```
+sudo systemctl start enterpriseapplicationplatform.service
+sudo systemctl status enterpriseapplicationplatform.service
+```
+### 四、验证自动启动功能
+1. 测试重启服务：   
+   ```
+   sudo systemctl restart enterpriseapplicationplatform.service
+   ```
+2. 验证重启系统后是否自动启动：  
+   ```
+   sudo reboot
+   # 重启后重新连接服务器
+   systemctl status enterpriseapplicationplatform.service
+   ```
 
 ## react项目
 ## 安装
