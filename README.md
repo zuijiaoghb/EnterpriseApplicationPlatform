@@ -20,7 +20,7 @@ After=network.target
 [Service]
 User=root
 WorkingDirectory=/app
-ExecStart=/usr/bin/java -jar /app/enterprise-platform-backend-0.0.1-SNAPSHOT.jar
+ExecStart=/usr/local/java/jdk-17.0.15+6/bin/java -jar /app/enterprise-platform-backend-0.0.1-SNAPSHOT.jar
 SuccessExitStatus=143
 Restart=always
 RestartSec=5
