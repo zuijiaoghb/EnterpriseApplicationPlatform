@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface HYBarCodeMainRepository extends JpaRepository<HYBarCodeMain, Integer> {
+public interface HYBarCodeMainRepository extends JpaRepository<HYBarCodeMain, String> {
     Optional<HYBarCodeMain> findByBarcode(String barcode);    
     Optional<HYBarCodeMain> findByCsrccodeAndCsrcsubid(String csrccode, Integer csrcsubid);
     void deleteByBarcode(String barcode);
