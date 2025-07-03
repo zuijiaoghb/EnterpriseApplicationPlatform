@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal, ImageBackground } from 'react-native';
 import { Button, Card } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/AntDesign';
 import api from '../api';
@@ -65,6 +65,10 @@ const ClientManagement = () => {
   };
 
   return (
+    <ImageBackground
+      source={require('../../assets/login-bg.png')}
+      style={styles.backgroundImage}
+    >
     <View style={styles.container}>
       <Card style={styles.card}>
         <Card.Title 
@@ -143,13 +147,26 @@ const ClientManagement = () => {
         </View>
       </Modal>
     </View>
+  </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: 'transparent',
   },
   card: {
     flex: 1,

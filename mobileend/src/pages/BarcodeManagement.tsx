@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, ImageBackground } from 'react-native';
 import api from '../api';
 
 interface BarcodeItem {
@@ -104,19 +104,21 @@ export default function BarcodeManagement() {
   );
 
   return (
-    <View style={styles.container}>
-      {loading ? (
-        <ActivityIndicator size="large" />
-      ) : (
-        <FlatList
-          data={barcodes}
-          renderItem={renderItem}
-          keyExtractor={item => item.barCode}
-          onEndReached={() => setPage(prev => prev + 1)}
-          onEndReachedThreshold={0.5}
-        />
-      )}
-    </View>
+    <ImageBackground source={require('../../assets/login-bg.png')} style={styles.backgroundImage}>
+      <View style={styles.container}>
+        {loading ? (
+          <ActivityIndicator size="large" />
+        ) : (
+          <FlatList
+            data={barcodes}
+            renderItem={renderItem}
+            keyExtractor={item => item.barCode}
+            onEndReached={() => setPage(prev => prev + 1)}
+            onEndReachedThreshold={0.5}
+          />
+        )}
+      </View>
+    </ImageBackground>
   );
 }
 
@@ -124,6 +126,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
+    backgroundColor: 'transparent',
+  },
+  backgroundImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    resizeMode: 'cover',
   },
   item: {
     padding: 15,

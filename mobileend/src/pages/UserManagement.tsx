@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal,ImageBackground } from 'react-native';
+
 import { Button, Card } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/AntDesign';
 import api from '../api';
@@ -91,6 +92,10 @@ const [users, setUsers] = useState<User[]>([]);
   };
 
   return (
+    <ImageBackground
+      source={require('../../assets/login-bg.png')}
+      style={styles.backgroundImage}
+    >
     <View style={styles.container}>
       <Card style={styles.card}>
         <Card.Title 
@@ -179,14 +184,26 @@ const [users, setUsers] = useState<User[]>([]);
         </View>
       </Modal>
     </View>
+  </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   container: {
     flex: 1,
     padding: 10,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'transparent',
   },
   card: {
     flex: 1,

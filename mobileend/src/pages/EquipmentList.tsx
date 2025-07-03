@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
 import api from '../api';
 import EquipmentForm from './EquipmentForm';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -75,42 +75,44 @@ const EquipmentList = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <Button 
-        title="新增设备" 
-        onPress={() => { setCurrent(null); setVisible(true); }}
-      />
-      <ScrollView style={{ height: 150 }}>
-        {equipments.map((item) => (
-          <View style={styles.itemContainer} key={item.id.toString()}>
-            <Text>ID: {item.id}</Text>
-            <Text>名称: {item.name}</Text>
-            <Text>型号: {item.model}</Text>
-            <Text>状态: {item.status}</Text>
-            <Text>二维码: {item.qrCode}</Text>
-            <Text>最后维护: {item.lastMaintenance}</Text>
-            <View style={styles.buttonContainer}>
-              <Button 
-                title="编辑" 
-                onPress={() => { setCurrent(item); setVisible(true); }} 
-              />
-              <Button 
-                title="删除" 
-                onPress={() => handleDelete(item.id)}
-                color="red"
-              />
+    <ImageBackground source={require('../../assets/login-bg.png')} style={styles.backgroundImage}>
+      <View style={styles.container}>
+        <Button 
+          title="新增设备" 
+          onPress={() => { setCurrent(null); setVisible(true); }}
+        />
+        <ScrollView style={{ height: 150 }}>
+          {equipments.map((item) => (
+            <View style={styles.itemContainer} key={item.id.toString()}>
+              <Text>ID: {item.id}</Text>
+              <Text>名称: {item.name}</Text>
+              <Text>型号: {item.model}</Text>
+              <Text>状态: {item.status}</Text>
+              <Text>二维码: {item.qrCode}</Text>
+              <Text>最后维护: {item.lastMaintenance}</Text>
+              <View style={styles.buttonContainer}>
+                <Button 
+                  title="编辑" 
+                  onPress={() => { setCurrent(item); setVisible(true); }} 
+                />
+                <Button 
+                  title="删除" 
+                  onPress={() => handleDelete(item.id)}
+                  color="red"
+                />
+              </View>
             </View>
-          </View>
-        ))}
-        <View style={{ height: 25 }} />
-      </ScrollView>
-      <EquipmentForm 
-        visible={visible}
-        onClose={() => setVisible(false)}
-        onSuccess={fetchEquipments}
-        current={current}
-      />
-    </View>
+          ))}
+          <View style={{ height: 25 }} />
+        </ScrollView>
+        <EquipmentForm 
+          visible={visible}
+          onClose={() => setVisible(false)}
+          onSuccess={fetchEquipments}
+          current={current}
+        />
+      </View>
+    </ImageBackground>
   );
 };
 
@@ -118,6 +120,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: 'transparent',
+  },
+  backgroundImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    resizeMode: 'cover',
   },
   itemContainer: {
     padding: 16,

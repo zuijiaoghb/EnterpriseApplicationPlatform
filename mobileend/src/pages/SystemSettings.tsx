@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity,ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import api from '../api';
@@ -49,6 +49,10 @@ const SystemSettings = () => {
   }
 
   return (
+    <ImageBackground
+      source={require('../../assets/login-bg.png')}
+      style={styles.backgroundImage}
+    >
     <View style={styles.container}>
       <View style={styles.grid}>
         {menuItems.map(item => (
@@ -63,10 +67,17 @@ const SystemSettings = () => {
         ))}
       </View>
     </View>
+  </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',

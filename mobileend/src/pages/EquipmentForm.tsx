@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, Modal, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, Modal, StyleSheet, TextInput, TouchableOpacity, ImageBackground } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import api from '../api';
@@ -70,7 +70,8 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ visible, onClose, onSucce
       visible={visible}
       onRequestClose={onClose}
     >
-      <View style={styles.container}>
+      <ImageBackground source={require('../../assets/login-bg.png')} style={styles.backgroundImage}>
+        <View style={styles.container}>
         <Text style={styles.title}>{current ? '编辑设备' : '新增设备'}</Text>
         
         <Text style={styles.label}>设备名称</Text>
@@ -132,6 +133,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ visible, onClose, onSucce
           </TouchableOpacity>
         </View>
       </View>
+      </ImageBackground>
     </Modal>
   );
 };
@@ -140,6 +142,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: 'transparent',
+  },
+  backgroundImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    resizeMode: 'cover',
   },
   title: {
     fontSize: 20,
