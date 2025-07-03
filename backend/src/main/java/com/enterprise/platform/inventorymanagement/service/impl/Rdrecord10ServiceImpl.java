@@ -5,11 +5,15 @@ import com.enterprise.platform.inventorymanagement.model.sqlserver.Rdrecords10;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.HYBarCodeMain;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.MomOrder;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.MomOrderdetail;
+import com.enterprise.platform.inventorymanagement.model.sqlserver.Rdrecord10Extradefine;
+import com.enterprise.platform.inventorymanagement.model.sqlserver.Rdrecords10Extradefine;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.HYBarCodeMainRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.MomOrderRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.MomOrderdetailRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.Rdrecord10Repository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.Rdrecords10Repository;
+import com.enterprise.platform.inventorymanagement.repository.sqlserver.Rdrecord10ExtradefineRepository;
+import com.enterprise.platform.inventorymanagement.repository.sqlserver.Rdrecords10ExtradefineRepository;
 import com.enterprise.platform.inventorymanagement.service.Rdrecord10Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,8 +51,10 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
     private final Rdrecords10Repository rdrecords10Repository;
     private final HYBarCodeMainRepository hyBarcodeMainRepository;
     private final MomOrderRepository momOrderRepository;
-    private final MomOrderdetailRepository momOrderdetailRepository;    
-    
+    private final MomOrderdetailRepository momOrderdetailRepository;
+    private final Rdrecord10ExtradefineRepository rdrecord10ExtradefineRepository;
+    private final Rdrecords10ExtradefineRepository rdrecords10ExtradefineRepository;
+
 
     @Override
     public Optional<Rdrecord10> getInboundByBarcode(String barcode) {
@@ -64,9 +70,9 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
     public Rdrecord10 createInbound(Rdrecord10 inbound) {
         return rdrecord10Repository.save(inbound);
     }
-    
 
-    @Override    
+
+    @Override
     public Rdrecord10 createInboundByBarcode(String barcode, String cwhcode, Integer iQuantity) {
         // 1. 查询条码信息
         HYBarCodeMain barcodeMain = hyBarcodeMainRepository.findByBarcode(barcode)
@@ -79,9 +85,6 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
         MomOrderdetail orderDetail = momOrderdetailRepository.findByMoDId(barcodeMain.getCsrcsubid())
                 .orElseThrow(() -> new RuntimeException("订单明细不存在: " + barcodeMain.getCsrcsubid()));
 
-        //MomMorder morder = momMorderRepository.findByMoDId(barcodeMain.getCsrcsubid())
-                //.orElseThrow(() -> new RuntimeException("生产订单明细不存在: " + barcodeMain.getCsrcsubid()));
-
         // 3. 创建入库单主表记录
         Rdrecord10 inbound = new Rdrecord10();
         // 基础信息字段
@@ -91,7 +94,7 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
         // 查询当月最大流水号并加1
         String serialNumber = String.format("%05d", getMaxInboundSerial(yearMonth) + 1);
         // 组合成完整入库单号
-        inbound.setCCode("smscrk" + yearMonth + serialNumber); 
+        inbound.setCCode("smscrk" + yearMonth + serialNumber);
         inbound.setBRdFlag((byte) 1);
         inbound.setCVouchType("10"); // 产成品入库单类型
         inbound.setCBusType("成品入库");
@@ -169,13 +172,27 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
         inboundDetail.setCplanlotcode(orderDetail.getLPlanCode());
         
         // 6. 保存明细
-        rdrecords10Repository.save(inboundDetail);
+        Rdrecords10 savedDetail = rdrecords10Repository.save(inboundDetail);
+
+        // 7. 创建并保存主表扩展记录
+        Rdrecord10Extradefine recordExtradefine = new Rdrecord10Extradefine();
+        recordExtradefine.setID(savedInbound.getId());
+        recordExtradefine.setChdefine2(null); // 根据实际业务需求设置值
+        rdrecord10ExtradefineRepository.save(recordExtradefine);
+
+        // 8. 创建并保存明细表扩展记录
+        Rdrecords10Extradefine recordsExtradefine = new Rdrecords10Extradefine();
+        recordsExtradefine.setAutoID(savedDetail.getAutoId());
+        recordsExtradefine.setCbdefine1(null); // 根据实际业务需求设置值
+        recordsExtradefine.setCbdefine3(null); // 根据实际业务需求设置值
+        recordsExtradefine.setCbdefine4(null); // 根据实际业务需求设置值
+        rdrecords10ExtradefineRepository.save(recordsExtradefine);
 
         // 仅更新生产订单明细的已入库数量字段，避免修改其他字段
         momOrderdetailRepository.updateQualifiedInQty(orderDetail.getMoDId(), new BigDecimal(iQuantity));
 
         return savedInbound;
     }
-    
-    
+
+
 }

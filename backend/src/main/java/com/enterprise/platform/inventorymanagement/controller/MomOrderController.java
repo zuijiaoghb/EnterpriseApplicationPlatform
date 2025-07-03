@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/mom-orders")
+@RequestMapping("/api/inventory/mom-orders")
 public class MomOrderController {
 
     private final MomOrderService momOrderService;

@@ -15,7 +15,7 @@ import com.enterprise.platform.inventorymanagement.service.HYBarCodeMainService;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/hy-barcode-main")
+@RequestMapping("/api/inventory/hy-barcode-main")
 public class HYBarCodeMainController {
     private static final Logger logger = LoggerFactory.getLogger(HYBarCodeMainController.class);
 

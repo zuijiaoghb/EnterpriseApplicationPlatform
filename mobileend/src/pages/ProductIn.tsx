@@ -35,7 +35,7 @@ const ProductIn = () => {
     setScannedData(code);
     
     try {
-      const response = await api.get(`/api/mom-orders/barcode/detail/${code.value}`);
+      const response = await api.get(`/api/inventory/mom-orders/barcode/detail/${code.value}`);
       setOrderQuantity(response.data.iquantity);
       setQualifiedInQty(response.data.qualifiedInQty);
       setRemainingQuantity(response.data.iquantity - response.data.qualifiedInQty);

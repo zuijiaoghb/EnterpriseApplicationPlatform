@@ -28,7 +28,7 @@ export default function BarcodeManagement() {
   const fetchBarcodes = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/api/hy-barcode-main', {
+      const response = await api.get('/api/inventory/hy-barcode-main', {
         params: { page, size }
       });
       console.log('API响应状态:', response.status);

@@ -16,7 +16,7 @@ export default function BarcodeManagement() {
     try {
       setLoading(true);
     
-      const response = await api.get(`/api/hy-barcode-main`, {
+      const response = await api.get(`/api/inventory/hy-barcode-main`, {
         params: {
           page: pagination.current - 1,
           size: pagination.pageSize
