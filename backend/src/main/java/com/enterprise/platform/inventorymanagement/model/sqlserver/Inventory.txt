@@ -1,0 +1,513 @@
+
+
+/****** Object:  Table [dbo].[Inventory]    Script Date: 07/04/2025 09:13:45 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Inventory](
+	[cInvCode] [nvarchar](60) NOT NULL,
+	[cInvAddCode] [nvarchar](255) NULL,
+	[cInvName] [nvarchar](255) NULL,
+	[cInvStd] [nvarchar](255) NULL,
+	[cInvCCode] [nvarchar](12) NULL,
+	[cVenCode] [nvarchar](20) NULL,
+	[cReplaceItem] [nvarchar](60) NULL,
+	[cPosition] [nvarchar](20) NULL,
+	[bSale] [bit] NOT NULL,
+	[bPurchase] [bit] NOT NULL,
+	[bSelf] [bit] NOT NULL,
+	[bComsume] [bit] NOT NULL,
+	[bProducing] [bit] NOT NULL,
+	[bService] [bit] NOT NULL,
+	[bAccessary] [bit] NOT NULL,
+	[iTaxRate] [float] NULL,
+	[iInvWeight] [float] NULL,
+	[iVolume] [float] NULL,
+	[iInvRCost] [float] NULL,
+	[iInvSPrice] [float] NULL,
+	[iInvSCost] [float] NULL,
+	[iInvLSCost] [float] NULL,
+	[iInvNCost] [float] NULL,
+	[iInvAdvance] [float] NULL,
+	[iInvBatch] [float] NULL,
+	[iSafeNum] [float] NULL,
+	[iTopSum] [float] NULL,
+	[iLowSum] [float] NULL,
+	[iOverStock] [float] NULL,
+	[cInvABC] [nvarchar](1) NULL,
+	[bInvQuality] [bit] NOT NULL,
+	[bInvBatch] [bit] NOT NULL,
+	[bInvEntrust] [bit] NOT NULL,
+	[bInvOverStock] [bit] NOT NULL,
+	[dSDate] [datetime] NULL,
+	[dEDate] [datetime] NULL,
+	[bFree1] [bit] NOT NULL,
+	[bFree2] [bit] NOT NULL,
+	[cInvDefine1] [nvarchar](20) NULL,
+	[cInvDefine2] [nvarchar](20) NULL,
+	[cInvDefine3] [nvarchar](20) NULL,
+	[I_id] [int] IDENTITY(1,1) NOT NULL,
+	[bInvType] [bit] NULL,
+	[iInvMPCost] [float] NULL,
+	[cQuality] [nvarchar](100) NULL,
+	[iInvSaleCost] [float] NULL,
+	[iInvSCost1] [float] NULL,
+	[iInvSCost2] [float] NULL,
+	[iInvSCost3] [float] NULL,
+	[bFree3] [bit] NOT NULL,
+	[bFree4] [bit] NOT NULL,
+	[bFree5] [bit] NOT NULL,
+	[bFree6] [bit] NOT NULL,
+	[bFree7] [bit] NOT NULL,
+	[bFree8] [bit] NOT NULL,
+	[bFree9] [bit] NOT NULL,
+	[bFree10] [bit] NOT NULL,
+	[cCreatePerson] [nvarchar](20) NULL,
+	[cModifyPerson] [nvarchar](20) NULL,
+	[dModifyDate] [datetime] NULL,
+	[fSubscribePoint] [float] NULL,
+	[fVagQuantity] [float] NULL,
+	[cValueType] [nvarchar](20) NULL,
+	[bFixExch] [bit] NOT NULL,
+	[fOutExcess] [float] NULL,
+	[fInExcess] [float] NULL,
+	[iMassDate] [smallint] NULL,
+	[iWarnDays] [smallint] NULL,
+	[fExpensesExch] [float] NULL,
+	[bTrack] [bit] NOT NULL,
+	[bSerial] [bit] NOT NULL,
+	[bBarCode] [bit] NOT NULL,
+	[iId] [int] NULL,
+	[cBarCode] [nvarchar](30) NULL,
+	[cInvDefine4] [nvarchar](60) NULL,
+	[cInvDefine5] [nvarchar](60) NULL,
+	[cInvDefine6] [nvarchar](60) NULL,
+	[cInvDefine7] [nvarchar](120) NULL,
+	[cInvDefine8] [nvarchar](120) NULL,
+	[cInvDefine9] [nvarchar](120) NULL,
+	[cInvDefine10] [nvarchar](120) NULL,
+	[cInvDefine11] [int] NULL,
+	[cInvDefine12] [int] NULL,
+	[cInvDefine13] [float] NULL,
+	[cInvDefine14] [float] NULL,
+	[cInvDefine15] [datetime] NULL,
+	[cInvDefine16] [datetime] NULL,
+	[iGroupType] [tinyint] NOT NULL,
+	[cGroupCode] [nvarchar](35) NULL,
+	[cComUnitCode] [nvarchar](35) NULL,
+	[cAssComUnitCode] [nvarchar](35) NULL,
+	[cSAComUnitCode] [nvarchar](35) NULL,
+	[cPUComUnitCode] [nvarchar](35) NULL,
+	[cSTComUnitCode] [nvarchar](35) NULL,
+	[cCAComUnitCode] [nvarchar](35) NULL,
+	[cFrequency] [nvarchar](10) NULL,
+	[iFrequency] [smallint] NULL,
+	[iDays] [smallint] NULL,
+	[dLastDate] [datetime] NULL,
+	[iWastage] [float] NULL,
+	[bSolitude] [bit] NOT NULL,
+	[cEnterprise] [nvarchar](100) NULL,
+	[cAddress] [nvarchar](255) NULL,
+	[cFile] [nvarchar](40) NULL,
+	[cLabel] [nvarchar](30) NULL,
+	[cCheckOut] [nvarchar](30) NULL,
+	[cLicence] [nvarchar](30) NULL,
+	[bSpecialties] [bit] NOT NULL,
+	[cDefWareHouse] [nvarchar](10) NULL,
+	[iHighPrice] [float] NULL,
+	[iExpSaleRate] [float] NULL,
+	[cPriceGroup] [nvarchar](20) NULL,
+	[cOfferGrade] [nvarchar](20) NULL,
+	[iOfferRate] [float] NULL,
+	[cMonth] [nvarchar](6) NULL,
+	[iAdvanceDate] [smallint] NULL,
+	[cCurrencyName] [nvarchar](60) NULL,
+	[cProduceAddress] [nvarchar](255) NULL,
+	[cProduceNation] [nvarchar](60) NULL,
+	[cRegisterNo] [nvarchar](60) NULL,
+	[cEnterNo] [nvarchar](60) NULL,
+	[cPackingType] [nvarchar](60) NULL,
+	[cEnglishName] [nvarchar](100) NULL,
+	[bPropertyCheck] [bit] NOT NULL,
+	[cPreparationType] [nvarchar](30) NULL,
+	[cCommodity] [nvarchar](60) NULL,
+	[iRecipeBatch] [tinyint] NOT NULL,
+	[cNotPatentName] [nvarchar](30) NULL,
+	[pubufts] [timestamp] NULL,
+	[bPromotSales] [bit] NOT NULL,
+	[iPlanPolicy] [smallint] NULL,
+	[iROPMethod] [smallint] NULL,
+	[iBatchRule] [smallint] NULL,
+	[fBatchIncrement] [float] NULL,
+	[iAssureProvideDays] [int] NULL,
+	[iTestStyle] [smallint] NULL,
+	[iDTMethod] [smallint] NULL,
+	[fDTRate] [float] NULL,
+	[fDTNum] [float] NULL,
+	[cDTUnit] [nvarchar](35) NULL,
+	[iDTStyle] [smallint] NULL,
+	[iQTMethod] [int] NULL,
+	[PictureGUID] [uniqueidentifier] NULL,
+	[bPlanInv] [bit] NOT NULL,
+	[bProxyForeign] [bit] NOT NULL,
+	[bATOModel] [bit] NOT NULL,
+	[bCheckItem] [bit] NOT NULL,
+	[bPTOModel] [bit] NOT NULL,
+	[bEquipment] [bit] NOT NULL,
+	[cProductUnit] [nvarchar](35) NULL,
+	[fOrderUpLimit] [float] NULL,
+	[cMassUnit] [smallint] NULL,
+	[fRetailPrice] [float] NULL,
+	[cInvDepCode] [nvarchar](12) NULL,
+	[iAlterAdvance] [int] NULL,
+	[fAlterBaseNum] [float] NULL,
+	[cPlanMethod] [nvarchar](1) NULL,
+	[bMPS] [bit] NOT NULL,
+	[bROP] [bit] NOT NULL,
+	[bRePlan] [bit] NOT NULL,
+	[cSRPolicy] [nvarchar](2) NULL,
+	[bBillUnite] [bit] NOT NULL,
+	[iSupplyDay] [int] NULL,
+	[fSupplyMulti] [float] NULL,
+	[fMinSupply] [float] NULL,
+	[bCutMantissa] [bit] NOT NULL,
+	[cInvPersonCode] [nvarchar](20) NULL,
+	[iInvTfId] [int] NULL,
+	[cEngineerFigNo] [nvarchar](60) NULL,
+	[bInTotalCost] [bit] NOT NULL,
+	[iSupplyType] [smallint] NOT NULL,
+	[bConfigFree1] [bit] NOT NULL,
+	[bConfigFree2] [bit] NOT NULL,
+	[bConfigFree3] [bit] NOT NULL,
+	[bConfigFree4] [bit] NOT NULL,
+	[bConfigFree5] [bit] NOT NULL,
+	[bConfigFree6] [bit] NOT NULL,
+	[bConfigFree7] [bit] NOT NULL,
+	[bConfigFree8] [bit] NOT NULL,
+	[bConfigFree9] [bit] NOT NULL,
+	[bConfigFree10] [bit] NOT NULL,
+	[iDTLevel] [smallint] NULL,
+	[cDTAQL] [nvarchar](20) NULL,
+	[bPeriodDT] [bit] NOT NULL,
+	[cDTPeriod] [nvarchar](30) NULL,
+	[iBigMonth] [int] NULL,
+	[iBigDay] [int] NULL,
+	[iSmallMonth] [int] NULL,
+	[iSmallDay] [int] NULL,
+	[bOutInvDT] [bit] NOT NULL,
+	[bBackInvDT] [bit] NOT NULL,
+	[iEndDTStyle] [smallint] NULL,
+	[bDTWarnInv] [bit] NULL,
+	[fBackTaxRate] [float] NULL,
+	[cCIQCode] [nvarchar](30) NULL,
+	[cWGroupCode] [nvarchar](35) NULL,
+	[cWUnit] [nvarchar](35) NULL,
+	[fGrossW] [float] NULL,
+	[cVGroupCode] [nvarchar](35) NULL,
+	[cVUnit] [nvarchar](35) NULL,
+	[fLength] [float] NULL,
+	[fWidth] [float] NULL,
+	[fHeight] [float] NULL,
+	[iDTUCounter] [int] NULL,
+	[iDTDCounter] [int] NULL,
+	[iBatchCounter] [int] NULL,
+	[cShopUnit] [nvarchar](35) NULL,
+	[cPurPersonCode] [nvarchar](20) NULL,
+	[bImportMedicine] [bit] NOT NULL,
+	[bFirstBusiMedicine] [bit] NOT NULL,
+	[bForeExpland] [bit] NOT NULL,
+	[cInvPlanCode] [nvarchar](20) NULL,
+	[fConvertRate] [float] NOT NULL,
+	[dReplaceDate] [datetime] NULL,
+	[bInvModel] [bit] NOT NULL,
+	[bKCCutMantissa] [bit] NOT NULL,
+	[bReceiptByDT] [bit] NOT NULL,
+	[iImpTaxRate] [float] NULL,
+	[iExpTaxRate] [float] NULL,
+	[bExpSale] [bit] NOT NULL,
+	[iDrawBatch] [float] NULL,
+	[bCheckBSATP] [bit] NOT NULL,
+	[cInvProjectCode] [nvarchar](16) NULL,
+	[iTestRule] [smallint] NULL,
+	[cRuleCode] [nvarchar](20) NULL,
+	[bCheckFree1] [bit] NOT NULL,
+	[bCheckFree2] [bit] NOT NULL,
+	[bCheckFree3] [bit] NOT NULL,
+	[bCheckFree4] [bit] NOT NULL,
+	[bCheckFree5] [bit] NOT NULL,
+	[bCheckFree6] [bit] NOT NULL,
+	[bCheckFree7] [bit] NOT NULL,
+	[bCheckFree8] [bit] NOT NULL,
+	[bCheckFree9] [bit] NOT NULL,
+	[bCheckFree10] [bit] NOT NULL,
+	[bBomMain] [bit] NOT NULL,
+	[bBomSub] [bit] NOT NULL,
+	[bProductBill] [bit] NOT NULL,
+	[iCheckATP] [smallint] NOT NULL,
+	[iInvATPId] [int] NULL,
+	[iPlanTfDay] [int] NULL,
+	[iOverlapDay] [int] NULL,
+	[bPiece] [bit] NOT NULL,
+	[bSrvItem] [bit] NOT NULL,
+	[bSrvFittings] [bit] NOT NULL,
+	[fMaxSupply] [float] NULL,
+	[fMinSplit] [float] NULL,
+	[bSpecialOrder] [bit] NOT NULL,
+	[bTrackSaleBill] [bit] NOT NULL,
+	[cInvMnemCode] [nvarchar](40) NULL,
+	[iPlanDefault] [smallint] NULL,
+	[iPFBatchQty] [float] NULL,
+	[iAllocatePrintDgt] [int] NULL,
+	[bCheckBatch] [bit] NOT NULL,
+	[bMngOldpart] [bit] NOT NULL,
+	[iOldpartMngRule] [smallint] NULL,
+ CONSTRAINT [aaaaaInventory_PK] PRIMARY KEY NONCLUSTERED 
+(
+	[cInvCode] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[Inventory]  WITH CHECK ADD  CONSTRAINT [FK__Inventory__cInvC__6399A2AA] FOREIGN KEY([cInvCCode])
+REFERENCES [dbo].[InventoryClass] ([cInvCCode])
+GO
+
+ALTER TABLE [dbo].[Inventory] CHECK CONSTRAINT [FK__Inventory__cInvC__6399A2AA]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bFree__3BB699D9]  DEFAULT (0) FOR [bFree3]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bFree__3CAABE12]  DEFAULT (0) FOR [bFree4]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bFree__3D9EE24B]  DEFAULT (0) FOR [bFree5]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bFree__3E930684]  DEFAULT (0) FOR [bFree6]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bFree__3F872ABD]  DEFAULT (0) FOR [bFree7]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bFree__407B4EF6]  DEFAULT (0) FOR [bFree8]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bFree__416F732F]  DEFAULT (0) FOR [bFree9]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bFree__42639768]  DEFAULT (0) FOR [bFree10]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bFixE__6C59D134]  DEFAULT (0) FOR [bFixExch]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bTrac__6D4DF56D]  DEFAULT (0) FOR [bTrack]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bSeri__6E4219A6]  DEFAULT (0) FOR [bSerial]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bBarC__6F363DDF]  DEFAULT (0) FOR [bBarCode]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__iGrou__702A6218]  DEFAULT (0) FOR [iGroupType]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bSoli__711E8651]  DEFAULT (0) FOR [bSolitude]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bSpec__7212AA8A]  DEFAULT (0) FOR [bSpecialties]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bProp__7306CEC3]  DEFAULT (0) FOR [bPropertyCheck]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__iReci__73FAF2FC]  DEFAULT (0) FOR [iRecipeBatch]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bProm__05FA72FD]  DEFAULT (0) FOR [bPromotSales]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bPlan__403CEE82]  DEFAULT (0) FOR [bPlanInv]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bProx__413112BB]  DEFAULT (0) FOR [bProxyForeign]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bATOM__422536F4]  DEFAULT (0) FOR [bATOModel]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bChec__43195B2D]  DEFAULT (0) FOR [bCheckItem]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bPTOM__440D7F66]  DEFAULT (0) FOR [bPTOModel]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bEqui__4501A39F]  DEFAULT (0) FOR [bEquipment]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__cMass__45F5C7D8]  DEFAULT (0) FOR [cMassUnit]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__cPlan__46E9EC11]  DEFAULT ('R') FOR [cPlanMethod]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bMPS__47DE104A]  DEFAULT (0) FOR [bMPS]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bROP__48D23483]  DEFAULT (0) FOR [bROP]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bRePl__49C658BC]  DEFAULT (0) FOR [bRePlan]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__cSRPo__4ABA7CF5]  DEFAULT ('PE') FOR [cSRPolicy]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bBill__4BAEA12E]  DEFAULT (0) FOR [bBillUnite]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bCutM__4CA2C567]  DEFAULT (0) FOR [bCutMantissa]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bInTo__4D96E9A0]  DEFAULT (0) FOR [bInTotalCost]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__iSupp__4E8B0DD9]  DEFAULT (0) FOR [iSupplyType]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bConf__4F7F3212]  DEFAULT (0) FOR [bConfigFree1]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bConf__5073564B]  DEFAULT (0) FOR [bConfigFree2]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bConf__51677A84]  DEFAULT (0) FOR [bConfigFree3]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bConf__525B9EBD]  DEFAULT (0) FOR [bConfigFree4]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bConf__534FC2F6]  DEFAULT (0) FOR [bConfigFree5]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bConf__5443E72F]  DEFAULT (0) FOR [bConfigFree6]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bConf__55380B68]  DEFAULT (0) FOR [bConfigFree7]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bConf__562C2FA1]  DEFAULT (0) FOR [bConfigFree8]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bConf__572053DA]  DEFAULT (0) FOR [bConfigFree9]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bConf__58147813]  DEFAULT (0) FOR [bConfigFree10]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bPeri__59089C4C]  DEFAULT (0) FOR [bPeriodDT]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bOutI__59FCC085]  DEFAULT (0) FOR [bOutInvDT]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bBack__5AF0E4BE]  DEFAULT (0) FOR [bBackInvDT]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bImpo__4AFB3F6E]  DEFAULT (0) FOR [bImportMedicine]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bFirs__4BEF63A7]  DEFAULT (0) FOR [bFirstBusiMedicine]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bFore__4CE387E0]  DEFAULT (0) FOR [bForeExpland]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__fConv__4DD7AC19]  DEFAULT (1) FOR [fConvertRate]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bInvM__4ECBD052]  DEFAULT (0) FOR [bInvModel]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  CONSTRAINT [DF__Inventory__bKCCu__4FBFF48B]  DEFAULT (0) FOR [bKCCutMantissa]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bReceiptByDT]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bExpSale]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bCheckBSATP]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bCheckFree1]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bCheckFree2]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bCheckFree3]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bCheckFree4]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bCheckFree5]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bCheckFree6]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bCheckFree7]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bCheckFree8]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bCheckFree9]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bCheckFree10]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bBomMain]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bBomSub]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bProductBill]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [iCheckATP]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bPiece]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bSrvItem]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bSrvFittings]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bSpecialOrder]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bTrackSaleBill]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bCheckBatch]
+GO
+
+ALTER TABLE [dbo].[Inventory] ADD  DEFAULT (0) FOR [bMngOldpart]
+GO
+
+

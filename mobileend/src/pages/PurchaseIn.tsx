@@ -11,6 +11,7 @@ const PurchaseIn = () => {
   const [warehouses, setWarehouses] = useState([{ code: '', name: '请选择仓库' }]);
   const [selectedWarehouse, setSelectedWarehouse] = useState('');
   const [poQuantity, setPoQuantity] = useState(0);
+  const [productName, setProductName] = useState('');
   const [inboundQuantity, setInboundQuantity] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +25,7 @@ const PurchaseIn = () => {
       { code: '015', name: '原材料仓（建机）' },
       { code: '014', name: '原材料仓（专用）' }
     ];
-    setWarehouses([{ code: '', name: '请选择仓库' }, ...warehousesData]);
+    setWarehouses([{ code: '', name: '请选择仓库' }, ...warehousesData]);    
   }, []);
 
   // 扫描后获取采购订单信息
@@ -45,6 +46,11 @@ const PurchaseIn = () => {
       if (warehouses.length > 1) {
         setSelectedWarehouse(warehouses[1].code);
       }
+      // 获取产品名称
+      const parts = (scannedData.value ?? '').split('_');
+      const invCode = parts.length > 1 ? parts[1] : scannedData.value;
+      const inventoryResponse = await api.get(`/api/inventory/inventories/${invCode}`);
+      setProductName(inventoryResponse.data.cinvName);
     } catch (error) {
       console.error('获取采购订单信息失败:', error);
       Alert.alert('错误', '获取采购订单信息失败');
@@ -150,6 +156,10 @@ const PurchaseIn = () => {
               <View style={styles.resultItem}>
                 <Text style={styles.resultLabel}>物料编码:</Text>
                 <Text style={styles.resultValue}>{scannedData.value}</Text>
+              </View>
+              <View style={styles.resultItem}>
+                <Text style={styles.resultLabel}>产品名称:</Text>
+                <Text style={styles.resultValue}>{productName}</Text>
               </View>
               <View style={styles.resultItem}>
                 <Text style={styles.resultLabel}>采购订单数量:</Text>

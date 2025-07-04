@@ -43,6 +43,8 @@ public class RdRecordServiceImpl implements RdRecordService {
     private final HYBarCodeMainRepository hyBarCodeMainRepository;
     private final PO_PomainRepository poPomainRepository;
     private final PO_PodetailsRepository poPodetailsRepository;
+    private final RdRecord01ExtradefineRepository rdRecord01ExtradefineRepository;
+    private final Rdrecords01ExtradefineRepository rdrecords01ExtradefineRepository;
 
     @Override
     public RdRecord01 getInboundByPOCode(String poCode) {
@@ -117,6 +119,13 @@ public class RdRecordServiceImpl implements RdRecordService {
         inboundMain.setBredvouch(0); // 红蓝标识
         inboundMain = rdRecord01Repository.save(inboundMain);
 
+        // 创建主表扩展记录
+        RdRecord01Extradefine extMain = new RdRecord01Extradefine();
+        extMain.setID(inboundMain.getId());
+        extMain.setChdefine1(null); 
+        extMain.setChdefine2(null); 
+        rdRecord01ExtradefineRepository.save(extMain);
+
         // 5. 创建入库单子表
         RdRecords01 inboundDetail = new RdRecords01();
         inboundDetail.setId(inboundMain.getId());
@@ -170,7 +179,15 @@ public class RdRecordServiceImpl implements RdRecordService {
         inboundDetail.setIsoseq(poPodetails.getIorderseq());
         inboundDetail.setCplanlotcode(poPodetails.getPlanlotnumber());
         inboundDetail.setBgift(poPodetails.getBgift());
-        rdRecords01Repository.save(inboundDetail);        
+        inboundDetail = rdRecords01Repository.save(inboundDetail);        
+
+        // 创建子表扩展记录
+        Rdrecords01Extradefine extDetail = new Rdrecords01Extradefine();
+        extDetail.setAutoID(inboundDetail.getAutoId());
+        extDetail.setCbdefine1(null); 
+        extDetail.setCbdefine3(null); 
+        extDetail.setCbdefine4(null); 
+        rdrecords01ExtradefineRepository.save(extDetail);
 
         // 更新对应的采购订单子表PO_Podetails的累计到货数量iReceivedQTY和累计原币到货金额iReceivedMoney
         BigDecimal iQuantity = Optional.ofNullable(poPodetails.getiQuantity()).orElse(BigDecimal.ZERO);

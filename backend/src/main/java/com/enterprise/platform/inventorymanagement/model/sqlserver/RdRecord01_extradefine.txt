@@ -1,0 +1,22 @@
+
+
+/****** Object:  Table [dbo].[RdRecord01_extradefine]    Script Date: 07/04/2025 08:30:26 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[RdRecord01_extradefine](
+	[ID] [bigint] NOT NULL,
+	[chdefine1] [nvarchar](50) NULL,
+	[chdefine2] [nvarchar](100) NULL,
+ CONSTRAINT [PK_RdRecord01_extradefine] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+

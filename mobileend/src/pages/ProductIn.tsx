@@ -12,6 +12,7 @@ const ProductIn = () => {
   const [qualifiedInQty, setQualifiedInQty] = useState<number | null>(null);
   const [remainingQuantity, setRemainingQuantity] = useState<number | null>(null);
   const [cwhcode, setCwhcode] = useState('');
+  const [productName, setProductName] = useState('');
   const [iQuantity, setIQuantity] = useState('');
   const [loading, setLoading] = useState(false);
   const [warehouses, setWarehouses] = useState([{ code: '', name: '请选择仓库' }]);
@@ -39,6 +40,11 @@ const ProductIn = () => {
       setOrderQuantity(response.data.iquantity);
       setQualifiedInQty(response.data.qualifiedInQty);
       setRemainingQuantity(response.data.iquantity - response.data.qualifiedInQty);
+
+      const parts = (code.value ?? '').split('_');
+      const invCode = parts.length > 1 ? parts[1] : code.value;
+      const inventoryResponse = await api.get(`/api/inventory/inventories/${invCode}`);
+      setProductName(inventoryResponse.data.cinvName);
     } catch (error) {
       console.error('获取订单明细失败:', error);
       Alert.alert('错误', '无法获取订单信息');
@@ -119,6 +125,10 @@ const ProductIn = () => {
               <View style={styles.resultItem}>
                 <Text style={styles.resultLabel}>产品编码:</Text>
                 <Text style={styles.resultValue}>{scannedData.value}</Text>
+              </View>
+              <View style={styles.resultItem}>
+                <Text style={styles.resultLabel}>产品名称:</Text>
+                <Text style={styles.resultValue}>{productName}</Text>
               </View>
               {orderQuantity !== null && (
                 <View style={styles.resultItem}>
