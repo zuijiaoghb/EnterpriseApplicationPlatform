@@ -35,11 +35,6 @@ public class PurchaseServiceImpl implements PurchaseService {
 
 
         // 3. 根据csrccode和Csrcsubid查询采购订单明细
-        Optional<HYBarCodeMain> codeMainOptional = hyBarCodeMainRepository.findByCsrccodeAndCsrcsubid(barCodeMain.getCsrccode(), barCodeMain.getCsrcsubid());
-        if (!codeMainOptional.isPresent()) {
-            throw new RuntimeException("未找到对应的采购订单明细");
-        }
-
         // 4. 查询采购订单主表信息
         PO_Pomain poPomain = poPomainRepository.findBycPOID(barCodeMain.getCsrccode());
         if (poPomain == null) {
@@ -47,7 +42,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
 
         // 5. 查询采购订单子表信息
-        Integer cSrcSubID = codeMainOptional.get().getCsrcsubid();
+        Integer cSrcSubID = barCodeMain.getCsrcsubid();
         PO_Podetails poPodetails = poPomain.getPoPodetailsList().stream()
                 .filter(item -> item.getId().equals(cSrcSubID))
                 .findFirst()

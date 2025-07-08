@@ -7,6 +7,7 @@ import com.enterprise.platform.inventorymanagement.model.sqlserver.MomOrder;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.MomOrderdetail;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.Rdrecord10Extradefine;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.Rdrecords10Extradefine;
+import com.enterprise.platform.inventorymanagement.model.sqlserver.CurrentStock;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.HYBarCodeMainRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.MomOrderRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.MomOrderdetailRepository;
@@ -15,6 +16,7 @@ import com.enterprise.platform.inventorymanagement.repository.sqlserver.Rdrecord
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.Rdrecord10ExtradefineRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.Rdrecords10ExtradefineRepository;
 import com.enterprise.platform.inventorymanagement.service.Rdrecord10Service;
+import com.enterprise.platform.inventorymanagement.service.CurrentStockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
@@ -54,7 +56,7 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
     private final MomOrderdetailRepository momOrderdetailRepository;
     private final Rdrecord10ExtradefineRepository rdrecord10ExtradefineRepository;
     private final Rdrecords10ExtradefineRepository rdrecords10ExtradefineRepository;
-
+    private final CurrentStockService currentStockService;
 
     @Override
     public Optional<Rdrecord10> getInboundByBarcode(String barcode) {
@@ -190,6 +192,44 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
 
         // 仅更新生产订单明细的已入库数量字段，避免修改其他字段
         momOrderdetailRepository.updateQualifiedInQty(orderDetail.getMoDId(), new BigDecimal(iQuantity));
+
+        // 创建并保存当前库存记录
+        Optional<CurrentStock> existingStock = currentStockService.findByCInvCodeAndCWhCodeAndCBatch(orderDetail.getInvCode(), cwhcode, barcodeMain.getPLot());
+        if (existingStock.isPresent()) {            
+            currentStockService.updateFInQuantity(orderDetail.getInvCode(), cwhcode, barcodeMain.getPLot(), savedDetail.getIQuantity());
+        } else {
+            CurrentStock currentStock = new CurrentStock();
+            currentStock.setCWhCode(cwhcode);
+            currentStock.setCInvCode(orderDetail.getInvCode());
+            currentStock.setItemId(0);
+            currentStock.setCBatch(barcodeMain.getPLot());
+            currentStock.setISoType(0);            
+            currentStock.setIQuantity(BigDecimal.ZERO);
+            currentStock.setINum(BigDecimal.ZERO);
+            currentStock.setFInQuantity(savedDetail.getIQuantity());
+            currentStock.setFInNum(BigDecimal.ZERO);
+            currentStock.setFOutQuantity(BigDecimal.ZERO);
+            currentStock.setFOutNum(BigDecimal.ZERO);
+            currentStock.setBStopFlag(false);
+            currentStock.setFTransInQuantity(BigDecimal.ZERO);
+            currentStock.setFTransInNum(BigDecimal.ZERO);
+            currentStock.setFTransOutQuantity(BigDecimal.ZERO);
+            currentStock.setFTransOutNum(BigDecimal.ZERO);
+            currentStock.setFPlanQuantity(BigDecimal.ZERO);
+            currentStock.setFPlanNum(BigDecimal.ZERO);
+            currentStock.setFDisableQuantity(BigDecimal.ZERO);
+            currentStock.setFDisableNum(BigDecimal.ZERO);
+            currentStock.setFAvaQuantity(BigDecimal.ZERO);
+            currentStock.setFAvaNum(BigDecimal.ZERO);
+            currentStock.setBGSPSTOP(false);
+            currentStock.setCMassUnit((short)0);
+            currentStock.setFStopQuantity(BigDecimal.ZERO);
+            currentStock.setFStopNum(BigDecimal.ZERO);
+            currentStock.setIExpiratDateCalcu((short)0);
+            currentStock.setIpeqty(BigDecimal.ZERO);
+            currentStock.setIpenum(BigDecimal.ZERO);
+            currentStockService.saveCurrentStock(currentStock);
+        }
 
         return savedInbound;
     }

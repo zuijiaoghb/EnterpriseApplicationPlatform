@@ -3,6 +3,7 @@ package com.enterprise.platform.inventorymanagement.service.impl;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.*;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.*;
 import com.enterprise.platform.inventorymanagement.service.RdRecordService;
+import com.enterprise.platform.inventorymanagement.service.CurrentStockService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.core.Authentication;
@@ -45,6 +46,7 @@ public class RdRecordServiceImpl implements RdRecordService {
     private final PO_PodetailsRepository poPodetailsRepository;
     private final RdRecord01ExtradefineRepository rdRecord01ExtradefineRepository;
     private final Rdrecords01ExtradefineRepository rdrecords01ExtradefineRepository;
+    private final CurrentStockService currentStockService;
 
     @Override
     public RdRecord01 getInboundByPOCode(String poCode) {
@@ -208,6 +210,44 @@ public class RdRecordServiceImpl implements RdRecordService {
         }
         poPodetails.setiReceivedMoney(newReceivedMoney);
         poPodetailsRepository.save(poPodetails);
+
+        // 创建并保存当前库存记录
+        Optional<CurrentStock> existingStock = currentStockService.findByCInvCodeAndCWhCodeAndCBatch(poPodetails.getcInvCode(), warehouseCode, barcodeMain.getPLot());
+        if (existingStock.isPresent()) {            
+            currentStockService.updateFInQuantity(poPodetails.getcInvCode(), warehouseCode, barcodeMain.getPLot(), inboundDetail.getIQuantity());
+        } else {
+            CurrentStock currentStock = new CurrentStock();
+            currentStock.setCWhCode(warehouseCode);
+            currentStock.setCInvCode(poPodetails.getcInvCode());
+            currentStock.setItemId(0);
+            currentStock.setCBatch(barcodeMain.getPLot());
+            currentStock.setISoType(0);
+            currentStock.setIQuantity(BigDecimal.ZERO);
+            currentStock.setINum(BigDecimal.ZERO);
+            currentStock.setFInQuantity(inboundDetail.getIQuantity());
+            currentStock.setFInNum(BigDecimal.ZERO);
+            currentStock.setFOutQuantity(BigDecimal.ZERO);
+            currentStock.setFOutNum(BigDecimal.ZERO);
+            currentStock.setBStopFlag(false);
+            currentStock.setFTransInQuantity(BigDecimal.ZERO);
+            currentStock.setFTransInNum(BigDecimal.ZERO);
+            currentStock.setFTransOutQuantity(BigDecimal.ZERO);
+            currentStock.setFTransOutNum(BigDecimal.ZERO);
+            currentStock.setFPlanQuantity(BigDecimal.ZERO);
+            currentStock.setFPlanNum(BigDecimal.ZERO);
+            currentStock.setFDisableQuantity(BigDecimal.ZERO);
+            currentStock.setFDisableNum(BigDecimal.ZERO);
+            currentStock.setFAvaQuantity(BigDecimal.ZERO);
+            currentStock.setFAvaNum(BigDecimal.ZERO);
+            currentStock.setBGSPSTOP(false);
+            currentStock.setCMassUnit((short)0);
+            currentStock.setFStopQuantity(BigDecimal.ZERO);
+            currentStock.setFStopNum(BigDecimal.ZERO);
+            currentStock.setIExpiratDateCalcu((short)0);
+            currentStock.setIpeqty(BigDecimal.ZERO);
+            currentStock.setIpenum(BigDecimal.ZERO);
+            currentStockService.saveCurrentStock(currentStock);
+        }
 
         return inboundMain;
     }

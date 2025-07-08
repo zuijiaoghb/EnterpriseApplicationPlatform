@@ -1,0 +1,126 @@
+
+
+/****** Object:  Table [dbo].[CurrentStock]    Script Date: 07/08/2025 09:49:34 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[CurrentStock](
+	[AutoID] [int] IDENTITY(1,1) NOT NULL,
+	[cWhCode] [nvarchar](10) NOT NULL,
+	[cInvCode] [nvarchar](60) NULL,
+	[ItemId] [int] NOT NULL,
+	[cBatch] [nvarchar](60) NOT NULL,
+	[cVMIVenCode] [nvarchar](20) NOT NULL,
+	[iSoType] [int] NOT NULL,
+	[iSodid] [nvarchar](40) NULL,
+	[iQuantity] [dbo].[UDT_LogisticQuantity] NULL,
+	[iNum] [dbo].[UDT_LogisticQuantity] NULL,
+	[cFree1] [nvarchar](20) NULL,
+	[cFree2] [nvarchar](20) NULL,
+	[fOutQuantity] [dbo].[UDT_LogisticQuantity] NULL,
+	[fOutNum] [dbo].[UDT_LogisticQuantity] NULL,
+	[fInQuantity] [dbo].[UDT_LogisticQuantity] NULL,
+	[fInNum] [dbo].[UDT_LogisticQuantity] NULL,
+	[cFree3] [nvarchar](20) NULL,
+	[cFree4] [nvarchar](20) NULL,
+	[cFree5] [nvarchar](20) NULL,
+	[cFree6] [nvarchar](20) NULL,
+	[cFree7] [nvarchar](20) NULL,
+	[cFree8] [nvarchar](20) NULL,
+	[cFree9] [nvarchar](20) NULL,
+	[cFree10] [nvarchar](20) NULL,
+	[dVDate] [datetime] NULL,
+	[bStopFlag] [bit] NOT NULL,
+	[fTransInQuantity] [dbo].[UDT_LogisticQuantity] NULL,
+	[dMdate] [datetime] NULL,
+	[fTransInNum] [dbo].[UDT_LogisticQuantity] NULL,
+	[fTransOutQuantity] [dbo].[UDT_LogisticQuantity] NULL,
+	[fTransOutNum] [dbo].[UDT_LogisticQuantity] NULL,
+	[fPlanQuantity] [dbo].[UDT_LogisticQuantity] NULL,
+	[fPlanNum] [dbo].[UDT_LogisticQuantity] NULL,
+	[fDisableQuantity] [dbo].[UDT_LogisticQuantity] NULL,
+	[fDisableNum] [dbo].[UDT_LogisticQuantity] NULL,
+	[fAvaQuantity] [dbo].[UDT_LogisticQuantity] NULL,
+	[fAvaNum] [dbo].[UDT_LogisticQuantity] NULL,
+	[ufts] [timestamp] NULL,
+	[iMassDate] [int] NULL,
+	[BGSPSTOP] [bit] NOT NULL,
+	[cMassUnit] [smallint] NULL,
+	[fStopQuantity] [dbo].[UDT_LogisticQuantity] NULL,
+	[fStopNum] [dbo].[UDT_LogisticQuantity] NULL,
+	[dLastCheckDate] [datetime] NULL,
+	[cCheckState] [nvarchar](4) NOT NULL,
+	[dLastYearCheckDate] [datetime] NULL,
+	[iExpiratDateCalcu] [smallint] NULL,
+	[cExpirationdate] [varchar](10) NULL,
+	[dExpirationdate] [datetime] NULL,
+	[ipeqty] [decimal](38, 6) NOT NULL,
+	[ipenum] [decimal](38, 6) NOT NULL
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT ('') FOR [cBatch]
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT ('') FOR [cVMIVenCode]
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT (0) FOR [iSoType]
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT ('') FOR [cFree1]
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT ('') FOR [cFree2]
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT ('') FOR [cFree3]
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT ('') FOR [cFree4]
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT ('') FOR [cFree5]
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT ('') FOR [cFree6]
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT ('') FOR [cFree7]
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT ('') FOR [cFree8]
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT ('') FOR [cFree9]
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT ('') FOR [cFree10]
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT (0) FOR [bStopFlag]
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT (0) FOR [BGSPSTOP]
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT ('') FOR [cCheckState]
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT (0) FOR [ipeqty]
+GO
+
+ALTER TABLE [dbo].[CurrentStock] ADD  DEFAULT (0) FOR [ipenum]
+GO
+
+
