@@ -25,7 +25,7 @@ public class CurrentStockServiceImpl implements CurrentStockService {
     }
 
     @Override
-    public List<CurrentStockDTO> findByCInvCode(String cInvCode) {
+    public List<CurrentStockDTO> findByCInvCodeDTO(String cInvCode) {
         return currentStockRepository.findByCInvCode(cInvCode)
                 .stream()
                 .map(this::convertToDTO)
@@ -61,6 +61,16 @@ public class CurrentStockServiceImpl implements CurrentStockService {
     @Override
     public int updateFInQuantity(String cInvCode, String cWhCode, String cBatch, BigDecimal quantity) {
         return currentStockRepository.updateFInQuantityByCInvCodeAndCWhCodeAndCBatch(cInvCode, cWhCode, cBatch, quantity);
+    }
+
+    @Override
+    public List<CurrentStock> findByCInvCode(String cInvCode) {
+        return currentStockRepository.findByCInvCode(cInvCode);
+    }
+
+    @Override
+    public Integer findMaxItemId() {
+        return currentStockRepository.findMaxItemId();
     }
 
     private CurrentStockDTO convertToDTO(CurrentStock currentStock) {

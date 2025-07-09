@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -59,6 +60,10 @@ public class PurchaseServiceImpl implements PurchaseService {
         dto.setcPOID(poPomain.getcPOID());
         dto.setcInvCode(poPodetails.getcInvCode());
         dto.setiQuantity(poPodetails.getiQuantity());
+        // 计算未入库量 = 采购订单数量 - 累计到货数量
+        BigDecimal receivedQty = poPodetails.getiReceivedQTY() != null ? poPodetails.getiReceivedQTY() : BigDecimal.ZERO;
+        BigDecimal remainingQty = poPodetails.getiQuantity().subtract(receivedQty);
+        dto.setRemainingQuantity(remainingQty);
         dto.setBarcode(barCodeMain.getBarcode());
 
         return dto;

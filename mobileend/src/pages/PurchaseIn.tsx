@@ -11,6 +11,7 @@ const PurchaseIn = () => {
   const [warehouses, setWarehouses] = useState([{ code: '', name: '请选择仓库' }]);
   const [selectedWarehouse, setSelectedWarehouse] = useState('');
   const [poQuantity, setPoQuantity] = useState(0);
+  const [remainingQuantity, setRemainingQuantity] = useState(0);
   const [productName, setProductName] = useState('');
   const [inboundQuantity, setInboundQuantity] = useState('');
   const [loading, setLoading] = useState(false);
@@ -42,10 +43,11 @@ const PurchaseIn = () => {
     try {
       const response = await api.get(`/api/inventory/purchase/scan-in?barcode=${scannedData.value}`);
       setPoQuantity(response.data.iQuantity);
+      setRemainingQuantity(response.data.remainingQuantity || 0);
       // 默认选中第一个仓库
-      if (warehouses.length > 1) {
-        setSelectedWarehouse(warehouses[1].code);
-      }
+      // if (warehouses.length > 1) {
+      //   setSelectedWarehouse(warehouses[1].code);
+      // }
       // 获取产品名称
       const parts = (scannedData.value ?? '').split('_');
       const invCode = parts.length > 1 ? parts[1] : scannedData.value;
@@ -89,10 +91,15 @@ const PurchaseIn = () => {
       return false;
     }
 
-    if (quantity > poQuantity) {
-      Alert.alert('错误', `入库数量不能大于采购订单数量(${poQuantity})`);
+    if (quantity > remainingQuantity) {
+      Alert.alert('错误', `入库数量不能大于未入库量(${remainingQuantity})`);
       return false;
     }
+
+    // if (quantity > poQuantity) {
+    //   Alert.alert('错误', `入库数量不能大于采购订单数量(${poQuantity})`);
+    //   return false;
+    // }
 
     return true;
   };
@@ -184,8 +191,12 @@ const PurchaseIn = () => {
                   keyboardType="numeric"
                   value={inboundQuantity}
                   onChangeText={setInboundQuantity}
-                  placeholder={`请输入(1-${poQuantity})`}
+                  placeholder={`请输入(1-${remainingQuantity})`}
                 />
+              </View>
+              <View style={styles.resultItem}>
+                <Text style={styles.resultLabel}>未入库量:</Text>
+                <Text style={styles.resultValue}>{remainingQuantity} 件</Text>
               </View>
               <View style={styles.resultItem}>
                 <Text style={styles.resultLabel}>扫描时间:</Text>

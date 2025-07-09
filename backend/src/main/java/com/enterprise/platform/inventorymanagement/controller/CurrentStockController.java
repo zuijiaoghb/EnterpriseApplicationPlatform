@@ -27,7 +27,7 @@ public class CurrentStockController {
     @GetMapping("/inv-code/{cInvCode}")
     @Operation(summary = "根据存货编码查询库存")
     public ResponseEntity<List<CurrentStockDTO>> findByCInvCode(@PathVariable String cInvCode) {
-        return ResponseEntity.ok(currentStockService.findByCInvCode(cInvCode));
+        return ResponseEntity.ok(currentStockService.findByCInvCodeDTO(cInvCode));
     }
 
     @GetMapping("/wh-code/{cWhCode}")

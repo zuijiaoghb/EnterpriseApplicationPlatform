@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CurrentStockService {
-    List<CurrentStockDTO> findByCInvCode(String cInvCode);
+    List<CurrentStockDTO> findByCInvCodeDTO(String cInvCode);
+    List<CurrentStock> findByCInvCode(String cInvCode);
+    Integer findMaxItemId();
     List<CurrentStockDTO> findByCWhCode(String cWhCode);
     List<CurrentStockDTO> findByCInvCodeAndCWhCode(String cInvCode, String cWhCode);
     CurrentStock saveCurrentStock(CurrentStock currentStock);

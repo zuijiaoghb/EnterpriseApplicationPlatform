@@ -10,6 +10,7 @@ public class PurchaseScanDTO {
     private String cInvCode;
     
     private BigDecimal iQuantity;
+    private BigDecimal remainingQuantity;
     private String barcode;
 
     // Getters and Setters
@@ -23,6 +24,8 @@ public class PurchaseScanDTO {
 
     public BigDecimal getiQuantity() { return iQuantity; }
     public void setiQuantity(BigDecimal iQuantity) { this.iQuantity = iQuantity; }
+    public BigDecimal getRemainingQuantity() { return remainingQuantity; }
+    public void setRemainingQuantity(BigDecimal remainingQuantity) { this.remainingQuantity = remainingQuantity; }
     public String getBarcode() { return barcode; }
     public void setBarcode(String barcode) { this.barcode = barcode; }
 }

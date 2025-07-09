@@ -132,7 +132,18 @@ public class RdRecordServiceImpl implements RdRecordService {
         RdRecords01 inboundDetail = new RdRecords01();
         inboundDetail.setId(inboundMain.getId());
         inboundDetail.setCInvCode(poPodetails.getcInvCode());
-        inboundDetail.setIQuantity(new BigDecimal(quantity));
+        // 计算未入库量 = 采购订单数量 - 累计到货数量
+        BigDecimal orderQuantity = poPodetails.getiQuantity();
+        BigDecimal receivedQuantity = poPodetails.getiReceivedQTY() != null ? poPodetails.getiReceivedQTY() : BigDecimal.ZERO;
+        BigDecimal remainingQuantity = orderQuantity.subtract(receivedQuantity);
+        
+        // 校验入库数量是否超过未入库量
+        BigDecimal inboundQuantity = new BigDecimal(quantity);
+        if (inboundQuantity.compareTo(remainingQuantity) > 0) {
+            throw new RuntimeException("采购入库单数量不能超过未入库量，未入库量为: " + remainingQuantity);
+        }
+        
+        inboundDetail.setIQuantity(inboundQuantity);
         inboundDetail.setINum(poPodetails.getiNum());
         inboundDetail.setCBatch(barcodeMain.getPLot());
         Date expirationDate = barcodeMain.getDExpirationdate();
@@ -219,7 +230,13 @@ public class RdRecordServiceImpl implements RdRecordService {
             CurrentStock currentStock = new CurrentStock();
             currentStock.setCWhCode(warehouseCode);
             currentStock.setCInvCode(poPodetails.getcInvCode());
-            currentStock.setItemId(0);
+            List<CurrentStock> existingStocks = currentStockService.findByCInvCode(currentStock.getCInvCode());
+            if (existingStocks != null && !existingStocks.isEmpty()) {
+                currentStock.setItemId(existingStocks.get(0).getItemId());
+            } else {
+                Integer maxItemId = currentStockService.findMaxItemId();
+                currentStock.setItemId(maxItemId != null ? maxItemId + 1 : 1);
+            }
             currentStock.setCBatch(barcodeMain.getPLot());
             currentStock.setISoType(0);
             currentStock.setISodid("");

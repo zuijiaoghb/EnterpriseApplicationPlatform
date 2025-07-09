@@ -16,6 +16,9 @@ public interface CurrentStockRepository extends JpaRepository<CurrentStock, Inte
     @Query("SELECT c FROM CurrentStock c WHERE c.cInvCode = :cInvCode")
     List<CurrentStock> findByCInvCode(@Param("cInvCode") String cInvCode);
 
+    @Query("SELECT MAX(c.itemId) FROM CurrentStock c")
+    Integer findMaxItemId();
+
     @Query("SELECT c FROM CurrentStock c WHERE c.cWhCode = :cWhCode")
     List<CurrentStock> findByCWhCode(@Param("cWhCode") String cWhCode);
 

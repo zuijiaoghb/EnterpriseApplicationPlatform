@@ -201,7 +201,13 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
             CurrentStock currentStock = new CurrentStock();
             currentStock.setCWhCode(cwhcode);
             currentStock.setCInvCode(orderDetail.getInvCode());
-            currentStock.setItemId(0);
+            List<CurrentStock> existingStocks = currentStockService.findByCInvCode(currentStock.getCInvCode());
+            if (existingStocks != null && !existingStocks.isEmpty()) {
+                currentStock.setItemId(existingStocks.get(0).getItemId());
+            } else {
+                Integer maxItemId = currentStockService.findMaxItemId();
+                currentStock.setItemId(maxItemId != null ? maxItemId + 1 : 1);
+            }
             currentStock.setCBatch(barcodeMain.getPLot());
             currentStock.setISoType(0);
             currentStock.setISodid("");            
