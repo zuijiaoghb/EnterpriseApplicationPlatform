@@ -222,6 +222,7 @@ public class RdRecordServiceImpl implements RdRecordService {
             currentStock.setItemId(0);
             currentStock.setCBatch(barcodeMain.getPLot());
             currentStock.setISoType(0);
+            currentStock.setISodid("");
             currentStock.setIQuantity(BigDecimal.ZERO);
             currentStock.setINum(BigDecimal.ZERO);
             currentStock.setFInQuantity(inboundDetail.getIQuantity());

@@ -203,7 +203,8 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
             currentStock.setCInvCode(orderDetail.getInvCode());
             currentStock.setItemId(0);
             currentStock.setCBatch(barcodeMain.getPLot());
-            currentStock.setISoType(0);            
+            currentStock.setISoType(0);
+            currentStock.setISodid("");            
             currentStock.setIQuantity(BigDecimal.ZERO);
             currentStock.setINum(BigDecimal.ZERO);
             currentStock.setFInQuantity(savedDetail.getIQuantity());

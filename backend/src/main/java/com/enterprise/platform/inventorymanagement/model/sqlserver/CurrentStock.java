@@ -128,7 +128,7 @@ public class CurrentStock {
     @Column(name = "fAvaNum", precision = 38, scale = 6)
     private BigDecimal fAvaNum;
 
-    @Column(name = "ufts")
+    @Column(name = "ufts",insertable = false,updatable = false)
     private byte[] ufts;
 
     @Column(name = "iMassDate")
