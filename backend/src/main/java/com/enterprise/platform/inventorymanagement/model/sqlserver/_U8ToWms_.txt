@@ -1,0 +1,49 @@
+
+
+/****** Object:  Table [dbo].[_U8ToWms_]    Script Date: 07/11/2025 08:42:16 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[_U8ToWms_](
+	[AID] [bigint] IDENTITY(1,1) NOT NULL,
+	[ID] [bigint] NULL,
+	[VoucherType] [nvarchar](50) NULL,
+	[cCode] [nvarchar](50) NULL,
+	[dDate] [date] NULL,
+	[cDepCode] [nvarchar](50) NULL,
+	[cDepName] [nvarchar](50) NULL,
+	[cVenCode] [nvarchar](50) NULL,
+	[cVenName] [nvarchar](max) NULL,
+	[cWhCode] [nvarchar](50) NULL,
+	[cWhName] [nvarchar](50) NULL,
+	[cPersonCode] [nvarchar](50) NULL,
+	[cPersonName] [nvarchar](50) NULL,
+	[cDeliverCode] [nvarchar](50) NULL,
+	[cMemo] [nvarchar](max) NULL,
+	[cMaker] [nvarchar](50) NULL,
+	[AutoID] [bigint] NULL,
+	[iRowNo] [int] NULL,
+	[cInvCode] [nvarchar](50) NULL,
+	[cInvName] [nvarchar](max) NULL,
+	[cInvStd] [nvarchar](50) NULL,
+	[Wb] [nvarchar](50) NULL,
+	[cBatch] [nvarchar](50) NULL,
+	[cSnCode] [nvarchar](50) NULL,
+	[cUnitCode] [nvarchar](50) NULL,
+	[cUnitName] [nvarchar](50) NULL,
+	[iQuantity] [decimal](18, 4) NULL,
+	[iOriTaxCost] [decimal](18, 4) NULL,
+	[iOriTaxMoney] [decimal](18, 4) NULL,
+	[cbMemo] [nvarchar](max) NULL,
+	[U8CreateDatetime] [datetime] NULL,
+	[U8Status] [nvarchar](50) NULL,
+	[WMSReadError] [nvarchar](100) NULL,
+	[cInvCCode] [nvarchar](50) NULL
+) ON [PRIMARY]
+
+GO
+
+
