@@ -1,11 +1,14 @@
 package com.enterprise.platform.inventorymanagement.service.impl;
 
+import com.enterprise.platform.inventorymanagement.model.dto.U8ToWmsDTO;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.*;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.*;
 import com.enterprise.platform.inventorymanagement.service.RdRecordService;
 import com.enterprise.platform.inventorymanagement.service.CurrentStockService;
+import com.enterprise.platform.inventorymanagement.service.U8ToWmsService;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -47,6 +50,11 @@ public class RdRecordServiceImpl implements RdRecordService {
     private final RdRecord01ExtradefineRepository rdRecord01ExtradefineRepository;
     private final Rdrecords01ExtradefineRepository rdrecords01ExtradefineRepository;
     private final CurrentStockService currentStockService;
+    private final U8ToWmsService u8ToWmsService;
+
+    // 注入InventoryRepository
+    @Autowired
+    private InventoryRepository inventoryRepository;
 
     @Override
     public RdRecord01 getInboundByPOCode(String poCode) {
@@ -267,6 +275,49 @@ public class RdRecordServiceImpl implements RdRecordService {
             currentStockService.saveCurrentStock(currentStock);
         }
 
+        // 同步创建U8ToWms记录
+        U8ToWmsDTO u8ToWmsDTO = new U8ToWmsDTO();
+        u8ToWmsDTO.setID(inboundMain.getId());
+        u8ToWmsDTO.setVoucherType("采购入库"); // 采购入库单类型
+        u8ToWmsDTO.setCCode(inboundMain.getCCode());
+        u8ToWmsDTO.setDDate(inboundMain.getDDate().toLocalDate());
+        u8ToWmsDTO.setCDepCode(poPomain.getcDepCode());
+        u8ToWmsDTO.setCDepName("");
+        u8ToWmsDTO.setCVenCode(inboundMain.getCVenCode());
+        u8ToWmsDTO.setCVenName("");
+        u8ToWmsDTO.setCWhCode(inboundMain.getCWhCode());  
+        u8ToWmsDTO.setCWhName("");   
+        u8ToWmsDTO.setCPersonCode(poPomain.getcPersonCode());
+        u8ToWmsDTO.setCPersonName("");  
+        u8ToWmsDTO.setCDeliverCode(null);
+        u8ToWmsDTO.setCMemo(inboundMain.getCMemo());
+        u8ToWmsDTO.setCMaker(inboundMain.getCMaker());
+        u8ToWmsDTO.setAutoID(inboundDetail.getAutoId());
+        u8ToWmsDTO.setIRowNo(inboundDetail.getIrowno());        
+        u8ToWmsDTO.setCInvCode(inboundDetail.getCInvCode());
+        // 查询并设置cInvName
+        Optional<Inventory> inventoryOpt = inventoryRepository.findById(u8ToWmsDTO.getCInvCode());
+        if (inventoryOpt.isPresent()) {
+            u8ToWmsDTO.setCInvName(inventoryOpt.get().getCInvName());
+        } else {
+            u8ToWmsDTO.setCInvName("");
+        }
+        u8ToWmsDTO.setCInvStd(inventoryOpt.get().getCInvStd());
+        u8ToWmsDTO.setWb(null);
+        u8ToWmsDTO.setCBatch(inboundDetail.getCBatch());
+        u8ToWmsDTO.setCSnCode(null);
+        u8ToWmsDTO.setCUnitCode(inventoryOpt.get().getCComUnitCode());
+        u8ToWmsDTO.setCUnitName("");        
+        u8ToWmsDTO.setIQuantity(inboundDetail.getIQuantity());
+        u8ToWmsDTO.setIOriTaxCost(inboundDetail.getIOriTaxCost());
+        u8ToWmsDTO.setIOriTaxMoney(inboundDetail.getIQuantity().multiply(inboundDetail.getIOriTaxCost()));
+        u8ToWmsDTO.setCbMemo(inboundDetail.getCbMemo());
+        u8ToWmsDTO.setU8CreateDatetime(now);
+        u8ToWmsDTO.setU8Status("新增");
+        u8ToWmsDTO.setWmsReadError(null);
+        u8ToWmsDTO.setCInvCCode(inventoryOpt.get().getCInvCCode());
+        u8ToWmsService.save(u8ToWmsDTO);
+
         return inboundMain;
     }
 
@@ -286,6 +337,6 @@ public class RdRecordServiceImpl implements RdRecordService {
         //inboundMain.setDVeriDate(LocalDateTime.now());
         //inboundMain.setCAccounter("admin"); // 临时使用默认用户，需根据实际认证系统调整
         //inboundMain.setIverifystate(1); // 已审核状态
-        return rdRecord01Repository.save(inboundMain);
+        return rdRecord01Repository.save(inboundMain);        
     }
 }

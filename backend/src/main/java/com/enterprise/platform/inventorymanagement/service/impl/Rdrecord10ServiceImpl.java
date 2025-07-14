@@ -3,12 +3,15 @@ package com.enterprise.platform.inventorymanagement.service.impl;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.Rdrecord10;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.Rdrecords10;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.HYBarCodeMain;
+import com.enterprise.platform.inventorymanagement.model.sqlserver.Inventory;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.MomOrder;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.MomOrderdetail;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.Rdrecord10Extradefine;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.Rdrecords10Extradefine;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.CurrentStock;
+import com.enterprise.platform.inventorymanagement.model.dto.U8ToWmsDTO;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.HYBarCodeMainRepository;
+import com.enterprise.platform.inventorymanagement.repository.sqlserver.InventoryRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.MomOrderRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.MomOrderdetailRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.Rdrecord10Repository;
@@ -17,8 +20,10 @@ import com.enterprise.platform.inventorymanagement.repository.sqlserver.Rdrecord
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.Rdrecords10ExtradefineRepository;
 import com.enterprise.platform.inventorymanagement.service.Rdrecord10Service;
 import com.enterprise.platform.inventorymanagement.service.CurrentStockService;
+import com.enterprise.platform.inventorymanagement.service.U8ToWmsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,6 +62,11 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
     private final Rdrecord10ExtradefineRepository rdrecord10ExtradefineRepository;
     private final Rdrecords10ExtradefineRepository rdrecords10ExtradefineRepository;
     private final CurrentStockService currentStockService;
+    private final U8ToWmsService u8ToWmsService;
+
+    // 注入InventoryRepository
+    @Autowired
+    private InventoryRepository inventoryRepository;
 
     @Override
     public Optional<Rdrecord10> getInboundByBarcode(String barcode) {
@@ -237,8 +247,52 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
             currentStock.setIpenum(BigDecimal.ZERO);
             currentStockService.saveCurrentStock(currentStock);
         }
+    
 
-        return savedInbound;
+        // 同步创建U8ToWms记录
+        U8ToWmsDTO u8ToWmsDTO = new U8ToWmsDTO();
+        u8ToWmsDTO.setID(savedInbound.getId());
+        u8ToWmsDTO.setVoucherType("产成品入库"); 
+        u8ToWmsDTO.setCCode(savedInbound.getCCode());
+        u8ToWmsDTO.setDDate(savedInbound.getDDate().toLocalDate());
+        u8ToWmsDTO.setCDepCode(orderDetail.getMDeptCode());
+        u8ToWmsDTO.setCDepName("");
+        u8ToWmsDTO.setCVenCode(null);
+        u8ToWmsDTO.setCVenName(null);
+        u8ToWmsDTO.setCWhCode(savedInbound.getCWhCode());  
+        u8ToWmsDTO.setCWhName("");   
+        u8ToWmsDTO.setCPersonCode(null);
+        u8ToWmsDTO.setCPersonName(null);  
+        u8ToWmsDTO.setCDeliverCode("");
+        u8ToWmsDTO.setCMemo(savedInbound.getCMemo());
+        u8ToWmsDTO.setCMaker(savedInbound.getCMaker());
+        u8ToWmsDTO.setAutoID(savedDetail.getAutoId());
+        u8ToWmsDTO.setIRowNo(savedDetail.getIrowno());        
+        u8ToWmsDTO.setCInvCode(savedDetail.getCInvCode());
+        // 查询并设置cInvName
+        Optional<Inventory> inventoryOpt = inventoryRepository.findById(u8ToWmsDTO.getCInvCode());
+        if (inventoryOpt.isPresent()) {
+            u8ToWmsDTO.setCInvName(inventoryOpt.get().getCInvName());
+        } else {
+            u8ToWmsDTO.setCInvName("");
+        }
+        u8ToWmsDTO.setCInvStd(inventoryOpt.get().getCInvStd());
+        u8ToWmsDTO.setWb("");
+        u8ToWmsDTO.setCBatch(savedDetail.getCBatch());
+        u8ToWmsDTO.setCSnCode(null);
+        u8ToWmsDTO.setCUnitCode(inventoryOpt.get().getCComUnitCode());
+        u8ToWmsDTO.setCUnitName("");        
+        u8ToWmsDTO.setIQuantity(savedDetail.getIQuantity());
+        u8ToWmsDTO.setIOriTaxCost(null);
+        u8ToWmsDTO.setIOriTaxMoney(null);
+        u8ToWmsDTO.setCbMemo(savedDetail.getCbMemo());
+        u8ToWmsDTO.setU8CreateDatetime(now);
+        u8ToWmsDTO.setU8Status("新增");
+        u8ToWmsDTO.setWmsReadError(null);
+        u8ToWmsDTO.setCInvCCode(inventoryOpt.get().getCInvCCode());
+        u8ToWmsService.save(u8ToWmsDTO);
+
+        return savedInbound;        
     }
 
 
