@@ -133,7 +133,7 @@ public class RdRecordServiceImpl implements RdRecordService {
         RdRecord01Extradefine extMain = new RdRecord01Extradefine();
         extMain.setID(inboundMain.getId());
         extMain.setChdefine1(null); 
-        extMain.setChdefine2(null); 
+        extMain.setChdefine2("单据数据发送成功"); 
         rdRecord01ExtradefineRepository.save(extMain);
 
         // 5. 创建入库单子表
@@ -160,8 +160,8 @@ public class RdRecordServiceImpl implements RdRecordService {
         }
         // 补充用户要求的字段
         inboundDetail.setIUnitCost(poPodetails.getiUnitPrice()); // 单价取自采购子表
-        inboundDetail.setIPrice(poPodetails.getiMoney()); // 原币无税金额 
-        inboundDetail.setIAPrice(poPodetails.getiNatMoney()); // 本币无税金额 
+        inboundDetail.setIPrice(BigDecimal.valueOf(quantity).multiply(poPodetails.getiUnitPrice())); // 原币无税金额 
+        inboundDetail.setIAPrice(BigDecimal.valueOf(quantity).multiply(poPodetails.getiUnitPrice())); // 本币无税金额 
         inboundDetail.setIPOsID(poPodetails.getId().longValue()); // 采购子表ID
         inboundDetail.setFACost(poPodetails.getiNatUnitPrice()); // 本币无税单价 
         inboundDetail.setINQuantity(BigDecimal.valueOf(quantity)); // 数量
@@ -169,12 +169,12 @@ public class RdRecordServiceImpl implements RdRecordService {
         inboundDetail.setChVencode(poPomain.getcVenCode()); // 供应商编码
         inboundDetail.setIOriTaxCost(poPodetails.getiTaxPrice()); // 含税单价
         inboundDetail.setIOriCost(poPodetails.getiNatUnitPrice()); // 本币无税单价
-        inboundDetail.setIOriMoney(poPodetails.getiNatMoney()); // 无税金额
-        inboundDetail.setIOriTaxPrice(poPodetails.getiNatTax()); // 本币税额 
-        inboundDetail.setIoriSum(poPodetails.getiNatSum()); // 本币价税合计
+        inboundDetail.setIOriMoney(BigDecimal.valueOf(quantity).multiply(poPodetails.getiUnitPrice())); // 无税金额
+        inboundDetail.setIOriTaxPrice(BigDecimal.valueOf(quantity).multiply(poPodetails.getiTaxPrice()).multiply(poPodetails.getiPerTaxRate())); // 本币税额 
+        inboundDetail.setIoriSum(BigDecimal.valueOf(quantity).multiply(poPodetails.getiTaxPrice())); // 本币价税合计
         inboundDetail.setITaxRate(poPodetails.getiPerTaxRate()); // 税率
-        inboundDetail.setITaxPrice(poPodetails.getiTax()); // 税额
-        inboundDetail.setISum(poPodetails.getiSum()); // 价税合计
+        inboundDetail.setITaxPrice(BigDecimal.valueOf(quantity).multiply(poPodetails.getiTaxPrice()).multiply(poPodetails.getiPerTaxRate())); // 税额
+        inboundDetail.setISum(BigDecimal.valueOf(quantity).multiply(poPodetails.getiTaxPrice())); // 价税合计
         inboundDetail.setBTaxCost(poPodetails.getbTaxCost()); // 税额计算方式
         inboundDetail.setCPOID(poCode); // 采购订单号
         inboundDetail.setIrowno(1); // 行号

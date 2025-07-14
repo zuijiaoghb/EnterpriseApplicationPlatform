@@ -189,7 +189,7 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
         // 7. 创建并保存主表扩展记录
         Rdrecord10Extradefine recordExtradefine = new Rdrecord10Extradefine();
         recordExtradefine.setID(savedInbound.getId());
-        recordExtradefine.setChdefine2(null); // 根据实际业务需求设置值
+        recordExtradefine.setChdefine2("单据数据发送成功");
         rdrecord10ExtradefineRepository.save(recordExtradefine);
 
         // 8. 创建并保存明细表扩展记录
