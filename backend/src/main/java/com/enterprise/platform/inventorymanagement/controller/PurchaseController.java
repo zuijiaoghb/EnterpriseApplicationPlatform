@@ -36,10 +36,10 @@ public class PurchaseController {
     }
 
     @Operation(summary = "获取供应商已审核的采购订单列表")
-    @GetMapping("/supplier/audited-orders")
-    public ResponseEntity<List<PurchaseScanDTO>> getSupplierAuditedOrders(
-            @RequestParam String supplierCode) {
-        List<PurchaseScanDTO> orders = purchaseService.getSupplierAuditedOrders(supplierCode);
+    @GetMapping("/vendor/audited-orders")
+    public ResponseEntity<List<PurchaseScanDTO>> getVendorAuditedOrders(
+            @RequestParam String vendorCode) {
+        List<PurchaseScanDTO> orders = purchaseService.getVendorAuditedOrders(vendorCode);
         return ResponseEntity.ok(orders);
     }
 }

@@ -1,0 +1,206 @@
+
+
+/****** Object:  Table [dbo].[Vendor]    Script Date: 07/15/2025 13:35:35 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Vendor](
+	[cVenCode] [nvarchar](20) NOT NULL,
+	[cVenName] [nvarchar](98) NULL,
+	[cVenAbbName] [nvarchar](60) NOT NULL,
+	[cVCCode] [nvarchar](12) NULL,
+	[cDCCode] [nvarchar](12) NULL,
+	[cTrade] [nvarchar](50) NULL,
+	[cVenAddress] [nvarchar](255) NULL,
+	[cVenPostCode] [nvarchar](20) NULL,
+	[cVenRegCode] [nvarchar](50) NULL,
+	[cVenBank] [nvarchar](100) NULL,
+	[cVenAccount] [nvarchar](50) NULL,
+	[dVenDevDate] [datetime] NULL,
+	[cVenLPerson] [nvarchar](100) NULL,
+	[cVenPhone] [nvarchar](100) NULL,
+	[cVenFax] [nvarchar](100) NULL,
+	[cVenEmail] [nvarchar](100) NULL,
+	[cVenPerson] [nvarchar](50) NULL,
+	[cVenBP] [nvarchar](20) NULL,
+	[cVenHand] [nvarchar](20) NULL,
+	[cVenPPerson] [nvarchar](20) NULL,
+	[iVenDisRate] [float] NULL,
+	[iVenCreGrade] [nvarchar](6) NULL,
+	[iVenCreLine] [float] NULL,
+	[iVenCreDate] [int] NULL,
+	[cVenPayCond] [nvarchar](20) NULL,
+	[cVenIAddress] [nvarchar](255) NULL,
+	[cVenIType] [nvarchar](10) NULL,
+	[cVenHeadCode] [nvarchar](20) NULL,
+	[cVenWhCode] [nvarchar](10) NULL,
+	[cVenDepart] [nvarchar](12) NULL,
+	[iAPMoney] [float] NULL,
+	[dLastDate] [datetime] NULL,
+	[iLastMoney] [float] NULL,
+	[dLRDate] [datetime] NULL,
+	[iLRMoney] [float] NULL,
+	[dEndDate] [datetime] NULL,
+	[iFrequency] [int] NULL,
+	[bVenTax] [bit] NOT NULL,
+	[cVenDefine1] [nvarchar](20) NULL,
+	[cVenDefine2] [nvarchar](20) NULL,
+	[cVenDefine3] [nvarchar](20) NULL,
+	[cCreatePerson] [nvarchar](20) NULL,
+	[cModifyPerson] [nvarchar](20) NULL,
+	[dModifyDate] [datetime] NULL,
+	[cRelCustomer] [nvarchar](20) NULL,
+	[iId] [int] NULL,
+	[cBarCode] [nvarchar](30) NULL,
+	[cVenDefine4] [nvarchar](60) NULL,
+	[cVenDefine5] [nvarchar](60) NULL,
+	[cVenDefine6] [nvarchar](60) NULL,
+	[cVenDefine7] [nvarchar](120) NULL,
+	[cVenDefine8] [nvarchar](120) NULL,
+	[cVenDefine9] [nvarchar](120) NULL,
+	[cVenDefine10] [nvarchar](120) NULL,
+	[cVenDefine11] [int] NULL,
+	[cVenDefine12] [int] NULL,
+	[cVenDefine13] [float] NULL,
+	[cVenDefine14] [float] NULL,
+	[cVenDefine15] [datetime] NULL,
+	[cVenDefine16] [datetime] NULL,
+	[pubufts] [timestamp] NULL,
+	[fRegistFund] [float] NULL,
+	[iEmployeeNum] [int] NULL,
+	[iGradeABC] [smallint] NULL,
+	[cMemo] [nvarchar](240) NULL,
+	[bLicenceDate] [bit] NOT NULL,
+	[dLicenceSDate] [datetime] NULL,
+	[dLicenceEDate] [datetime] NULL,
+	[iLicenceADays] [int] NULL,
+	[bBusinessDate] [bit] NOT NULL,
+	[dBusinessSDate] [datetime] NULL,
+	[dBusinessEDate] [datetime] NULL,
+	[iBusinessADays] [int] NULL,
+	[bProxyDate] [bit] NOT NULL,
+	[dProxySDate] [datetime] NULL,
+	[dProxyEDate] [datetime] NULL,
+	[iProxyADays] [int] NULL,
+	[bPassGMP] [bit] NOT NULL,
+	[bVenCargo] [bit] NOT NULL,
+	[bProxyForeign] [bit] NOT NULL,
+	[bVenService] [bit] NOT NULL,
+	[cVenTradeCCode] [nvarchar](12) NULL,
+	[cVenBankCode] [nvarchar](5) NULL,
+	[cVenExch_name] [nvarchar](50) NULL,
+	[iVenGSPType] [smallint] NOT NULL,
+	[iVenGSPAuth] [smallint] NULL,
+	[cVenGSPAuthNo] [nvarchar](40) NULL,
+	[cVenBusinessNo] [nvarchar](20) NULL,
+	[cVenLicenceNo] [nvarchar](20) NULL,
+	[bVenOverseas] [bit] NOT NULL,
+	[bVenAccPeriodMng] [bit] NOT NULL,
+	[cVenPUOMProtocol] [nvarchar](20) NULL,
+	[cVenOtherProtocol] [nvarchar](20) NULL,
+	[cVenCountryCode] [nvarchar](10) NULL,
+	[cVenEnName] [nvarchar](100) NULL,
+	[cVenEnAddr1] [nvarchar](60) NULL,
+	[cVenEnAddr2] [nvarchar](60) NULL,
+	[cVenEnAddr3] [nvarchar](60) NULL,
+	[cVenEnAddr4] [nvarchar](60) NULL,
+	[cVenPortCode] [nvarchar](10) NULL,
+	[cVenPrimaryVen] [nvarchar](20) NULL,
+	[fVenCommisionRate] [float] NULL,
+	[fVenInsueRate] [float] NULL,
+	[bVenHomeBranch] [bit] NOT NULL,
+	[cVenBranchAddr] [nvarchar](200) NULL,
+	[cVenBranchPhone] [nvarchar](100) NULL,
+	[cVenBranchPerson] [nvarchar](50) NULL,
+	[cVenSSCode] [nvarchar](20) NULL,
+	[cOMWhCode] [nvarchar](20) NULL,
+	[cVenCMProtocol] [nvarchar](20) NULL,
+	[cVenIMProtocol] [nvarchar](20) NULL,
+	[iVenTaxRate] [float] NULL,
+	[dVenCreateDatetime] [datetime] NOT NULL,
+	[cVenMnemCode] [nvarchar](98) NULL,
+	[cVenContactCode] [uniqueidentifier] NULL,
+	[cvenbankall] [nvarchar](50) NULL,
+	[bIsVenAttachFile] [bit] NULL,
+	[cLicenceRange] [nvarchar](255) NULL,
+	[cBusinessRange] [nvarchar](255) NULL,
+	[cVenGSPRange] [nvarchar](255) NULL,
+	[dVenGSPEDate] [datetime] NULL,
+	[dVenGSPSDate] [datetime] NULL,
+	[iVenGSPADays] [int] NULL,
+ CONSTRAINT [aaaaaVendor_PK] PRIMARY KEY NONCLUSTERED 
+(
+	[cVenCode] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[Vendor]  WITH CHECK ADD  CONSTRAINT [FK__Vendor__cDCCode__48E5AC6E] FOREIGN KEY([cDCCode])
+REFERENCES [dbo].[DistrictClass] ([cDCCode])
+GO
+
+ALTER TABLE [dbo].[Vendor] CHECK CONSTRAINT [FK__Vendor__cDCCode__48E5AC6E]
+GO
+
+ALTER TABLE [dbo].[Vendor]  WITH CHECK ADD  CONSTRAINT [FK__Vendor__cVCCode__5ACF527F] FOREIGN KEY([cVCCode])
+REFERENCES [dbo].[VendorClass] ([cVCCode])
+GO
+
+ALTER TABLE [dbo].[Vendor] CHECK CONSTRAINT [FK__Vendor__cVCCode__5ACF527F]
+GO
+
+ALTER TABLE [dbo].[Vendor]  WITH CHECK ADD  CONSTRAINT [FK__Vendor__cVenDepa__3E681DFB] FOREIGN KEY([cVenDepart])
+REFERENCES [dbo].[Department] ([cDepCode])
+GO
+
+ALTER TABLE [dbo].[Vendor] CHECK CONSTRAINT [FK__Vendor__cVenDepa__3E681DFB]
+GO
+
+ALTER TABLE [dbo].[Vendor]  WITH CHECK ADD  CONSTRAINT [FK__Vendor__cVenWhCo__05B9B084] FOREIGN KEY([cVenWhCode])
+REFERENCES [dbo].[Warehouse] ([cWhCode])
+GO
+
+ALTER TABLE [dbo].[Vendor] CHECK CONSTRAINT [FK__Vendor__cVenWhCo__05B9B084]
+GO
+
+ALTER TABLE [dbo].[Vendor] ADD  CONSTRAINT [DF__Vendor__bLicence__06EE9736]  DEFAULT (0) FOR [bLicenceDate]
+GO
+
+ALTER TABLE [dbo].[Vendor] ADD  CONSTRAINT [DF__Vendor__bBusines__07E2BB6F]  DEFAULT (0) FOR [bBusinessDate]
+GO
+
+ALTER TABLE [dbo].[Vendor] ADD  CONSTRAINT [DF__Vendor__bProxyDa__08D6DFA8]  DEFAULT (0) FOR [bProxyDate]
+GO
+
+ALTER TABLE [dbo].[Vendor] ADD  CONSTRAINT [DF__Vendor__bPassGMP__09CB03E1]  DEFAULT (0) FOR [bPassGMP]
+GO
+
+ALTER TABLE [dbo].[Vendor] ADD  CONSTRAINT [DF__Vendor__bVenCarg__6E03B932]  DEFAULT (1) FOR [bVenCargo]
+GO
+
+ALTER TABLE [dbo].[Vendor] ADD  CONSTRAINT [DF__Vendor__bProxyFo__6EF7DD6B]  DEFAULT (0) FOR [bProxyForeign]
+GO
+
+ALTER TABLE [dbo].[Vendor] ADD  CONSTRAINT [DF__Vendor__bVenServ__6FEC01A4]  DEFAULT (0) FOR [bVenService]
+GO
+
+ALTER TABLE [dbo].[Vendor] ADD  CONSTRAINT [DF__vendor__iVenGSPT__5578CDE1]  DEFAULT (0) FOR [iVenGSPType]
+GO
+
+ALTER TABLE [dbo].[Vendor] ADD  DEFAULT (0) FOR [bVenOverseas]
+GO
+
+ALTER TABLE [dbo].[Vendor] ADD  DEFAULT (0) FOR [bVenAccPeriodMng]
+GO
+
+ALTER TABLE [dbo].[Vendor] ADD  DEFAULT (0) FOR [bVenHomeBranch]
+GO
+
+ALTER TABLE [dbo].[Vendor] ADD  DEFAULT (getdate()) FOR [dVenCreateDatetime]
+GO
+
+

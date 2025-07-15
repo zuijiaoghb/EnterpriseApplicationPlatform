@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.enterprise.platform.inventorymanagement.model.sqlserver.Supplier;
-import com.enterprise.platform.inventorymanagement.repository.SupplierRepository;
-import com.enterprise.platform.inventorymanagement.model.sqlserver.Unit;
-import com.enterprise.platform.inventorymanagement.repository.UnitRepository;
+import com.enterprise.platform.inventorymanagement.model.sqlserver.Vendor;
+import com.enterprise.platform.inventorymanagement.repository.sqlserver.VendorRepository;
+import com.enterprise.platform.inventorymanagement.model.sqlserver.ComputationUnit;
+import com.enterprise.platform.inventorymanagement.repository.sqlserver.ComputationUnitRepository;
 
 @Service
 @Transactional(transactionManager = "sqlServerTransactionManager")
@@ -43,10 +43,10 @@ public class PurchaseServiceImpl implements PurchaseService {
     private InventoryRepository inventoryRepository;
 
     @Autowired
-    private SupplierRepository supplierRepository;
+    private VendorRepository vendorRepository;
 
     @Autowired
-    private UnitRepository unitRepository;
+    private ComputationUnitRepository computationUnitRepository;
 
     @Override    
     public PurchaseScanDTO scanPurchaseIn(String barcode) {
@@ -110,18 +110,18 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public List<PurchaseScanDTO> getSupplierAuditedOrders(String supplierCode) {
+    public List<PurchaseScanDTO> getVendorAuditedOrders(String vendorCode) {
         // 查询供应商已审核的采购订单
-        List<PO_Pomain> pomainList = poPomainRepository.findByCVenCodeAndCAuditDateIsNotNull(supplierCode);
+        List<PO_Pomain> pomainList = poPomainRepository.findByCVenCodeAndCAuditDateIsNotNull(vendorCode);
 
         return pomainList.stream().flatMap(pomain -> {
             // 查询订单明细
             List<PO_Podetails> podetailsList = poPodetailsRepository.findByPoPomainPoid(pomain.getPoid());
 
             // 查询供应商名称
-            Supplier supplier = supplierRepository.findById(pomain.getcVenCode())
-                .orElseThrow(() -> new BusinessException("供应商不存在: " + pomain.getCVenCode()));
-            String supplierName = supplier.getCVenName();
+            Vendor vendor = vendorRepository.findById(pomain.getcVenCode())
+                .orElseThrow(() -> new RuntimeException("供应商不存在: " + pomain.getcVenCode()));
+            String supplierName = vendor.getCVenName();
 
             return podetailsList.stream().map(podetails -> {
                 PurchaseScanDTO dto = new PurchaseScanDTO();
@@ -148,9 +148,9 @@ public class PurchaseServiceImpl implements PurchaseService {
                 dto.setcItemName(inventory.getCInvName());
 
                 // 查询单位名称
-                Unit unit = unitRepository.findById(podetails.getcUnitID())
-                    .orElseThrow(() -> new RuntimeException("单位不存在: " + podetails.getcUnitID()));
-                dto.setUnitName(unit.getCUnitName());
+                ComputationUnit computationUnit = computationUnitRepository.findById(inventory.getCComUnitCode())
+                    .orElseThrow(() -> new RuntimeException("单位不存在: " + inventory.getCComUnitCode()));
+                dto.setUnitName(computationUnit.getCComUnitName());
 
                 // 生成批号(当前日期+时分秒)
                 String batchNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
