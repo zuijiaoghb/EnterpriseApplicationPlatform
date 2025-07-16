@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import api from '../api';
@@ -14,6 +14,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [menuItems, setMenuItems] = useState<{key: string; label: string; icon: string;}[]>([]);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
 
   const handleLogout = () => {
@@ -69,10 +70,40 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
           <MaterialIcons name="apps" size={28} color="white" />
           <Text style={styles.portalText}>工作门户</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <TouchableOpacity style={styles.logoutButton} onPress={() => setShowLogoutModal(true)}>
           <Text style={styles.logoutText}>退出</Text>
         </TouchableOpacity>
       </View>
+      <Modal
+        visible={showLogoutModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowLogoutModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>确认退出</Text>
+            <Text style={styles.modalMessage}>您确定要退出当前账号吗？</Text>
+            <View style={styles.modalButtons}>
+              <Pressable
+                style={styles.cancelButton}
+                onPress={() => setShowLogoutModal(false)}
+              >
+                <Text style={styles.cancelButtonText}>取消</Text>
+              </Pressable>
+              <Pressable
+                style={styles.confirmButton}
+                onPress={() => {
+                  handleLogout();
+                  setShowLogoutModal(false);
+                }}
+              >
+                <Text style={styles.confirmButtonText}>确定</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -115,6 +146,68 @@ const styles = StyleSheet.create({
   logoutText: {
     color: 'white',
     textAlign: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 24,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    textAlign: 'center',
+    color: '#333'
+  },
+  modalMessage: {
+    fontSize: 16,
+    marginBottom: 24,
+    textAlign: 'center',
+    color: '#666',
+    lineHeight: 24
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16
+  },
+  cancelButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    backgroundColor: '#f5f5f5',
+    marginRight: 12,
+    alignItems: 'center'
+  },
+  confirmButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    backgroundColor: '#1890ff',
+    marginLeft: 12,
+    alignItems: 'center'
+  },
+  cancelButtonText: {
+    color: '#333',
+    fontSize: 16,
+    fontWeight: '500'
+  },
+  confirmButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '500'
   },
 });
 
