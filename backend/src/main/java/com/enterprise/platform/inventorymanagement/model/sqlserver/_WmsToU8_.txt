@@ -1,0 +1,21 @@
+
+/****** Object:  Table [dbo].[_WmsToU8_]    Script Date: 07/25/2025 10:56:56 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[_WmsToU8_](
+	[id] [bigint] IDENTITY(1,1) NOT NULL,
+	[AID] [bigint] NULL,
+	[AutoID] [bigint] NULL,
+	[VoucherType] [nvarchar](50) NULL,
+	[iQuantity] [decimal](18, 4) NOT NULL,
+	[WMSCreateDatetime] [datetime] NULL,
+	[U8ReadError] [nvarchar](100) NULL
+) ON [PRIMARY]
+
+GO
+
+
