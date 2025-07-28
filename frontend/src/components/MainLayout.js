@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Menu, Dropdown, Avatar, message } from 'antd';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { 
-  LogoutOutlined, 
+import {
+  LogoutOutlined,
   UserOutlined,
   DashboardOutlined,
   ToolOutlined,
   SettingOutlined,
-  InboxOutlined
+  InboxOutlined,
+  ShopOutlined
 } from '@ant-design/icons';
 import api from '../api';
 import './MainLayout.css';
@@ -51,6 +52,17 @@ const MainLayout = () => {
             label: '库存管理'
           }
         ];
+
+        const hasSupplierRole = response.data.roles?.some(role => 
+          role === 'ROLE_SUPPLIER' || role === 'ROLE_ADMIN'
+        );
+        if (hasSupplierRole) {
+          baseItems.push({
+            key: 'supplierportal',
+            icon: <ShopOutlined />,
+            label: '供应商门户'
+          });
+        }
         
         console.log('User Info roles:', response.data.roles?.some(role => role.authority === 'ROLE_ADMIN'));
         // 只有管理员才显示系统管理菜单
@@ -60,7 +72,7 @@ const MainLayout = () => {
             icon: <SettingOutlined />,
             label: '系统管理'
           });
-        }
+        }        
         
         setMenuItems(baseItems);
       } catch (error) {

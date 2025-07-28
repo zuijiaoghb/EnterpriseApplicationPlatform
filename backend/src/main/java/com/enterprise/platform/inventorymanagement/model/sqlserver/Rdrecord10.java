@@ -205,7 +205,7 @@ public class Rdrecord10 {
 
     @Version
     @Column(name = "ufts",insertable = false,updatable = false)
-    private Long ufts;
+    private byte[] ufts;
 
     @Column(name = "iExchRate")
     private Double iExchRate;

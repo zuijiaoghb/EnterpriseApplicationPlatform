@@ -1,7 +1,6 @@
 package com.enterprise.platform.inventorymanagement.service;
 
-import java.util.List;
-
+import com.enterprise.platform.inventorymanagement.model.dto.PageResultDTO;
 import com.enterprise.platform.inventorymanagement.model.dto.PurchaseScanDTO;
 
 public interface PurchaseService {
@@ -22,7 +21,9 @@ public interface PurchaseService {
     /**
      * 根据供应商编码查询已审核的采购订单
      * @param vendorCode 供应商编码
+     * @param pageNum 页码
+     * @param pageSize 每页数量
      * @return 采购订单列表
      */
-    List<PurchaseScanDTO> getVendorAuditedOrders(String vendorCode);
+    PageResultDTO<PurchaseScanDTO> getVendorAuditedOrders(String vendorCode, Integer pageNum, Integer pageSize);
 }

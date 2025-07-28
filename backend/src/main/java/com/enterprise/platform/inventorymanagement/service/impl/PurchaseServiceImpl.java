@@ -1,5 +1,6 @@
 package com.enterprise.platform.inventorymanagement.service.impl;
 
+import com.enterprise.platform.inventorymanagement.model.dto.PageResultDTO;
 import com.enterprise.platform.inventorymanagement.model.dto.PurchaseScanDTO;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.HYBarCodeMain;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.Inventory;
@@ -7,19 +8,31 @@ import com.enterprise.platform.inventorymanagement.model.sqlserver.PO_Podetails;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.PO_Pomain;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.HYBarCodeMainRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.InventoryRepository;
-import com.enterprise.platform.inventorymanagement.repository.sqlserver.PO_PodetailsRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.PO_PomainRepository;
 import com.enterprise.platform.inventorymanagement.service.PurchaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.enterprise.platform.inventorymanagement.model.sqlserver.Vendor;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.VendorRepository;
@@ -29,15 +42,14 @@ import com.enterprise.platform.inventorymanagement.repository.sqlserver.Computat
 @Service
 @Transactional(transactionManager = "sqlServerTransactionManager")
 public class PurchaseServiceImpl implements PurchaseService {
+    private static final Logger log = LoggerFactory.getLogger(PurchaseServiceImpl.class);
+
 
     @Autowired
     private HYBarCodeMainRepository hyBarCodeMainRepository;
 
     @Autowired
     private PO_PomainRepository poPomainRepository;
-
-    @Autowired
-    private PO_PodetailsRepository poPodetailsRepository;
 
     @Autowired
     private InventoryRepository inventoryRepository;
@@ -110,65 +122,119 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public List<PurchaseScanDTO> getVendorAuditedOrders(String vendorCode) {
+    public PageResultDTO<PurchaseScanDTO> getVendorAuditedOrders(
+            @NotBlank(message = "供应商编码不能为空") String vendorCode,
+            @Positive(message = "页码必须为正数") Integer pageNum,
+            @PositiveOrZero(message = "每页条数不能为负数") Integer pageSize) {
+        // 创建分页请求 (注意Spring Data JPA页码从0开始)
+        // 限制最大分页大小为100
+        int limitedPageSize = Math.min(pageSize, 100);
+        Pageable pageable = PageRequest.of(pageNum - 1, limitedPageSize, Sort.by(Sort.Direction.DESC, "dPODate"));
+        log.info("查询供应商[{}]的采购订单，页码[{}]，每页条数[{}]", vendorCode, pageNum, limitedPageSize);
         // 查询供应商已审核的采购订单
-        List<PO_Pomain> pomainList = poPomainRepository.findByCVenCodeAndCAuditDateIsNotNull(vendorCode);
+        Page<PO_Pomain> pomainPage = poPomainRepository.findByCVenCodeAndCAuditDateIsNotNull(vendorCode, pageable);
+        List<PO_Pomain> pomainList = pomainPage.getContent();
 
-        return pomainList.stream().flatMap(pomain -> {
-            // 查询订单明细
-            List<PO_Podetails> podetailsList = poPodetailsRepository.findByPoPomainPoid(pomain.getPoid());
+        // 提取所有供应商编码进行批量查询
+        Set<String> venCodeSet = pomainList.stream()
+                .map(PO_Pomain::getcVenCode)
+                .collect(Collectors.toSet());
+        Map<String, Vendor> vendorMap = vendorRepository.findByCVenCodeIn(venCodeSet).stream()
+                .collect(Collectors.toMap(Vendor::getCVenCode, vendor -> vendor, (existing, replacement) -> existing));
 
-            // 查询供应商名称
-            Vendor vendor = vendorRepository.findById(pomain.getcVenCode())
-                .orElseThrow(() -> new RuntimeException("供应商不存在: " + pomain.getcVenCode()));
-            String supplierName = vendor.getCVenName();
+        // 提取所有存货编码进行批量查询
+        Set<String> invCodeSet = pomainList.stream()
+                .flatMap(pomain -> pomain.getPoPodetailsList().stream())
+                .map(PO_Podetails::getcInvCode)
+                .collect(Collectors.toSet());
+        Map<String, Inventory> inventoryMap = inventoryRepository.findByCInvCodeIn(invCodeSet).stream()
+                .collect(Collectors.toMap(Inventory::getCInvCode, inventory -> inventory, (existing, replacement) -> existing));
 
-            return podetailsList.stream().map(podetails -> {
-                PurchaseScanDTO dto = new PurchaseScanDTO();
-                // 设置主表信息
-                dto.setcPOID(pomain.getcPOID());
-                dto.setdPODate(pomain.getdPODate());
-                dto.setcVenCode(pomain.getcVenCode());
-                dto.setcDefine1(pomain.getcDefine1());
-                dto.setcPersonCode(pomain.getcPersonCode());
-                dto.setcDepCode(pomain.getcDepCode());
-                dto.setdArriveDate(podetails.getdArriveDate());
+        // 提取所有单位编码进行批量查询
+        Set<String> unitCodeSet = inventoryMap.values().stream()
+                .map(Inventory::getCComUnitCode)
+                .collect(Collectors.toSet());
+        Map<String, ComputationUnit> unitMap = computationUnitRepository.findByCComunitCodeIn(unitCodeSet).stream()
+                .collect(Collectors.toMap(ComputationUnit::getCComunitCode, unit -> unit, (existing, replacement) -> existing));
 
-                // 设置明细信息
-                dto.setcInvCode(podetails.getcInvCode());
-                dto.setiQuantity(podetails.getiQuantity());
-                dto.setIrowno(podetails.getIvouchrowno());
-                // 使用iNum作为一箱的数量
-                dto.setBoxQuantity(podetails.getiNum());
-                dto.setcUnitID(podetails.getcUnitID());
+        List<PurchaseScanDTO> resultList = pomainList.stream()
+                .flatMap(pomain -> convertToPurchaseScanDTOs(pomain, vendorMap, inventoryMap, unitMap))
+                .collect(Collectors.toList());
 
-                // 查询存货名称
-                Inventory inventory = inventoryRepository.findById(podetails.getcInvCode())
-                    .orElseThrow(() -> new RuntimeException("存货不存在: " + podetails.getcInvCode()));
-                dto.setcItemName(inventory.getCInvName());
+        return new PageResultDTO<>(pomainPage.getTotalElements(), resultList);
+    }
 
-                // 查询单位名称
-                ComputationUnit computationUnit = computationUnitRepository.findById(inventory.getCComUnitCode())
-                    .orElseThrow(() -> new RuntimeException("单位不存在: " + inventory.getCComUnitCode()));
-                dto.setUnitName(computationUnit.getCComUnitName());
+    /**
+     * 将采购订单转换为DTO列表
+     */
+    private Stream<PurchaseScanDTO> convertToPurchaseScanDTOs(PO_Pomain pomain, Map<String, Vendor> vendorMap, 
+                                                             Map<String, Inventory> inventoryMap, Map<String, ComputationUnit> unitMap) {
+        // 查询订单明细
+        // 使用已加载的明细列表，避免N+1查询
+        List<PO_Podetails> podetailsList = pomain.getPoPodetailsList();
+        log.debug("订单[{}]包含[{}]条明细记录", pomain.getcPOID(), podetailsList.size());
 
-                // 生成批号(当前日期+时分秒)
-                String batchNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-                dto.setBatchNumber(batchNumber);
+        // 获取供应商名称
+        Vendor vendor = vendorMap.get(pomain.getcVenCode());
+        if (vendor == null) {
+            log.error("供应商不存在: {}", pomain.getcVenCode());
+            return Stream.empty();
+        }
+        String supplierName = vendor.getCVenName();
 
-                // 生成条码
-                String barcode = String.format("%s_%s_%s_%s_%d_%s",
-                    pomain.getcVenCode(),
-                    podetails.getcInvCode(),
-                    dto.getBoxQuantity(),
-                    pomain.getcPOID(),
-                    podetails.getIvouchrowno(),
-                    batchNumber);
-                dto.setBarcode(barcode);
-                dto.setSupplierName(supplierName);
+        return podetailsList.stream()
+                .filter(Objects::nonNull)
+                .map(podetails -> buildPurchaseScanDTO(pomain, podetails, supplierName, inventoryMap, unitMap));
+    }
 
-                return dto;
-            });
-        }).collect(Collectors.toList());
+    /**
+     * 构建采购订单DTO对象
+     */
+    private PurchaseScanDTO buildPurchaseScanDTO(PO_Pomain pomain, PO_Podetails podetails, String supplierName, 
+                                                Map<String, Inventory> inventoryMap, Map<String, ComputationUnit> unitMap) {
+        PurchaseScanDTO dto = new PurchaseScanDTO();
+        // 设置主表信息
+        dto.setcPOID(pomain.getcPOID());
+        dto.setdPODate(pomain.getdPODate());
+        dto.setcVenCode(pomain.getcVenCode());
+        dto.setcDefine1(pomain.getcDefine1());
+        dto.setcPersonCode(pomain.getcPersonCode());
+        dto.setcDepCode(pomain.getcDepCode());
+        dto.setdArriveDate(podetails.getdArriveDate());
+
+        // 设置明细信息
+        dto.setcInvCode(podetails.getcInvCode());
+        dto.setiQuantity(podetails.getiQuantity());
+        dto.setIrowno(podetails.getIvouchrowno());
+        dto.setBoxQuantity(podetails.getiNum());
+        dto.setcUnitID(podetails.getcUnitID());
+
+        // 设置存货名称
+        Inventory inventory = inventoryMap.get(podetails.getcInvCode());
+        if (inventory != null) {
+            dto.setcItemName(inventory.getCInvName());
+            // 设置单位名称
+            ComputationUnit unit = unitMap.get(inventory.getCComUnitCode());
+            if (unit != null) {
+                dto.setUnitName(unit.getCComUnitName());
+            } else {
+                log.warn("单位不存在: {}", inventory.getCComUnitCode());
+                dto.setUnitName("未知单位");
+            }
+        } else {
+            log.warn("存货不存在: {}", podetails.getcInvCode());
+            dto.setcItemName("未知存货");
+            dto.setUnitName("未知单位");
+        }
+
+        // 生成批号和条码
+        String batchNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        dto.setBatchNumber(batchNumber);
+        dto.setBarcode(String.format("%s_%s_%s_%s_%d_%s",
+                pomain.getcVenCode(), podetails.getcInvCode(), dto.getBoxQuantity(),
+                pomain.getcPOID(), podetails.getIvouchrowno(), batchNumber));
+        dto.setSupplierName(supplierName);
+
+        return dto;
     }
 }

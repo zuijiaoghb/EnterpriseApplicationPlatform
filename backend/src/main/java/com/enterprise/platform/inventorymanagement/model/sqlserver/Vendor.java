@@ -196,7 +196,7 @@ public class Vendor {
 
     @Version
     @Column(name = "pubufts",insertable = false,updatable = false)
-    private Long pubufts;
+    private byte[] pubufts;
 
     @Column(name = "fRegistFund")
     private Double fRegistFund;

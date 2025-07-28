@@ -406,7 +406,7 @@ public class Rdrecords10 {
 
     @Version
     @Column(name = "rowufts",insertable = false,updatable = false)
-    private Long rowufts;
+    private byte[] rowufts;
 
     @Column(name = "ipreuseqty", precision = 38, scale = 8)
     private BigDecimal ipreuseqty;

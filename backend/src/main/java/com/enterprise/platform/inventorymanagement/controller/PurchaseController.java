@@ -1,12 +1,12 @@
 package com.enterprise.platform.inventorymanagement.controller;
 
+import com.enterprise.platform.inventorymanagement.model.dto.PageResultDTO;
 import com.enterprise.platform.inventorymanagement.model.dto.PurchaseScanDTO;
 import com.enterprise.platform.inventorymanagement.service.PurchaseService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/inventory/purchase")
@@ -37,9 +37,11 @@ public class PurchaseController {
 
     @Operation(summary = "获取供应商已审核的采购订单列表")
     @GetMapping("/vendor/audited-orders")
-    public ResponseEntity<List<PurchaseScanDTO>> getVendorAuditedOrders(
-            @RequestParam String vendorCode) {
-        List<PurchaseScanDTO> orders = purchaseService.getVendorAuditedOrders(vendorCode);
+    public ResponseEntity<PageResultDTO<PurchaseScanDTO>> getVendorAuditedOrders(
+        @RequestParam String vendorCode,
+        @RequestParam(defaultValue = "1") Integer pageNum,
+        @RequestParam(defaultValue = "50") Integer pageSize) {
+        PageResultDTO<PurchaseScanDTO> orders = purchaseService.getVendorAuditedOrders(vendorCode, pageNum, pageSize);
         return ResponseEntity.ok(orders);
     }
 }
