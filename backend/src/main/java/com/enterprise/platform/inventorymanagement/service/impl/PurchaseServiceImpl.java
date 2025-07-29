@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,8 +133,16 @@ public class PurchaseServiceImpl implements PurchaseService {
         Pageable pageable = PageRequest.of(pageNum - 1, limitedPageSize, Sort.by(Sort.Direction.DESC, "dPODate"));
         log.info("查询供应商[{}]的采购订单，页码[{}]，每页条数[{}]", vendorCode, pageNum, limitedPageSize);
         // 查询供应商已审核的采购订单
-        Page<PO_Pomain> pomainPage = poPomainRepository.findByCVenCodeAndCAuditDateIsNotNull(vendorCode, pageable);
-        List<PO_Pomain> pomainList = pomainPage.getContent();
+        // 转换Pageable为SQL Server分页参数，添加边界检查防止整数溢出
+        long offset = pageable.getOffset();
+        if (offset > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("分页偏移量过大，超出系统处理能力");
+        }
+        // 分别查询数据列表和总数，手动实现分页
+        List<PO_Pomain> pomainList = poPomainRepository.findByCVenCodeAndCAuditDateIsNotNull(vendorCode, (int)offset, pageable.getPageSize());
+        long total = poPomainRepository.countByCVenCodeAndCAuditDateIsNotNull(vendorCode);
+        // 构建分页结果
+        Page<PO_Pomain> pomainPage = new PageImpl<>(pomainList, pageable, total);
 
         // 提取所有供应商编码进行批量查询
         Set<String> venCodeSet = pomainList.stream()
@@ -234,6 +243,12 @@ public class PurchaseServiceImpl implements PurchaseService {
                 pomain.getcVenCode(), podetails.getcInvCode(), dto.getBoxQuantity(),
                 pomain.getcPOID(), podetails.getIvouchrowno(), batchNumber));
         dto.setSupplierName(supplierName);
+
+        // 计算已入库数量和剩余未入库数量
+        BigDecimal receivedQty = podetails.getiReceivedQTY() != null ? podetails.getiReceivedQTY() : BigDecimal.ZERO;
+        dto.setReceivedQuantity(receivedQty);
+        BigDecimal remainingQuantity = podetails.getiQuantity().subtract(receivedQty);
+        dto.setRemainingQuantity(remainingQuantity);
 
         return dto;
     }

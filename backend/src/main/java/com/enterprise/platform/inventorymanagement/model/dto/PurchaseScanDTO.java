@@ -17,6 +17,7 @@ public class PurchaseScanDTO {
     private String unitName; // 单位名称
     private LocalDateTime dArriveDate; // 计划到货日期
     private BigDecimal remainingQuantity;
+    private BigDecimal receivedQuantity; // 已入库数量
     private String barcode;
     private String batchNumber; // 批号
     private Integer irowno; // 行号
@@ -55,6 +56,8 @@ public class PurchaseScanDTO {
     public void setiQuantity(BigDecimal iQuantity) { this.iQuantity = iQuantity; }
     public BigDecimal getRemainingQuantity() { return remainingQuantity; }
     public void setRemainingQuantity(BigDecimal remainingQuantity) { this.remainingQuantity = remainingQuantity; }
+    public BigDecimal getReceivedQuantity() { return receivedQuantity; }
+    public void setReceivedQuantity(BigDecimal receivedQuantity) { this.receivedQuantity = receivedQuantity; }
     public String getBarcode() { return barcode; }
     public void setBarcode(String barcode) { this.barcode = barcode; }
     public String getUnitName() { return unitName; }

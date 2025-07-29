@@ -40,7 +40,7 @@ const SupplierPurchaseOrders = () => {
     };
 
     fetchOrders();
-  }, []);
+  }, [currentPage, pageSize]);
 
   const columns = [
     {
@@ -104,13 +104,7 @@ const SupplierPurchaseOrders = () => {
       key: 'iQuantity',
       render: (quantity) => (quantity ?? 0).toFixed(2),
       sorter: (a, b) => (a.iQuantity ?? 0) - (b.iQuantity ?? 0),
-    },
-    {
-      title: '单位ID',
-      dataIndex: 'cUnitID',
-      key: 'cUnitID',
-      sorter: (a, b) => a.cUnitID.localeCompare(b.cUnitID),
-    },
+    },    
     {
       title: '单位名称',
       dataIndex: 'unitName',
@@ -124,19 +118,9 @@ const SupplierPurchaseOrders = () => {
       render: (date) => date ? new Date(date).toLocaleString() : '',
       sorter: (a, b) => new Date(a.dArriveDate) - new Date(b.dArriveDate),
     },
-    {
-      title: '剩余未入库数量',
-      dataIndex: 'remainingQuantity',
-      key: 'remainingQuantity',
-      render: (quantity) => (quantity ?? 0).toFixed(2),
-      sorter: (a, b) => (a.remainingQuantity ?? 0) - (b.remainingQuantity ?? 0),
-    },
-    {
-      title: '条码值',
-      dataIndex: 'barcode',
-      key: 'barcode',
-      sorter: (a, b) => a.barcode.localeCompare(b.barcode),
-    },
+    { title: '剩余未入库数量', dataIndex: 'remainingQuantity', key: 'remainingQuantity', render: (quantity) => (quantity ?? 0).toFixed(2), sorter: (a, b) => (a.remainingQuantity ?? 0) - (b.remainingQuantity ?? 0), },
+    { title: '已入库数量', dataIndex: 'receivedQuantity', key: 'receivedQuantity', render: (quantity) => (quantity ?? 0).toFixed(2), sorter: (a, b) => (a.receivedQuantity ?? 0) - (b.receivedQuantity ?? 0), },
+    { title: '条码值', dataIndex: 'barcode', key: 'barcode', sorter: (a, b) => a.barcode.localeCompare(b.barcode), },
     {
       title: '批号',
       dataIndex: 'batchNumber',
@@ -167,7 +151,7 @@ const SupplierPurchaseOrders = () => {
         <Spin spinning={loading} tip="加载采购订单...">
           <Table
             columns={columns}
-            dataSource={orders.map(order => ({ ...order, key: order.cPOID }))}
+            dataSource={orders}
             pagination={{
               current: currentPage,
               pageSize: pageSize,
@@ -179,7 +163,7 @@ const SupplierPurchaseOrders = () => {
               showSizeChanger: true,
               showTotal: (total) => `共 ${total} 条记录`
             }}
-            rowKey="cPOID"
+            rowKey={record => `${record.cPOID}_${record.irowno}`}
           />
         </Spin>
       </Card>
