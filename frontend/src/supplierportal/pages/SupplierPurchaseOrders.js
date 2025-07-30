@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Card, Typography, Spin, message, Form, Input, DatePicker, Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import locale from 'antd/lib/date-picker/locale/zh_CN'; // 尝试不同的导入路径
 import api from '../../api';
 
 const { Title } = Typography;
@@ -50,7 +51,7 @@ const SupplierPurchaseOrders = () => {
     };
 
     fetchOrders();
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, searchParams]);
 
   const columns = [
     {
@@ -169,7 +170,7 @@ const SupplierPurchaseOrders = () => {
               <Input placeholder="请输入订单编号" />
             </Form.Item>
             <Form.Item name="dPODate" label="订单日期">
-              <DatePicker placeholder="选择订单日期" />
+              <DatePicker placeholder="选择订单日期" format="YYYY-MM-DD" locale={locale} />
             </Form.Item>
             <Form.Item name="cInvCode" label="存货编码">
               <Input placeholder="请输入存货编码" />

@@ -16,10 +16,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -115,34 +119,56 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     public PageResultDTO<PurchaseScanDTO> getVendorAuditedOrders(String vendorCode, String cPOID, String dPODate, String cInvCode, String cItemName, Integer pageNum, Integer pageSize) {
-        // 计算offset并检查边界
-        long offset = (long)(pageNum - 1) * pageSize;
-        if (offset > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException("Offset exceeds maximum integer value");
+        // 转换dPODate格式: 从Tue,+03+Jun+2025+16:00:00+GMT转换为YYYY-MM-DD
+        String formattedDPODate = null;
+        if (dPODate != null && !dPODate.isEmpty()) {
+            try {
+                // 解析GMT格式日期
+                SimpleDateFormat gmtFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+                Date date = gmtFormat.parse(dPODate);
+                // 格式化为YYYY-MM-DD
+                SimpleDateFormat targetFormat = new SimpleDateFormat("yyyy-MM-dd");
+                formattedDPODate = targetFormat.format(date);
+                log.info("Converted dPODate from {} to {}", dPODate, formattedDPODate);
+            } catch (ParseException e) {
+                log.error("Failed to parse dPODate: {}", dPODate, e);
+                // 如果解析失败，使用原始值
+                formattedDPODate = dPODate;
+            }
         }
-        // 调用Repository层方法，传递新的搜索参数
-        List<PO_Pomain> poPomainList = poPomainRepository.findByCVenCodeAndCAuditDateIsNotNullAndCPOIDLikeAndDPODateLikeAndCInvCodeLikeAndCItemNameLike(
-            vendorCode, cPOID, dPODate, cInvCode, cItemName, (int)offset, pageSize);        
+
+        // 调用Repository层方法获取所有符合条件的记录
+        List<PO_Pomain> allPoPomainList = poPomainRepository.findAllByCVenCodeAndCAuditDateIsNotNullAndCPOIDLikeAndDPODateLikeAndCInvCodeLikeAndCItemNameLike(
+            vendorCode, cPOID, formattedDPODate, cInvCode, cItemName);        
 
         try {
-            // 使用for循环逐行打印poPomainList的属性值
-            log.info("getVendorAuditedOrders, poPomainList size: {}", poPomainList.size());
-            for (int i = 0; i < poPomainList.size(); i++) {
-                PO_Pomain poPomain = poPomainList.get(i);
-                log.info("poPomain[{}]: POID={}, cPOID={}, dPODate={}, cVenCode={}",
-                    i, poPomain.getPoid(), poPomain.getcPOID(), poPomain.getdPODate(), poPomain.getcVenCode());
-                // 如果需要打印更多属性，可以在此处添加
-            }
+            // 使用for循环逐行打印所有数据的属性值
+            log.info("getVendorAuditedOrders, allPoPomainList size: {}", allPoPomainList.size());
         } catch (Exception e) {
-            log.error("Failed to print poPomainList", e);
+            log.error("Failed to print allPoPomainList", e);
         }
         
-        long total = poPomainRepository.countByCVenCodeAndCAuditDateIsNotNullAndCPOIDLikeAndDPODateLikeAndCInvCodeLikeAndCItemNameLike(
-            vendorCode, cPOID, dPODate, cInvCode, cItemName);
-        // 转换为DTO并返回分页结果
-        List<PurchaseScanDTO> dtos = convertToPurchaseScanDTOs(poPomainList);
-        log.info("getVendorAuditedOrders, total: {}, dtos: {}", total, dtos);
-        return new PageResultDTO<PurchaseScanDTO>(total, dtos);
+        // 转换为DTO
+        List<PurchaseScanDTO> allDtos = convertToPurchaseScanDTOs(allPoPomainList);
+        log.info("getVendorAuditedOrders, allDtos size: {}", allDtos.size());
+
+        // 计算分页参数
+        int startIndex = (pageNum - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, allDtos.size());
+
+        // 执行应用层分页
+        List<PurchaseScanDTO> pagedDtos;
+        if (startIndex >= allDtos.size()) {
+            pagedDtos = Collections.emptyList();
+        } else {
+            pagedDtos = allDtos.subList(startIndex, endIndex);
+        }
+
+        // 获取总记录数
+        long total = allDtos.size();
+
+        log.info("getVendorAuditedOrders, total: {}, pagedDtos: {}", total, pagedDtos);
+        return new PageResultDTO<PurchaseScanDTO>(total, pagedDtos);
     }
 
     /**
