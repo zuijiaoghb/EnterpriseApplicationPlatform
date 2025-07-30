@@ -40,8 +40,13 @@ public class PurchaseController {
     public ResponseEntity<PageResultDTO<PurchaseScanDTO>> getVendorAuditedOrders(
         @RequestParam String vendorCode,
         @RequestParam(defaultValue = "1") Integer pageNum,
-        @RequestParam(defaultValue = "50") Integer pageSize) {
-        PageResultDTO<PurchaseScanDTO> orders = purchaseService.getVendorAuditedOrders(vendorCode, pageNum, pageSize);
+        @RequestParam(defaultValue = "50") Integer pageSize,
+        @RequestParam(required = false) String cPOID,
+        @RequestParam(required = false) String dPODate,
+        @RequestParam(required = false) String cInvCode,
+        @RequestParam(required = false) String cItemName) {
+        PageResultDTO<PurchaseScanDTO> orders = purchaseService.getVendorAuditedOrders(
+            vendorCode, cPOID, dPODate, cInvCode, cItemName, pageNum, pageSize);
         return ResponseEntity.ok(orders);
     }
 }

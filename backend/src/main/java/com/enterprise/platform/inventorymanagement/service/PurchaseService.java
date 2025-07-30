@@ -21,9 +21,13 @@ public interface PurchaseService {
     /**
      * 根据供应商编码查询已审核的采购订单
      * @param vendorCode 供应商编码
+     * @param cPOID 订单号
+     * @param dPODate 订单日期
+     * @param cInvCode 存货编码
+     * @param cItemName 存货名称
      * @param pageNum 页码
      * @param pageSize 每页数量
      * @return 采购订单列表
      */
-    PageResultDTO<PurchaseScanDTO> getVendorAuditedOrders(String vendorCode, Integer pageNum, Integer pageSize);
+    PageResultDTO<PurchaseScanDTO> getVendorAuditedOrders(String vendorCode, String cPOID, String dPODate, String cInvCode, String cItemName, Integer pageNum, Integer pageSize);
 }

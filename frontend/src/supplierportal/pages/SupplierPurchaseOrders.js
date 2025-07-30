@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Card, Typography, Spin, message } from 'antd';
+import { Table, Card, Typography, Spin, message, Form, Input, DatePicker, Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api';
 
@@ -12,6 +12,8 @@ const SupplierPurchaseOrders = () => {
   const [pageSize, setPageSize] = useState(50);
   const [total, setTotal] = useState(0);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useState({});
+  const [form] = Form.useForm();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -28,7 +30,15 @@ const SupplierPurchaseOrders = () => {
 
         // 调用后端API获取供应商已审核的采购订单
         const response = await api.get('/api/inventory/purchase/vendor/audited-orders', {
-          params: { vendorCode, pageNum: currentPage, pageSize }
+          params: {
+            vendorCode,
+            pageNum: currentPage,
+            pageSize,
+            cPOID: searchParams.cPOID,
+            dPODate: searchParams.dPODate,
+            cInvCode: searchParams.cInvCode,
+            cItemName: searchParams.cItemName
+          }
         });
         setOrders(response.data.records);
         setTotal(response.data.total);
@@ -144,11 +154,33 @@ const SupplierPurchaseOrders = () => {
     },
   ];
 
+  const handleSearch = (values) => {
+    setSearchParams(values);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="supplier-purchase-orders">
       <Title level={2}>供应商采购订单管理</Title>
       <Card>
         <Spin spinning={loading} tip="加载采购订单...">
+          <Form form={form} onFinish={handleSearch} layout="inline" style={{ marginBottom: 16 }}>
+            <Form.Item name="cPOID" label="订单编号">
+              <Input placeholder="请输入订单编号" />
+            </Form.Item>
+            <Form.Item name="dPODate" label="订单日期">
+              <DatePicker placeholder="选择订单日期" />
+            </Form.Item>
+            <Form.Item name="cInvCode" label="存货编码">
+              <Input placeholder="请输入存货编码" />
+            </Form.Item>
+            <Form.Item name="cItemName" label="存货名称">
+              <Input placeholder="请输入存货名称" />
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit">搜索</Button>
+            </Form.Item>
+          </Form>
           <Table
             columns={columns}
             dataSource={orders}
@@ -164,6 +196,8 @@ const SupplierPurchaseOrders = () => {
               showTotal: (total) => `共 ${total} 条记录`
             }}
             rowKey={record => `${record.cPOID}_${record.irowno}`}
+            tableLayout="auto"
+            scroll={{ x: 'max-content', y: 'calc(100vh - 320px)' }}
           />
         </Spin>
       </Card>

@@ -12,21 +12,13 @@ import com.enterprise.platform.inventorymanagement.repository.sqlserver.PO_Pomai
 import com.enterprise.platform.inventorymanagement.service.PurchaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Sort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -123,59 +115,58 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public PageResultDTO<PurchaseScanDTO> getVendorAuditedOrders(
-            @NotBlank(message = "供应商编码不能为空") String vendorCode,
-            @Positive(message = "页码必须为正数") Integer pageNum,
-            @PositiveOrZero(message = "每页条数不能为负数") Integer pageSize) {
-        // 创建分页请求 (注意Spring Data JPA页码从0开始)
-        // 限制最大分页大小为100
-        int limitedPageSize = Math.min(pageSize, 100);
-        Pageable pageable = PageRequest.of(pageNum - 1, limitedPageSize, Sort.by(Sort.Direction.DESC, "dPODate"));
-        log.info("查询供应商[{}]的采购订单，页码[{}]，每页条数[{}]", vendorCode, pageNum, limitedPageSize);
-        // 查询供应商已审核的采购订单
-        // 转换Pageable为SQL Server分页参数，添加边界检查防止整数溢出
-        long offset = pageable.getOffset();
+    public PageResultDTO<PurchaseScanDTO> getVendorAuditedOrders(String vendorCode, String cPOID, String dPODate, String cInvCode, String cItemName, Integer pageNum, Integer pageSize) {
+        // 计算offset并检查边界
+        long offset = (long)(pageNum - 1) * pageSize;
         if (offset > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException("分页偏移量过大，超出系统处理能力");
+            throw new IllegalArgumentException("Offset exceeds maximum integer value");
         }
-        // 分别查询数据列表和总数，手动实现分页
-        List<PO_Pomain> pomainList = poPomainRepository.findByCVenCodeAndCAuditDateIsNotNull(vendorCode, (int)offset, pageable.getPageSize());
-        long total = poPomainRepository.countByCVenCodeAndCAuditDateIsNotNull(vendorCode);
-        // 构建分页结果
-        Page<PO_Pomain> pomainPage = new PageImpl<>(pomainList, pageable, total);
-
-        // 提取所有供应商编码进行批量查询
-        Set<String> venCodeSet = pomainList.stream()
-                .map(PO_Pomain::getcVenCode)
-                .collect(Collectors.toSet());
-        Map<String, Vendor> vendorMap = vendorRepository.findByCVenCodeIn(venCodeSet).stream()
-                .collect(Collectors.toMap(Vendor::getCVenCode, vendor -> vendor, (existing, replacement) -> existing));
-
-        // 提取所有存货编码进行批量查询
-        Set<String> invCodeSet = pomainList.stream()
-                .flatMap(pomain -> pomain.getPoPodetailsList().stream())
-                .map(PO_Podetails::getcInvCode)
-                .collect(Collectors.toSet());
-        Map<String, Inventory> inventoryMap = inventoryRepository.findByCInvCodeIn(invCodeSet).stream()
-                .collect(Collectors.toMap(Inventory::getCInvCode, inventory -> inventory, (existing, replacement) -> existing));
-
-        // 提取所有单位编码进行批量查询
-        Set<String> unitCodeSet = inventoryMap.values().stream()
-                .map(Inventory::getCComUnitCode)
-                .collect(Collectors.toSet());
-        Map<String, ComputationUnit> unitMap = computationUnitRepository.findByCComunitCodeIn(unitCodeSet).stream()
-                .collect(Collectors.toMap(ComputationUnit::getCComunitCode, unit -> unit, (existing, replacement) -> existing));
-
-        List<PurchaseScanDTO> resultList = pomainList.stream()
-                .flatMap(pomain -> convertToPurchaseScanDTOs(pomain, vendorMap, inventoryMap, unitMap))
-                .collect(Collectors.toList());
-
-        return new PageResultDTO<>(pomainPage.getTotalElements(), resultList);
+        // 调用Repository层方法，传递新的搜索参数
+        List<PO_Pomain> poPomainList = poPomainRepository.findByCVenCodeAndCAuditDateIsNotNullAndCPOIDLikeAndDPODateLikeAndCInvCodeLikeAndCItemNameLike(
+            vendorCode, cPOID, dPODate, cInvCode, cItemName, (int)offset, pageSize);
+        long total = poPomainRepository.countByCVenCodeAndCAuditDateIsNotNullAndCPOIDLikeAndDPODateLikeAndCInvCodeLikeAndCItemNameLike(
+            vendorCode, cPOID, dPODate, cInvCode, cItemName);
+        // 转换为DTO并返回分页结果
+        List<PurchaseScanDTO> dtos = convertToPurchaseScanDTOs(poPomainList);
+        return new PageResultDTO<PurchaseScanDTO>(total, dtos);
     }
 
     /**
      * 将采购订单转换为DTO列表
      */
+    private List<PurchaseScanDTO> convertToPurchaseScanDTOs(List<PO_Pomain> poPomainList) {
+        if (poPomainList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        
+        // Extract all vendor codes
+        Set<String> venCodeSet = poPomainList.stream()
+                .map(PO_Pomain::getcVenCode)
+                .collect(Collectors.toSet());
+        Map<String, Vendor> vendorMap = vendorRepository.findByCVenCodeIn(venCodeSet).stream()
+                .collect(Collectors.toMap(Vendor::getCVenCode, vendor -> vendor, (existing, replacement) -> existing));
+        
+        // Extract all inventory codes
+        Set<String> invCodeSet = poPomainList.stream()
+                .flatMap(pomain -> pomain.getPoPodetailsList().stream())
+                .map(PO_Podetails::getcInvCode)
+                .collect(Collectors.toSet());
+        Map<String, Inventory> inventoryMap = inventoryRepository.findByCInvCodeIn(invCodeSet).stream()
+                .collect(Collectors.toMap(Inventory::getCInvCode, inventory -> inventory, (existing, replacement) -> existing));
+        
+        // Extract all unit codes
+        Set<String> unitCodeSet = inventoryMap.values().stream()
+                .map(Inventory::getCComUnitCode)
+                .collect(Collectors.toSet());
+        Map<String, ComputationUnit> unitMap = computationUnitRepository.findByCComunitCodeIn(unitCodeSet).stream()
+                .collect(Collectors.toMap(ComputationUnit::getCComunitCode, unit -> unit, (existing, replacement) -> existing));
+        
+        // Process each PO_Pomain
+        return poPomainList.stream()
+                .flatMap(pomain -> convertToPurchaseScanDTOs(pomain, vendorMap, inventoryMap, unitMap))
+                .collect(Collectors.toList());
+    }
+
     private Stream<PurchaseScanDTO> convertToPurchaseScanDTOs(PO_Pomain pomain, Map<String, Vendor> vendorMap, 
                                                              Map<String, Inventory> inventoryMap, Map<String, ComputationUnit> unitMap) {
         // 查询订单明细
@@ -193,6 +184,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         return podetailsList.stream()
                 .filter(Objects::nonNull)
+                .filter(podetails -> !podetails.getiQuantity().equals(podetails.getiReceivedQTY()))
                 .map(podetails -> buildPurchaseScanDTO(pomain, podetails, supplierName, inventoryMap, unitMap));
     }
 

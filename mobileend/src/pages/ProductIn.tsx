@@ -19,9 +19,8 @@ const ProductIn = () => {
 
   // 初始化仓库列表
   useEffect(() => {
-    const warehousesData = [
-      { code: '019', name: '半成品仓（建机）' },
-      { code: '018', name: '半成品仓（专用）' },
+    const warehousesData = [    
+      { code: '046', name: '半成品仓（50亩）' },
       { code: '035', name: '成品库（建机）' },
       { code: '034', name: '成品库（专用）' },
       { code: '015', name: '原材料仓（建机）' },
