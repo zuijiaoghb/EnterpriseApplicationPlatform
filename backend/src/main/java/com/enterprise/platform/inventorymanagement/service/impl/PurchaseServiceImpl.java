@@ -37,7 +37,6 @@ import com.enterprise.platform.inventorymanagement.repository.sqlserver.Computat
 public class PurchaseServiceImpl implements PurchaseService {
     private static final Logger log = LoggerFactory.getLogger(PurchaseServiceImpl.class);
 
-
     @Autowired
     private HYBarCodeMainRepository hyBarCodeMainRepository;
 
@@ -123,11 +122,26 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
         // 调用Repository层方法，传递新的搜索参数
         List<PO_Pomain> poPomainList = poPomainRepository.findByCVenCodeAndCAuditDateIsNotNullAndCPOIDLikeAndDPODateLikeAndCInvCodeLikeAndCItemNameLike(
-            vendorCode, cPOID, dPODate, cInvCode, cItemName, (int)offset, pageSize);
+            vendorCode, cPOID, dPODate, cInvCode, cItemName, (int)offset, pageSize);        
+
+        try {
+            // 使用for循环逐行打印poPomainList的属性值
+            log.info("getVendorAuditedOrders, poPomainList size: {}", poPomainList.size());
+            for (int i = 0; i < poPomainList.size(); i++) {
+                PO_Pomain poPomain = poPomainList.get(i);
+                log.info("poPomain[{}]: POID={}, cPOID={}, dPODate={}, cVenCode={}",
+                    i, poPomain.getPoid(), poPomain.getcPOID(), poPomain.getdPODate(), poPomain.getcVenCode());
+                // 如果需要打印更多属性，可以在此处添加
+            }
+        } catch (Exception e) {
+            log.error("Failed to print poPomainList", e);
+        }
+        
         long total = poPomainRepository.countByCVenCodeAndCAuditDateIsNotNullAndCPOIDLikeAndDPODateLikeAndCInvCodeLikeAndCItemNameLike(
             vendorCode, cPOID, dPODate, cInvCode, cItemName);
         // 转换为DTO并返回分页结果
         List<PurchaseScanDTO> dtos = convertToPurchaseScanDTOs(poPomainList);
+        log.info("getVendorAuditedOrders, total: {}, dtos: {}", total, dtos);
         return new PageResultDTO<PurchaseScanDTO>(total, dtos);
     }
 
@@ -184,7 +198,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         return podetailsList.stream()
                 .filter(Objects::nonNull)
-                .filter(podetails -> !podetails.getiQuantity().equals(podetails.getiReceivedQTY()))
+                .filter(podetails -> !Objects.equals(podetails.getiQuantity(), podetails.getiReceivedQTY()))
                 .map(podetails -> buildPurchaseScanDTO(pomain, podetails, supplierName, inventoryMap, unitMap));
     }
 

@@ -12,19 +12,23 @@ import org.springframework.data.repository.query.Param;
 @Repository
 public interface PO_PomainRepository extends JpaRepository<PO_Pomain, Integer> {
     PO_Pomain findBycPOID(String cPOID);
-    @Query(value = "WITH FilteredData AS (" +
-        "SELECT p.*, ROW_NUMBER() OVER (ORDER BY p.dPODate DESC) AS RowNum " +
+    @Query(value = "WITH DistinctPOs AS (" +
+        "SELECT DISTINCT p.* " +
         "FROM PO_Pomain p " +
         "INNER JOIN PO_Podetails pd ON p.POID = pd.POID " +
         "INNER JOIN inventory i ON pd.cInvCode = i.cInvCode " +
         "WHERE p.cVenCode = :cVenCode " +
         "AND p.cAuditDate IS NOT NULL " +
         "AND p.cState != 2 " +
-        "AND COALESCE(:cPOID, '') = '' OR p.cPOID LIKE '%' + COALESCE(:cPOID, '') + '%' " +
-        "AND COALESCE(:dPODate, '') = '' OR CONVERT(VARCHAR, p.dPODate, 23) LIKE '%' + COALESCE(:dPODate, '') + '%' " +
-        "AND COALESCE(:cInvCode, '') = '' OR pd.cInvCode LIKE '%' + COALESCE(:cInvCode, '') + '%' " +
-        "AND COALESCE(:cItemName, '') = '' OR i.cInvName LIKE '%' + COALESCE(:cItemName, '') + '%' " +
-        "AND pd.iQuantity != pd.iReceivedQTY " +
+        "AND (COALESCE(:cPOID, '') = '' OR p.cPOID LIKE '%' + COALESCE(:cPOID, '') + '%') " +
+        "AND (COALESCE(:dPODate, '') = '' OR CONVERT(VARCHAR, p.dPODate, 23) LIKE '%' + COALESCE(:dPODate, '') + '%') " +
+        "AND (COALESCE(:cInvCode, '') = '' OR pd.cInvCode LIKE '%' + COALESCE(:cInvCode, '') + '%') " +
+        "AND (COALESCE(:cItemName, '') = '' OR i.cInvName LIKE '%' + COALESCE(:cItemName, '') + '%') " +
+        "AND isnull(pd.iQuantity, 0) != isnull(pd.iReceivedQTY, 0) " +
+        "), " +
+        "FilteredData AS (" +
+        "SELECT *, ROW_NUMBER() OVER (ORDER BY dPODate DESC) AS RowNum " +
+        "FROM DistinctPOs" +
         ") " +
         "SELECT * FROM FilteredData " +
         "WHERE RowNum > :offset AND RowNum <= :offset + :pageSize", nativeQuery = true)
@@ -48,7 +52,7 @@ public interface PO_PomainRepository extends JpaRepository<PO_Pomain, Integer> {
             "AND (:dPODate IS NULL OR CONVERT(VARCHAR, p.dPODate, 23) LIKE '%' + :dPODate + '%') " +
             "AND (:cInvCode IS NULL OR pd.cInvCode LIKE '%' + :cInvCode + '%') " +
             "AND (:cItemName IS NULL OR i.cInvName LIKE '%' + :cItemName + '%') " +
-            "AND pd.iQuantity != pd.iReceivedQTY", nativeQuery = true)            
+            "AND isnull(pd.iQuantity, 0) != isnull(pd.iReceivedQTY, 0)", nativeQuery = true)
     long countByCVenCodeAndCAuditDateIsNotNullAndCPOIDLikeAndDPODateLikeAndCInvCodeLikeAndCItemNameLike(
         @Param("cVenCode") String cVenCode,
         @Param("cPOID") String cPOID,
