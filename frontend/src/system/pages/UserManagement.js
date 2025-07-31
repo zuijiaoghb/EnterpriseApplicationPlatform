@@ -104,6 +104,7 @@ const UserManagement = () => {
         const updateData = {
           username: values.username,
           email: values.email,
+          cnname: values.cnname,
           roleIds: values.roleIds || []
         };
         // 只有密码不为空且不等于原始密码时才更新密码
@@ -118,6 +119,7 @@ const UserManagement = () => {
           username: values.username,
           password: values.password,
           email: values.email,
+          cnname: values.cnname,
           roleIds: values.roleIds || []
         };
         await api.post('/api/users', userData);
@@ -136,6 +138,7 @@ const UserManagement = () => {
     form.setFieldsValue({
       username: record.username,
       email: record.email,
+      cnname: record.cnname,
       password: '', // 编辑时清空密码字段
       roleIds: record.roles?.map(role => role.id) || []
     });
@@ -222,6 +225,11 @@ const UserManagement = () => {
             title: <span><UserOutlined /> 用户名</span>,
             dataIndex: 'username',
             render: text => <Tag color="blue">{text}</Tag>
+          },
+          { 
+            title: '中文名称',
+            dataIndex: 'cnname',
+            render: text => <Tag color="purple">{text || '-'}</Tag>
           },
           { 
             title: <span><MailOutlined /> 邮箱</span>,
@@ -336,6 +344,17 @@ const UserManagement = () => {
             ]}
           >
             <Input placeholder="请输入邮箱" />
+          </Form.Item>
+          
+          <Form.Item 
+            name="cnname" 
+            label="中文名称"
+            rules={[
+              { required: true, message: '请输入中文名称' },
+              { max: 50, message: '中文名称不能超过50个字符' }
+            ]}
+          >
+            <Input placeholder="请输入中文名称" />
           </Form.Item>
           
           <Form.Item 

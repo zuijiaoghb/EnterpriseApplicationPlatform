@@ -30,32 +30,48 @@ const MainLayout = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await api.get('/auth/info');
-        setCurrentUser(response.data);
-        console.log('User Info:', response.data);
+        // 先获取auth info
+        const authResponse = await api.get('/auth/info');
+        const username = authResponse.data.username;
+        console.log('Auth Info Username:', username);
+
+        // 再使用username调用新API获取用户详细信息
+        const userResponse = await api.get(`/api/users/username/${username}`);
+        setCurrentUser(userResponse.data);        
 
         // 根据用户角色设置菜单项
-        const baseItems = [          
-          {
+        const baseItems = [];
+        const roles = authResponse.data.roles || [];
+        const isAdmin = roles.some(role => role === 'ROLE_ADMIN');
+
+        // 仪表盘菜单 - 仪表盘管理员或管理员可见
+        if (isAdmin || roles.some(role => role === 'ROLE_YBPGL')) {
+          baseItems.push({
             key: 'dashboard',
             icon: <DashboardOutlined />,
             label: '仪表盘',
-          },
-          {
+          });
+        }
+
+        // 设备管理菜单 - 设备管理员或管理员可见
+        if (isAdmin || roles.some(role => role === 'ROLE_SBGL')) {
+          baseItems.push({
             key: 'equipments',
             icon: <ToolOutlined />,
             label: '设备管理',
-          },
-          {
+          });
+        }
+
+        // 库存管理菜单 - 仓库管理员或管理员可见
+        if (isAdmin || roles.some(role => role === 'ROLE_CKGLY')) {
+          baseItems.push({
             key: 'inventorymanagement',
             icon: <InboxOutlined />,
             label: '库存管理'
-          }
-        ];
+          });
+        }
 
-        const hasSupplierRole = response.data.roles?.some(role => 
-          role === 'ROLE_SUPPLIER' || role === 'ROLE_ADMIN'
-        );
+        const hasSupplierRole = isAdmin || roles.some(role => role === 'ROLE_SUPPLIER');
         if (hasSupplierRole) {
           baseItems.push({
             key: 'supplierportal',
@@ -63,10 +79,9 @@ const MainLayout = () => {
             label: '供应商门户'
           });
         }
-        
-        console.log('User Info roles:', response.data.roles?.some(role => role.authority === 'ROLE_ADMIN'));
+                
         // 只有管理员才显示系统管理菜单
-        if (response.data.roles?.some(role => role === 'ADMIN' || role === 'ROLE_ADMIN')) {
+        if (isAdmin) {
           baseItems.push({
             key: 'system',
             icon: <SettingOutlined />,
@@ -109,7 +124,7 @@ const MainLayout = () => {
         <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
           <div className="user-info">
             <Avatar icon={<UserOutlined />} />
-            <span className="username">{currentUser?.username || '用户'}</span>
+            <span className="username">{currentUser?.cnname || '用户'}</span>
           </div>
         </Dropdown>
       </Header>

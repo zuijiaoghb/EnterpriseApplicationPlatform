@@ -1,6 +1,7 @@
 package com.enterprise.platform.user.controller;
 
 import com.enterprise.platform.user.dto.UserCreateRequest;
+import com.enterprise.platform.user.dto.UserDTO;
 import com.enterprise.platform.user.model.Role;
 import com.enterprise.platform.user.model.User;
 import com.enterprise.platform.user.service.UserService;
@@ -42,6 +43,7 @@ public class UserController {
         user.setUsername(request.getUsername());
         user.setPassword(request.getPassword());
         user.setEmail(request.getEmail());
+        user.setCnname(request.getCnname());
         
         // 其他字段设置...
         
@@ -66,6 +68,7 @@ public class UserController {
         user.setUsername(request.getUsername());
         user.setPassword(request.getPassword());
         user.setEmail(request.getEmail());
+        user.setCnname(request.getCnname());
         
         // 处理角色
         if (request.getRoleIds() != null && !request.getRoleIds().isEmpty()) {
@@ -112,5 +115,11 @@ public class UserController {
         @RequestParam(required = false) Long excludeUserId) {
         boolean exists = userService.existsByUsername(username, excludeUserId);
         return ResponseEntity.ok(Map.of("exists", exists));
+    }
+
+    @GetMapping("/username/{username}")
+    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
+        UserDTO userDTO = userService.getUserByUsername(username);
+        return ResponseEntity.ok(userDTO);
     }
 }

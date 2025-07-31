@@ -155,10 +155,11 @@ public class SecurityConfig {
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/oauth2/token").permitAll() // 允许令牌端点匿名访问
                 .requestMatchers("/api/equipments/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SBGL")
-                .requestMatchers("/api/users/**").hasAnyAuthority("ROLE_ADMIN","ROLE_CLIENT")
+                .requestMatchers("/api/users/**").hasAnyAuthority("ROLE_ADMIN","ROLE_CLIENT","ROLE_SUPPLIER","ROLE_USER","ROLE_CKGLY","ROLE_SBGL","ROLE_YBPGL")
                 .requestMatchers("/api/roles/**").hasAnyAuthority("ROLE_ADMIN")
                 .requestMatchers("/api/permissions/**").hasAnyAuthority("ROLE_ADMIN")               
                 .requestMatchers("/api/clients/**").hasAnyAuthority("ROLE_ADMIN")
+                .requestMatchers("/api/inventory/**").hasAnyAuthority("ROLE_ADMIN","ROLE_CKGLY","ROLE_SUPPLIER")
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2

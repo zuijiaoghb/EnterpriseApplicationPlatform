@@ -1,6 +1,7 @@
 package com.enterprise.platform.user.service.impl;
 
 import com.enterprise.platform.user.model.Role;
+import com.enterprise.platform.user.dto.UserDTO;
 import com.enterprise.platform.user.model.User;
 import com.enterprise.platform.user.repository.RoleRepository;
 import com.enterprise.platform.user.repository.UserRepository;
@@ -82,6 +83,7 @@ public class UserServiceImpl implements UserService {
         existingUser.setEmail(user.getEmail());
         existingUser.setStatus(user.getStatus());
         existingUser.setCreateTime(user.getCreateTime());
+        existingUser.setCnname(user.getCnname());
         
         // 更新密码（如果有）
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
@@ -119,5 +121,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existsByUsername(String username,Long excludeUserId) {
         return userRepository.existsByUsername(username, excludeUserId);
+    }
+
+    @Override
+    public UserDTO getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("用户不存在: " + username));
+        return new UserDTO(user.getUsername(), user.getCnname());
     }
 }

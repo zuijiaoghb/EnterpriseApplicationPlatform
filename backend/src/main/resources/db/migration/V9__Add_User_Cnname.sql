@@ -1,0 +1,1 @@
+ALTER TABLE sys_user ADD COLUMN cnname VARCHAR(50) NULL COMMENT '中文名称';

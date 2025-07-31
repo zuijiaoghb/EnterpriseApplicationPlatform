@@ -1,5 +1,6 @@
 package com.enterprise.platform.user.service;
 
+import com.enterprise.platform.user.dto.UserDTO;
 import com.enterprise.platform.user.model.User;
 
 import java.util.Set;
@@ -14,4 +15,5 @@ public interface UserService {
     User updateUserRoles(Long id, Set<Long> roleIds);
     boolean existsByEmail(String email);
     boolean existsByUsername(String username,Long excludeUserId);
+    UserDTO getUserByUsername(String username);
 }

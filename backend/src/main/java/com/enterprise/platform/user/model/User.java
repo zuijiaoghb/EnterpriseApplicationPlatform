@@ -15,6 +15,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
@@ -49,6 +50,11 @@ public class User {
     
     @Column(unique = true, nullable = false)
     private String email;
+    
+    @Column(name = "cnname", length = 50, nullable = false)
+    @Size(max = 50, message = "中文名称不能超过50个字符")
+    @NotBlank(message = "中文名称不能为空")
+    private String cnname; // 中文名称
     
     // 同时需要更新数据库迁移脚本
 }

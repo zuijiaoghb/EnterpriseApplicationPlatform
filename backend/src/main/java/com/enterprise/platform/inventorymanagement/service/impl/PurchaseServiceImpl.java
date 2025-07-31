@@ -150,6 +150,21 @@ public class PurchaseServiceImpl implements PurchaseService {
         
         // 转换为DTO
         List<PurchaseScanDTO> allDtos = convertToPurchaseScanDTOs(allPoPomainList);
+        
+        // 如果提供了cInvCode，过滤只包含该存货编码的DTO
+        if (cInvCode != null && !cInvCode.isEmpty()) {
+            allDtos = allDtos.stream()
+                    .filter(dto -> dto.getcInvCode() != null && dto.getcInvCode().contains(cInvCode))
+                    .collect(Collectors.toList());
+        }
+
+        // 如果提供了cItemName，过滤只包含该存货名称的DTO
+        if (cItemName != null && !cItemName.isEmpty()) {
+            allDtos = allDtos.stream()
+                    .filter(dto -> dto.getcItemName() != null && dto.getcItemName().contains(cItemName))
+                    .collect(Collectors.toList());
+        }
+        
         log.info("getVendorAuditedOrders, allDtos size: {}", allDtos.size());
 
         // 计算分页参数

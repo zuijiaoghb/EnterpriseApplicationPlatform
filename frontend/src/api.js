@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { message } from 'antd';
 
 const isExternal = window.location.hostname!== '192.168.21.175';
 const api = axios.create({
@@ -20,16 +21,8 @@ api.interceptors.request.use(config => {
   if (token) {
     config.headers['Authorization'] = `Bearer ${token}`;
     config.headers['Content-Type'] = 'application/json';
-  } else if (config.url.includes('/auth/login')) {
-    // 如果是登录请求，不添加token
-    delete config.headers['Authorization']; 
-  }
-  else {
-    // 如果没有token且不是登录请求，重定向到登录
-    if (!config.url.includes('/auth/login')) {
-      window.location.href = '/login';
-    }
-  }
+  } 
+  // 不立即重定向，让请求继续，由响应拦截器处理错误
   return config;
 }, error => {
   return Promise.reject(error);
@@ -43,15 +36,15 @@ api.interceptors.response.use(response => {
   }
   return response;
 }, error => {
-  if (error.response?.status === 401 || error.response?.status === 403) {
-    localStorage.removeItem('token');    
-  }
-  // 修改错误处理，确保返回完整响应
-  if (error.response) {
+  if (error.response?.status === 401) {
+    // 未授权，可能是token过期或无效
+    localStorage.removeItem('token');
     if (!error.response.config.url.includes('/auth/login')) {
       window.location.href = '/login';
     }
-    return Promise.reject(error); // 返回完整错误对象
+  } else if (error.response?.status === 403) {
+    // 权限不足，显示错误消息但不重定向
+    message.error('权限不足，无法访问该资源');
   }
   return Promise.reject(error);
 });
