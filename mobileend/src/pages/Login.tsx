@@ -25,6 +25,7 @@ const Login = () => {
   const [loginError, setLoginError] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // 控制密码可见性
     
 
   // 移除重复的 RootStackParamList 定义，使用统一的定义
@@ -108,10 +109,20 @@ const Login = () => {
           <TextInput
             style={styles.input}
             placeholder="密码"
-            secureTextEntry
+            secureTextEntry={!showPassword}
             value={password}
             onChangeText={setPassword}
           />
+          <TouchableOpacity
+            style={styles.eyeIconContainer}
+            onPress={() => setShowPassword(!showPassword)}
+          >
+            <Icon
+              name={showPassword ? "eye" : "eyeo"}
+              size={20}
+              style={styles.eyeIcon}
+            />
+          </TouchableOpacity>
         </View>
         
         <TouchableOpacity 
@@ -166,6 +177,12 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: 40,
+  },
+  eyeIconContainer: {
+    padding: 10,
+  },
+  eyeIcon: {
+    color: '#666',
   },
   button: {
     backgroundColor: '#1890ff',

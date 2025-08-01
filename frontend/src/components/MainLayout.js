@@ -100,6 +100,12 @@ const MainLayout = () => {
 
   const userMenuItems = [
     {
+      key: 'changePassword',
+      icon: <SettingOutlined />,
+      label: '修改密码',
+      onClick: () => navigate('/change-password')
+    },
+    {
       key: 'logout',
       icon: <LogoutOutlined />,
       label: '退出登录',

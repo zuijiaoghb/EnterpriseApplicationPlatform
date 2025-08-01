@@ -7,9 +7,10 @@ import com.enterprise.platform.user.model.User;
 import com.enterprise.platform.user.service.UserService;
 
 import jakarta.validation.Valid;
-
-import java.time.LocalDateTime;
 import java.util.Map;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -121,5 +122,21 @@ public class UserController {
     public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
         UserDTO userDTO = userService.getUserByUsername(username);
         return ResponseEntity.ok(userDTO);
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<Map<String, String>> changePassword(@RequestBody Map<String, String> passwordRequest) {
+        // 获取当前认证用户
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        // 获取请求中的旧密码和新密码
+        String oldPassword = passwordRequest.get("oldPassword");
+        String newPassword = passwordRequest.get("newPassword");
+
+        // 调用服务层方法修改密码
+        userService.changePassword(username, oldPassword, newPassword);
+
+        return ResponseEntity.ok(Map.of("message", "密码修改成功"));
     }
 }

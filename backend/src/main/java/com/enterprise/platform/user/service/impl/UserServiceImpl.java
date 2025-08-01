@@ -129,4 +129,28 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("用户不存在: " + username));
         return new UserDTO(user.getUsername(), user.getCnname());
     }
+
+    @Override
+    @Transactional(transactionManager = "mysqlTransactionManager")
+    public void changePassword(String username, String oldPassword, String newPassword) {
+        // 1. 根据用户名查找用户
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("用户不存在: " + username));
+
+        // 2. 验证旧密码是否正确
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new RuntimeException("旧密码不正确");
+        }
+
+        // 3. 检查新密码是否符合要求（这里可以添加密码复杂度验证）
+        if (newPassword == null || newPassword.length() < 8) {
+            throw new RuntimeException("新密码长度不能少于8个字符");
+        }
+
+        // 4. 加密新密码并更新用户
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        // 5. 保存用户信息
+        userRepository.save(user);
+    }
 }

@@ -16,4 +16,5 @@ public interface UserService {
     boolean existsByEmail(String email);
     boolean existsByUsername(String username,Long excludeUserId);
     UserDTO getUserByUsername(String username);
+    void changePassword(String username, String oldPassword, String newPassword);
 }

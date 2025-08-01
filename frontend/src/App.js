@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from './components/MainLayout';
 import Login from './system/pages/Login';
+import ChangePassword from './system/pages/ChangePassword';
 import EquipmentList from './equipment/pages/EquipmentList';
 import SystemSettings from './system/pages/SystemSettings';
 import InventoryManagement from './inventorymanagement/pages/InventoryManagement';
@@ -29,6 +30,7 @@ function App() {
           <Route path="/equipments" element={<EquipmentList />} />
           <Route path="/system" element={<SystemSettings />} />
           <Route path="/inventorymanagement" element={<InventoryManagement />} />
+          <Route path="/change-password" element={<ChangePassword />} />
           <Route element={<RoleGuard allowedRoles={['ROLE_SUPPLIER', 'ROLE_ADMIN']} />}>
             <Route path="/supplierportal" element={<SupplierPortal />} />
             <Route path="/supplierportal/purchase-orders" element={<SupplierPurchaseOrders />} />
