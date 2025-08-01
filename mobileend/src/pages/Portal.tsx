@@ -12,29 +12,60 @@ interface User {
   username: string;
   roles?: string[];
   nickname?: string;
+  cnname?: string;
 }
 
 const Portal = () => {
   const navigation = useNavigation<PortalNavigationProp>();
   const [scale, setScale] = useState(1);
   
-  const baseItems = [
-    { key: 'Dashboard', label: '仪表盘', icon: 'home' },
-    { key: 'EquipmentList', label: '设备管理', icon: 'list' },
-    { key: 'InventoryManagement', label: '库存管理', icon: 'inventory' },
-  ];
-  
-  const [menuItems, setMenuItems] = useState(baseItems);
+  interface MenuItem {
+    key: string;
+    label: string;
+    icon: string;
+  }
+
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [user, setUser] = useState<User | null>(null);
   
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await api.get<User>('/auth/info');
-        setUser(response.data);
-        if (response.data.roles?.some((role: string) => role === 'ADMIN' || role === 'ROLE_ADMIN')) {
-          setMenuItems([...baseItems, { key: 'SystemSettings', label: '系统管理', icon: 'settings' }]);
+        // 先获取auth info
+        const authResponse = await api.get('/auth/info');
+        const username = authResponse.data.username;
+        console.log('Auth Info Username:', username);
+
+        // 再使用username调用新API获取用户详细信息
+        const userResponse = await api.get(`/api/users/username/${username}`);
+        setUser(userResponse.data);
+
+        // 根据角色权限生成菜单
+        const roles = authResponse.data.roles || [];
+        const isAdmin = roles.some((role: string) => role === 'ADMIN' || role === 'ROLE_ADMIN');
+        const newMenuItems = [];
+
+        // 仪表盘菜单 - 仪表盘管理员或管理员可见
+        if (isAdmin || roles.some((role: string) => role === 'ROLE_YBPGL')) {
+          newMenuItems.push({ key: 'Dashboard', label: '仪表盘', icon: 'home' });
         }
+
+        // 设备管理菜单 - 设备管理员或管理员可见
+        if (isAdmin || roles.some((role: string) => role === 'ROLE_SBGL')) {
+          newMenuItems.push({ key: 'EquipmentList', label: '设备管理', icon: 'list' });
+        }
+
+        // 库存管理菜单 - 仓库管理员或管理员可见
+        if (isAdmin || roles.some((role: string) => role === 'ROLE_CKGLY')) {
+          newMenuItems.push({ key: 'InventoryManagement', label: '库存管理', icon: 'inventory' });
+        }
+
+        // 系统管理菜单 - 仅管理员可见
+        if (isAdmin) {
+          newMenuItems.push({ key: 'SystemSettings', label: '系统管理', icon: 'settings' });
+        }
+
+        setMenuItems(newMenuItems);
       } catch (error) {
         console.error('获取用户信息失败', error);
       }
@@ -51,7 +82,7 @@ const Portal = () => {
       <View style={styles.overlay}>
         <View style={styles.header}>
           <Text style={styles.welcomeText}>欢迎回来，</Text>
-          <Text style={styles.username}>{user?.nickname || user?.username || '用户'}</Text>
+          <Text style={styles.username}>{user?.cnname || user?.username || '用户'}</Text>
         </View>
 
         <View style={styles.grid}>
@@ -99,7 +130,7 @@ const styles = StyleSheet.create({
   },
   username: {
     color: '#ffffff',
-    fontSize: 24,
+    fontSize: 15,
     fontWeight: 'bold',
     marginTop: 4,
     textShadowColor: 'rgba(0, 0, 0, 0.3)',

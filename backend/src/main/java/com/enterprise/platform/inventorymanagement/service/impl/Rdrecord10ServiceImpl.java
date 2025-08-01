@@ -21,6 +21,8 @@ import com.enterprise.platform.inventorymanagement.repository.sqlserver.Rdrecord
 import com.enterprise.platform.inventorymanagement.service.Rdrecord10Service;
 import com.enterprise.platform.inventorymanagement.service.CurrentStockService;
 import com.enterprise.platform.inventorymanagement.service.U8ToWmsService;
+import com.enterprise.platform.user.model.User;
+import com.enterprise.platform.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +65,7 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
     private final Rdrecords10ExtradefineRepository rdrecords10ExtradefineRepository;
     private final CurrentStockService currentStockService;
     private final U8ToWmsService u8ToWmsService;
+    private final UserRepository userRepository;
 
     // 注入InventoryRepository
     @Autowired
@@ -120,7 +123,11 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
         if (authentication == null || authentication.getName() == null) {
             throw new RuntimeException("当前用户未登录，无法创建产成品入库单");
         }
-        inbound.setCMaker(authentication.getName());
+        // 根据用户名查询用户信息获取中文名称
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("未找到用户: " + username));
+        inbound.setCMaker(user.getCnname()); // 设置中文名称作为制单人
         inbound.setBTransFlag(false);
         inbound.setBpufirst(false);
         inbound.setBiafirst(false);
