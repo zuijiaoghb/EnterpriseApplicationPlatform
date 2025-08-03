@@ -19,10 +19,6 @@ const PermissionManagement = () => {
   const [form] = Form.useForm();
   const [treeData, setTreeData] = useState([]);
 
-  useEffect(() => {
-    fetchPermissions();
-  }, []);
-
   const fetchPermissions = async () => {
     try {
       const { data } = await api.get('/api/permissions/tree');
@@ -35,6 +31,10 @@ const PermissionManagement = () => {
       setTreeData([]); // 出错时设为空数组
     }
   };
+
+  useEffect(() => {
+    fetchPermissions();
+  }, []);
   
   const buildTreeData = (data) => {
       const buildNode = (node) => {
@@ -191,6 +191,8 @@ const PermissionManagement = () => {
         onOk={handleSubmit}
         onCancel={() => setVisible(false)}
         width={600}
+        okButtonProps={{ size: 'middle', style: { width: '80px' } }}
+        cancelButtonProps={{ size: 'middle', style: { width: '80px' } }}
       >
         <Form form={form} key={current ? `edit-${current.id}` : 'create'}>
           <Form.Item 

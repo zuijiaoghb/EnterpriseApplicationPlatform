@@ -92,7 +92,7 @@ const RoleManagement = () => {
           <Title level={4} style={{ margin: 0 }}>角色管理</Title>
         </div>
       }
-      bordered={false}
+      variant={false}
       extra={
         <Button 
           type="primary" 
@@ -173,6 +173,8 @@ const RoleManagement = () => {
           form.resetFields();
         }}
         width={600}
+        okButtonProps={{ size: 'middle', style: { width: '80px' } }}
+        cancelButtonProps={{ size: 'middle', style: { width: '80px' } }}
       >
         <Form form={form} key={current ? `edit-${current.id}` : 'create'}>
           <Form.Item 
@@ -206,6 +208,8 @@ const RoleManagement = () => {
         onOk={saveRolePermissions}
         onCancel={() => setPermissionModalVisible(false)}
         width={800}
+        okButtonProps={{ size: 'middle', style: { width: '80px' } }}
+        cancelButtonProps={{ size: 'middle', style: { width: '80px' } }}
       >
         <Transfer
           dataSource={permissions.map(p => ({

@@ -1,0 +1,301 @@
+.supplier-purchase-orders-container {
+  padding: 24px;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+/* 页面头部样式 */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.page-icon {
+  font-size: 28px;
+  margin-right: 12px;
+  color: #1890ff;
+}
+
+.page-title {
+  margin: 0;
+  font-weight: 600;
+  color: #333;
+}
+
+.header-right {
+  display: flex;
+  gap: 12px;
+}
+
+.export-button {
+  background-color: #52c41a;
+  border-color: #52c41a;
+}
+
+.export-button:hover {
+  background-color: #73d13d;
+  border-color: #73d13d;
+}
+
+/* 主卡片样式 */
+.main-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* 搜索区域样式 */
+.search-container {
+  padding: 16px 0;
+}
+
+.basic-search {
+  padding: 16px;
+  background-color: #fafafa;
+  border-radius: 8px;
+}
+
+.search-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.search-item {
+  flex: 1;
+  min-width: 200px;
+}
+
+.search-button-group {
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 4px;
+}
+
+.search-button {
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+.search-button:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+.reset-button {
+  margin-left: 8px;
+}
+
+.advanced-search-button {
+  margin-left: 8px;
+}
+
+.search-icon {
+  color: #999;
+}
+
+.advanced-search-content {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed #e8e8e8;
+}
+
+/* 表格容器样式 */
+.table-container {
+  margin-top: 24px;
+}
+
+/* 自定义表格样式 */
+.custom-table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.custom-table .ant-table-thead > tr > th {
+  background-color: #f0f2f5;
+  font-weight: 600;
+  color: #333;
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.custom-table .ant-table-tbody > tr > td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.custom-table .ant-table-tbody > tr.even-row {
+  background-color: #fff;
+}
+
+.custom-table .ant-table-tbody > tr.odd-row {
+  background-color: #fafafa;
+}
+
+.custom-table .ant-table-tbody > tr:hover > td {
+  background-color: #f5f7fa;
+}
+
+/* 分页样式 */
+.custom-pagination {
+  margin-top: 24px;
+  text-align: right;
+}
+
+/* 展开行内容样式 */
+.expanded-row-content {
+  padding: 16px;
+  background-color: #fafafa;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.detail-item {
+  margin-bottom: 8px;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #666;
+  margin-right: 8px;
+}
+
+.detail-value {
+  color: #333;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background-color: #52c41a;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+/* 空状态样式 */
+.empty-state {
+  padding: 48px 0;
+  text-align: center;
+}
+
+/* 自定义加载状态 */
+.custom-spin {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 响应式调整 */
+@media (max-width: 1200px) {
+  .detail-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .search-row {
+    flex-direction: column;
+  }
+
+  .search-item {
+    width: 100%;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+/* 表格滚动优化 */
+.ant-table-body {
+  overflow-x: auto;
+}
+
+/* 按钮样式优化 */
+.ant-btn {
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.ant-btn-primary {
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
+}
+
+/* 标签样式优化 */
+.ant-tag {
+  border-radius: 4px;
+}
+
+/* 表单元素样式优化 */
+.ant-input {
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.ant-input:focus {
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  border-color: #1890ff;
+}
+
+.ant-date-picker {
+  width: 100%;
+}
+
+.ant-date-picker-input {
+  width: 100%;
+  border-radius: 4px;
+}
+
+/* 卡片标题样式 */
+.ant-card-head-title {
+  font-weight: 600;
+  color: #333;
+}
+
+/* 工具提示样式 */
+.ant-tooltip {
+  font-size: 12px;
+}
+
+/* 表格行高优化 */
+.ant-table-row {
+  height: 60px;
+}
+
+/* 表格固定列阴影 */
+.ant-table-fixed-left {
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.04);
+}
+
+.ant-table-fixed-right {
+  box-shadow: -2px 0 6px rgba(0, 0, 0, 0.04);
+}

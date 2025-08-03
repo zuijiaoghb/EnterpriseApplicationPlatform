@@ -262,6 +262,8 @@ const ClientManagement = () => {
         onOk={handleCreate}
         onCancel={() => {setVisible(false);form.resetFields();}}
         key="create-client-modal" // 新增：添加唯一key
+        okButtonProps={{ size: 'middle', style: { width: '80px' } }}
+        cancelButtonProps={{ size: 'middle', style: { width: '80px' } }}
       >
         <Form form={form} key={currentClient ? `edit-${currentClient.id}` : 'create'}>
           <Form.Item 
@@ -306,6 +308,8 @@ const ClientManagement = () => {
             我已保存密钥
           </Button>
         ]}
+        okButtonProps={{ size: 'middle', style: { width: '80px' } }}
+        cancelButtonProps={{ size: 'middle', style: { width: '80px' } }}
       >
         <p>客户端密钥为: <b>{newSecret}</b></p>
         <p style={{color: 'red'}}>请妥善保存此密钥，离开此页面后将无法再次查看</p>
@@ -316,6 +320,8 @@ const ClientManagement = () => {
         onOk={handleUpdate}
         onCancel={() => {setEditModalVisible(false);form.resetFields();}}
         key={`edit-client-${currentClient?.clientId || ''}`} // 新增：动态key
+        okButtonProps={{ size: 'middle', style: { width: '80px' } }}
+        cancelButtonProps={{ size: 'middle', style: { width: '80px' } }}
       >
         <Form form={form} layout="vertical">
           <Form.Item name="clientName" label="客户端名称" rules={[{ required: true }]}>
@@ -333,6 +339,8 @@ const ClientManagement = () => {
         onCancel={() => setResetSecretModalVisible(false)}
         okText="确认"
         cancelText="取消"
+        okButtonProps={{ size: 'middle', style: { width: '80px' } }}
+        cancelButtonProps={{ size: 'middle', style: { width: '80px' } }}
       >
         <p>重置后原密钥将立即失效</p>
      </Modal>
@@ -343,6 +351,8 @@ const ClientManagement = () => {
       onCancel={() => setDisableModalVisible(false)}
       okText="确认"
       cancelText="取消"
+      okButtonProps={{ size: 'middle', style: { width: '80px' } }}
+      cancelButtonProps={{ size: 'middle', style: { width: '80px' } }}
     >
       <p>禁用后该客户端将无法获取新令牌</p>
     </Modal>    
@@ -353,6 +363,8 @@ const ClientManagement = () => {
       onCancel={() => setEnableModalVisible(false)}
       okText="确认"
       cancelText="取消"
+      okButtonProps={{ size: 'middle', style: { width: '80px' } }}
+      cancelButtonProps={{ size: 'middle', style: { width: '80px' } }}
     >
       <p>确认要启用该客户端吗？</p>
     </Modal>
@@ -361,6 +373,8 @@ const ClientManagement = () => {
       open={successModalVisible}
       onOk={() => setSuccessModalVisible(false)}
       onCancel={() => setSuccessModalVisible(false)}
+      okButtonProps={{ size: 'middle', style: { width: '80px' } }}
+      cancelButtonProps={{ size: 'middle', style: { width: '80px' } }}
     >
       <p>新密钥为: <b>{newSecret}</b></p>
       <p style={{color: 'red'}}>请妥善保存此密钥，离开此页面后将无法再次查看</p>

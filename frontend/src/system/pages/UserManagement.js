@@ -36,10 +36,6 @@ const UserManagement = () => {
   const navigate = useNavigate();
   const [hasAdminRole, setHasAdminRole] = useState(false);
 
-  useEffect(() => {
-    checkUserRole();
-  }, []);
-
   const checkUserRole = async () => {
     try {
       const { data } = await api.get('/auth/check-role');
@@ -55,8 +51,7 @@ const UserManagement = () => {
   };
 
   useEffect(() => {
-    fetchUsers();
-    fetchRoles();
+    checkUserRole();
   }, []);
 
   const [pagination, setPagination] = useState({
@@ -64,10 +59,6 @@ const UserManagement = () => {
     pageSize: 10,
     total: 0,
   });
-  
-  useEffect(() => {
-    fetchUsers();
-  }, [pagination.current, pagination.pageSize]); // 添加分页参数依赖
   
   const fetchUsers = async () => {
     try {
@@ -92,9 +83,22 @@ const UserManagement = () => {
   };
 
   const fetchRoles = async () => {
-    const { data } = await api.get('/api/roles');
-    setRoles(data);
+    try {
+      const { data } = await api.get('/api/roles');
+      setRoles(data);
+    } catch (error) {
+      message.error('获取角色列表失败');
+    }
   };
+
+  useEffect(() => {
+    fetchUsers();
+    fetchRoles();
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [pagination.current, pagination.pageSize]); // 添加分页参数依赖
 
   const handleSubmit = async () => {
     try {
@@ -295,6 +299,8 @@ const UserManagement = () => {
           form.resetFields();
         }}
         width={600}
+        okButtonProps={{ size: 'middle', style: { width: '80px' } }}
+        cancelButtonProps={{ size: 'middle', style: { width: '80px' } }}
       >
         <Form form={form} key={current ? `edit-${current.id}` : 'create'}>
           <Form.Item 
