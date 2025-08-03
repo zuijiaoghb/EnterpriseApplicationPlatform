@@ -1,4 +1,5 @@
 import React from 'react';
+import './SupplierPortal.css';
 import { Card, Typography, List, Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { ShoppingOutlined } from '@ant-design/icons';
