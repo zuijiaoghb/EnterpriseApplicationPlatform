@@ -24,6 +24,7 @@ import com.enterprise.platform.inventorymanagement.service.U8ToWmsService;
 import com.enterprise.platform.user.model.User;
 import com.enterprise.platform.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -70,6 +71,9 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
     // 注入InventoryRepository
     @Autowired
     private InventoryRepository inventoryRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Override
     public Optional<Rdrecord10> getInboundByBarcode(String barcode) {
@@ -298,6 +302,10 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
         u8ToWmsDTO.setWmsReadError(null);
         u8ToWmsDTO.setCInvCCode(inventoryOpt.get().getCInvCCode());
         u8ToWmsService.save(u8ToWmsDTO);
+
+        // 执行存储过程IA_SP_WriteUnAccountVouchForST
+        String storedProcedure = "EXEC IA_SP_WriteUnAccountVouchForST ?, ?";
+        jdbcTemplate.update(storedProcedure, savedInbound.getId(), "10");
 
         return savedInbound;        
     }

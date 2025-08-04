@@ -103,7 +103,7 @@ public class RdRecordServiceImpl implements RdRecordService {
         inboundMain.setCWhCode(warehouseCode);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication.getName() == null) {
-            throw new RuntimeException("当前用户未登录，无法创建产成品入库单");
+            throw new RuntimeException("当前用户未登录，无法创建采购入库单");
         }
         // 根据用户名查询用户信息获取中文名称
         String username = authentication.getName();
