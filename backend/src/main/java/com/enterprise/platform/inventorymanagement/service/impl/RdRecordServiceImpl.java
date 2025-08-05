@@ -10,7 +10,11 @@ import com.enterprise.platform.user.model.User;
 import com.enterprise.platform.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,6 +34,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(transactionManager = "sqlServerTransactionManager")
 public class RdRecordServiceImpl implements RdRecordService {
+    private static final Logger log = LoggerFactory.getLogger(RdRecordServiceImpl.class);
+
     /**
      * 查询当月以smcgrk开头的最大流水号
      */
@@ -58,6 +64,10 @@ public class RdRecordServiceImpl implements RdRecordService {
     // 注入InventoryRepository
     @Autowired
     private InventoryRepository inventoryRepository;
+
+    @Autowired
+    @Qualifier("sqlServerJdbcTemplate")
+    private JdbcTemplate sqlServerJdbcTemplate;
 
     @Override
     public RdRecord01 getInboundByPOCode(String poCode) {
@@ -324,6 +334,16 @@ public class RdRecordServiceImpl implements RdRecordService {
         u8ToWmsDTO.setWmsReadError(null);
         u8ToWmsDTO.setCInvCCode(inventoryOpt.get().getCInvCCode());
         u8ToWmsService.save(u8ToWmsDTO);
+
+        // 执行存储过程IA_SP_WriteUnAccountVouchForST
+        try {
+            String storedProcedure = "EXEC IA_SP_WriteUnAccountVouchForST ?, ?";
+            sqlServerJdbcTemplate.update(storedProcedure, inboundMain.getId(), "01");
+            log.info("成功执行存储过程IA_SP_WriteUnAccountVouchForST，采购入库单ID: {}", inboundMain.getId());
+        } catch (Exception e) {
+            log.error("执行存储过程IA_SP_WriteUnAccountVouchForST失败，采购入库单ID: {}", inboundMain.getId(), e);
+            throw new RuntimeException("执行存储过程失败: " + e.getMessage());
+        }
 
         return inboundMain;
     }

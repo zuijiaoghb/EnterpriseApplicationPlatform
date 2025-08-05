@@ -27,9 +27,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -42,6 +45,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional(transactionManager = "sqlServerTransactionManager")
 public class Rdrecord10ServiceImpl implements Rdrecord10Service {
+
+    private static final Logger log = LoggerFactory.getLogger(Rdrecord10ServiceImpl.class);
 
     /**
      * 查询当月以smscrk开头的最大流水号
@@ -73,7 +78,8 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
     private InventoryRepository inventoryRepository;
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    @Qualifier("sqlServerJdbcTemplate")
+    private JdbcTemplate sqlServerJdbcTemplate;
 
     @Override
     public Optional<Rdrecord10> getInboundByBarcode(String barcode) {
@@ -304,8 +310,14 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
         u8ToWmsService.save(u8ToWmsDTO);
 
         // 执行存储过程IA_SP_WriteUnAccountVouchForST
-        String storedProcedure = "EXEC IA_SP_WriteUnAccountVouchForST ?, ?";
-        jdbcTemplate.update(storedProcedure, savedInbound.getId(), "10");
+        try {
+            String storedProcedure = "EXEC IA_SP_WriteUnAccountVouchForST ?, ?";
+            sqlServerJdbcTemplate.update(storedProcedure, savedInbound.getId(), "10");
+            log.info("成功执行存储过程IA_SP_WriteUnAccountVouchForST，产成品入库单ID: {}", savedInbound.getId());
+        } catch (Exception e) {
+            log.error("执行存储过程IA_SP_WriteUnAccountVouchForST失败，产成品入库单ID: {}", savedInbound.getId(), e);
+            throw new RuntimeException("执行存储过程失败: " + e.getMessage());
+        }
 
         return savedInbound;        
     }

@@ -1,0 +1,16 @@
+GRANT EXECUTE ON OBJECT::dbo.IA_SP_WriteUnAccountVouchForST TO smcrkapp;
+
+SELECT 
+    dp.class_desc,
+    dp.permission_name,
+    dp.state_desc,
+    OBJECT_NAME(dp.major_id) AS object_name,
+    dp.major_id,
+    gr.name AS grantee_name
+FROM 
+    sys.database_permissions dp
+JOIN 
+    sys.database_principals gr ON dp.grantee_principal_id = gr.principal_id
+WHERE 
+    gr.name = 'smcrkapp'
+    AND OBJECT_NAME(dp.major_id) = 'IA_SP_WriteUnAccountVouchForST';
