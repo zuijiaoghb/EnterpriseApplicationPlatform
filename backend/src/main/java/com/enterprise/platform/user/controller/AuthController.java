@@ -92,7 +92,7 @@ public class AuthController {
             JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                     .issuer("enterprise-platform")
                     .issuedAt(Instant.now())
-                    .expiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
+                    .expiresAt(Instant.now().plus(1, ChronoUnit.MINUTES))
                     .subject(authentication.getName())
                     .claim("roles", authentication.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)

@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import { navigationRef } from './src/navigation/NavigationService';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MainLayout from './src/components/MainLayout';
 import Login from './src/pages/Login';
@@ -27,7 +28,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const App = () => {
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen 
           name="Login" 

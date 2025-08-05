@@ -1,9 +1,8 @@
 import axios from 'axios';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
-import { LoginScreenNavigationProp } from './navigation/types';
-
+// 已移除useNavigation导入，使用NavigationService.navigate代替
+import { navigate } from './navigation/NavigationService';
 
 // 根据运行环境设置基础URL
 const baseURL = Platform.OS === 'web' 
@@ -33,12 +32,10 @@ api.interceptors.request.use(
       // 如果是登录请求，不添加token
       delete config.headers['Authorization']; 
     }
-    else {
+    else if (!config.url.includes('/auth/login')) {
       // 如果没有token且不是登录请求，重定向到登录
-      if (!config.url.includes('/auth/login')) {
-        const navigation = useNavigation<LoginScreenNavigationProp>();
-        navigation.navigate('Login', { param1: '', param2: 0 });
-      }
+      await AsyncStorage.removeItem('token');
+      navigate('Login', { param1: '', param2: 0 });
     }
     return config;
   },
@@ -59,12 +56,8 @@ api.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401 || error.response?.status === 403) {
       await AsyncStorage.removeItem('token');
-      // 导航到登录页面
-      if (error.response.config.url.includes('/auth/login')) {
-        const navigation = useNavigation<LoginScreenNavigationProp>();
-        navigation.navigate('Login', { param1: '', param2: 0 });
-      }
-    }
+      navigate('Login', { param1: '', param2: 0 });
+   }
     // 修改错误处理，确保返回完整响应
     if (error.response) {
       if (!error.response.config.url.includes('/auth/login')) {
@@ -76,5 +69,33 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// 添加主动检查令牌过期的机制
+async function checkTokenExpiration() {
+  const token = await AsyncStorage.getItem('token');
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expirationTime = payload.exp * 1000;
+      const currentTime = Date.now();
+      const timeLeft = expirationTime - currentTime;
+
+      if (timeLeft <= 0) {
+        await AsyncStorage.removeItem('token');
+        navigate('Login', { param1: '', param2: 0 });
+      }
+    } catch (error) {
+      console.error('解析token失败:', error);
+      await AsyncStorage.removeItem('token');
+      navigate('Login', { param1: '', param2: 0 });
+    }
+  }
+}
+
+// 在应用初始化时检查
+checkTokenExpiration();
+
+// 设置定时器定期检查（每分钟）
+setInterval(checkTokenExpiration, 60000);
 
 export default api;

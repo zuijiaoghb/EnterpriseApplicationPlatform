@@ -49,4 +49,37 @@ api.interceptors.response.use(response => {
   return Promise.reject(error);
 });
 
+// 检查令牌是否过期的函数
+function checkTokenExpiration() {  
+  const token = localStorage.getItem('token');
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expirationTime = payload.exp * 1000; // 转换为毫秒
+      const currentTime = Date.now();
+      const timeLeft = expirationTime - currentTime;
+
+      // 当令牌将在5分钟内过期时，提示用户
+      if (timeLeft > 0 && timeLeft < 5 * 60 * 1000) {
+        message.warning('登录即将过期，请刷新页面或重新登录');
+      }
+      // 当令牌已过期时，直接跳转到登录页
+      else if (timeLeft <= 0) {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
+    } catch (error) {
+      console.error('解析token失败:', error);
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+  }
+}
+
+// 在应用初始化时检查
+checkTokenExpiration();
+
+// 设置定时器定期检查（每分钟）
+setInterval(checkTokenExpiration, 60000);
+
 export default api;
