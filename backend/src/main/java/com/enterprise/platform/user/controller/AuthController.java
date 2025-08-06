@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.http.HttpStatus;
@@ -52,6 +52,9 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 @RequestMapping("/auth")
 public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
+    @Value("${jwt.expiration}")
+    private long jwtExpiration; // 令牌过期时间(秒)
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -92,7 +95,7 @@ public class AuthController {
             JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                     .issuer("enterprise-platform")
                     .issuedAt(Instant.now())
-                    .expiresAt(Instant.now().plus(1, ChronoUnit.MINUTES))
+                    .expiresAt(Instant.now().plus(Duration.ofSeconds(jwtExpiration)))
                     .subject(authentication.getName())
                     .claim("roles", authentication.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
@@ -184,7 +187,7 @@ public class AuthController {
     
             // 设置令牌过期时间
             Instant now = Instant.now();
-            Instant expiresAt = now.plus(30, ChronoUnit.MINUTES);
+            Instant expiresAt = now.plus(Duration.ofSeconds(jwtExpiration));
 
             // 构建JWT时明确指定密钥
             // 添加JWS Header配置
