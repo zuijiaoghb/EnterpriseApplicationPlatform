@@ -61,11 +61,10 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public Optional<RefreshToken> findByToken(String token) {
         try {
-            // 加密传入的令牌进行查询
-            String encryptedToken = aesEncryptUtil.encrypt(token);
-            return refreshTokenRepository.findByToken(encryptedToken);
+            // 直接使用传入的令牌进行查询（已加密）
+            return refreshTokenRepository.findByToken(token);
         } catch (Exception e) {
-            log.error("Error encrypting token for lookup", e);
+            log.error("Error looking up token", e);
             return Optional.empty();
         }
     }
