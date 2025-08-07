@@ -19,8 +19,10 @@ import PurchaseIn from './src/pages/PurchaseIn';
 import ProductIn from './src/pages/ProductIn';
 import SalesOut from './src/pages/SalesOut';
 import MaterialOut from './src/pages/MaterialOut';
+import ChangePassword from './src/pages/ChangePassword';
 
 import { RootStackParamList } from './src/navigation/types';
+
 
 // 移除重复的 RootStackParamList 定义，使用统一的定义
 
@@ -58,6 +60,7 @@ const App = () => {
                 <Stack.Screen name="ProductIn" component={ProductIn} options={{ title: '产成品入库' }} />
                 <Stack.Screen name="SalesOut" component={SalesOut} options={{ title: '销售出库' }} />
                 <Stack.Screen name="MaterialOut" component={MaterialOut} options={{ title: '材料出库' }} />
+                <Stack.Screen name="ChangePassword" component={ChangePassword} options={{ title: '修改密码' }} />
               </Stack.Navigator>
             </MainLayout>
           )}

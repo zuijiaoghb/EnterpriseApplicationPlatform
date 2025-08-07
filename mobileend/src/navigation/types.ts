@@ -8,6 +8,7 @@ export type RootStackParamList = {
   PermissionManagement:  { param1: string; param2: number };
   ClientManagement:  { param1: string; param2: number };
   Portal: undefined;
+  ChangePassword: undefined;
   EquipmentList: { param1: string; param2: number };
   SystemSettings: { param1: string; param2: number };
   InventoryManagement: { param1: string; param2: number };

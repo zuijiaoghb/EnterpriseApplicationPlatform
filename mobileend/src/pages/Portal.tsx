@@ -45,6 +45,9 @@ const Portal = () => {
         const isAdmin = roles.some((role: string) => role === 'ADMIN' || role === 'ROLE_ADMIN');
         const newMenuItems = [];
 
+        // 修改密码菜单 - 所有用户可见
+        newMenuItems.push({ key: 'ChangePassword', label: '修改密码', icon: 'lock' });
+
         // 仪表盘菜单 - 仪表盘管理员或管理员可见
         if (isAdmin || roles.some((role: string) => role === 'ROLE_YBPGL')) {
           newMenuItems.push({ key: 'Dashboard', label: '仪表盘', icon: 'home' });
