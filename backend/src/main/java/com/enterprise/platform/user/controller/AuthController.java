@@ -13,12 +13,16 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
+import com.enterprise.platform.user.model.RefreshToken;
+import com.enterprise.platform.user.model.User;
+import com.enterprise.platform.user.repository.UserRepository;
+import com.enterprise.platform.user.service.RefreshTokenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,6 +43,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.JwtEncodingException;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -50,26 +55,35 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 @CrossOrigin(origins = {"http://192.168.21.175:3001", "http://localhost:8081"}, allowCredentials = "true")
 @RestController
 @RequestMapping("/auth")
+@Transactional(transactionManager = "mysqlTransactionManager")
 public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Value("${jwt.expiration}")
     private long jwtExpiration; // 令牌过期时间(秒)
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    
-    @Autowired
-    private JwtEncoder jwtEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtEncoder jwtEncoder;
+    private final ClientRegistrationRepository clientRegistrationRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final OAuth2ClientService oAuth2ClientService;
 
-    @Autowired
-    private ClientRegistrationRepository clientRegistrationRepository;
-    
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final RefreshTokenService refreshTokenService;    
+    private final UserRepository userRepository;
+        
 
-    @Autowired
-    private OAuth2ClientService oAuth2ClientService;
+    public AuthController(AuthenticationManager authenticationManager, JwtEncoder jwtEncoder,
+                          RefreshTokenService refreshTokenService, 
+                          UserRepository userRepository, PasswordEncoder passwordEncoder,
+                          OAuth2ClientService oAuth2ClientService, ClientRegistrationRepository clientRegistrationRepository) {
+        this.authenticationManager = authenticationManager;
+        this.jwtEncoder = jwtEncoder;
+        this.refreshTokenService = refreshTokenService;        
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.oAuth2ClientService = oAuth2ClientService;
+        this.clientRegistrationRepository = clientRegistrationRepository;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest) {
@@ -109,12 +123,23 @@ public class AuthController {
             
             logger.debug("JWT generated successfully");
             
+            // 生成刷新令牌
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            // 使用注入的userRepository查找用户
+            User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("用户不存在: " + userDetails.getUsername()));
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+
             return ResponseEntity.ok()
                 .header("Authorization", "Bearer " + jwt.getTokenValue())
-                .body(Map.of(
+                .body((Map<String, Object>) Map.of(
                     "status", 200,
                     "message", "登录成功",
-                    "user", Map.of(
+                    "access_token", jwt.getTokenValue(),
+                    "token_type", "Bearer",
+                    "expires_in", jwtExpiration,
+                    "refresh_token", refreshToken.getToken(),
+                    "user", (Map<String, Object>) Map.of(
                         "username", authentication.getName(),
                         "roles", authentication.getAuthorities()
                     )                
@@ -163,6 +188,68 @@ public class AuthController {
         boolean hasAdminRole = ((Jwt) (authentication.getPrincipal())).getClaimAsStringList("roles").contains("ROLE_ADMIN");
         
         return ResponseEntity.ok(Map.of("hasAdminRole", hasAdminRole));
+    }
+
+    @PostMapping("/refresh-token")    
+    public ResponseEntity<Map<String, Object>> refreshToken(@RequestBody Map<String, String> request) {
+        String refreshTokenStr = request.get("refresh_token");
+        
+        if (refreshTokenStr == null || refreshTokenStr.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body( Map.of("status", 400, "message", "刷新令牌不能为空"));
+        }
+        
+        try {
+            return refreshTokenService.findByToken(refreshTokenStr)
+                .map(token -> {
+                    if (!refreshTokenService.validateRefreshToken(token)) {
+                        refreshTokenService.revokeRefreshToken(token);
+                        Map<String, Object> response = new HashMap<>();
+                        response.put("status", 401);
+                        response.put("message", "刷新令牌无效或已过期");
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+                    }
+                    
+                    User user = token.getUser();
+                    
+                    // 构建新的访问令牌
+                    JwsHeader jwsHeaders = JwsHeader.with(() -> "HS256")
+                            .type("JWT")
+                            .keyId("HS256-KEY")
+                            .build();                
+                    
+                    JwtClaimsSet claimsSet = JwtClaimsSet.builder()
+                            .issuer("enterprise-platform")
+                            .issuedAt(Instant.now())
+                            .expiresAt(Instant.now().plus(Duration.ofSeconds(jwtExpiration)))
+                            .subject(user.getUsername())
+                            .claim("roles", user.getRoles().stream()
+                                .map(role -> role.getCode())
+                                .collect(Collectors.toList()))
+                            .build();
+                    
+                    Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeaders, claimsSet));
+                    
+                    // 生成新的刷新令牌
+                    RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user);
+                    
+                    Map<String, Object> responseBody = new HashMap<>();
+                    responseBody.put("status", 200);
+                    responseBody.put("message", "令牌刷新成功");
+                    responseBody.put("access_token", jwt.getTokenValue());
+                    responseBody.put("token_type", "Bearer");
+                    responseBody.put("expires_in", jwtExpiration);
+                    responseBody.put("refresh_token", newRefreshToken.getToken());
+                    
+                    return ResponseEntity.ok().body(responseBody);
+                })
+                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("status", 401, "message", "无效的刷新令牌")));
+        } catch (Exception e) {
+            logger.error("刷新令牌过程中发生错误", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("status", 500, "message", "系统错误，请稍后重试"));
+        }
     }
 
     @PostMapping("/oauth2/token")
