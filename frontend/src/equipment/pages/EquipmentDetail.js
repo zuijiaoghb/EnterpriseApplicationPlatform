@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../../api';
 
 const EquipmentDetail = () => {
   const { id } = useParams();
-  const [equipment, setEquipment] = React.useState(null);
+  const [equipment, setEquipment] = useState(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchEquipment = async () => {
       try {
         const { data } = await api.get(`/api/equipments/${id}`);
