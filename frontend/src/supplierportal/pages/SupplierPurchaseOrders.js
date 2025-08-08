@@ -87,6 +87,61 @@ const SupplierPurchaseOrders = () => {
     setCurrentPage(1);
   };
 
+  // 打印条码 - 调用HYBarCodeMainController接口
+  const handlePrintBarcode = async (record) => {
+    try {
+      setLoading(true);
+      
+      // 构建条码数据
+      const barcodeData = {
+        cPOID: record.cPOID,
+        dPODate: record.dPODate,
+        cVenCode: record.cVenCode,
+        cDefine1: record.cDefine1,
+        cPersonCode: record.cPersonCode,
+        cDepCode: record.cDepCode,
+        cInvCode: record.cInvCode,
+        cItemName: record.cItemName,
+        iQuantity: record.iQuantity,
+        cUnitID: record.cUnitID,
+        unitName: record.unitName,
+        dArriveDate: record.dArriveDate,
+        remainingQuantity: record.remainingQuantity,
+        receivedQuantity: record.receivedQuantity,
+        batchNumber: record.batchNumber || '',
+        irowno: record.irowno,
+        supplierName: record.supplierName
+      };
+
+      // 调用HYBarCodeMainController接口保存条码
+      const response = await api.post('/api/inventory/hy-barcode-main', barcodeData);
+      
+      if (response.status === 201) {
+        message.success('条码生成成功，准备打印...');
+        
+        // 这里可以添加打印逻辑
+        // 例如：调用浏览器打印API或生成打印预览
+        console.log('生成的条码数据:', response.data);
+        
+        // 模拟打印操作
+        setTimeout(() => {
+          if (window.confirm(`条码已生成，条码号: ${response.data.barCode || '自动生成'}
+
+是否立即打印？`)) {
+            // 这里可以集成实际的打印功能
+            window.print();
+          }
+        }, 500);
+      }
+      
+    } catch (error) {
+      console.error('条码生成失败:', error);
+      message.error('条码生成失败: ' + (error.response?.data?.message || error.message));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // 表格列定义
   const columns = [
     {
@@ -187,8 +242,13 @@ const SupplierPurchaseOrders = () => {
       width: 120,
       render: (_, record) => (
         <Space size="middle">
-          <Button type="link" onClick={() => navigate(`/supplierportal/purchase-orders/${record.cPOID}`)}>
-            查看详情
+          <Button 
+            type="primary" 
+            size="small"
+            onClick={() => handlePrintBarcode(record)}
+            disabled={record.remainingQuantity <= 0}
+          >
+            打印条码
           </Button>
           <Tooltip title={expandedRowKeys.includes(`${record.cPOID}_${record.irowno}`) ? '收起' : '展开'}>
             <Button
