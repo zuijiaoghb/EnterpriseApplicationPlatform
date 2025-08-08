@@ -207,7 +207,7 @@ const UserManagement = () => {
           <Title level={4} style={{ margin: 0 }}>用户管理</Title>
         </div>
       }
-      bordered={false}
+      variant="outlined"
       extra={
         <Button 
           type="primary" 

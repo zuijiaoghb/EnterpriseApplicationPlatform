@@ -53,8 +53,23 @@ const Login = () => {
       // 设置全局token
       api.defaults.headers.common['Authorization'] = `Bearer ${normalizedToken}`;
       
-      message.success('登录成功');              
-      navigate('/dashboard');
+      message.success('登录成功');      
+      
+      const roles = response.data.user.roles.map(role => role.authority);
+
+      // 根据角色判断跳转页面
+      if (roles.includes('ROLE_ADMIN') || roles.includes('ROLE_YBPGL')) {
+        navigate('/dashboard');
+      } else if (roles.includes('ROLE_SBGL')) {
+        navigate('/equipments');
+      } else if (roles.includes('ROLE_CKGLY')) {
+        navigate('/inventorymanagement');
+      } else if (roles.includes('ROLE_SUPPLIER')) {
+        navigate('/supplierportal');
+      } else {
+        // 默认跳转到dashboard
+        navigate('/dashboard');
+      }
     } catch (error) {
       console.error('登录错误:', error);
       setLoginError(true);
