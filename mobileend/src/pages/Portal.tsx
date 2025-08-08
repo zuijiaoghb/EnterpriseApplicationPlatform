@@ -43,10 +43,7 @@ const Portal = () => {
         // 根据角色权限生成菜单
         const roles = authResponse.data.roles || [];
         const isAdmin = roles.some((role: string) => role === 'ADMIN' || role === 'ROLE_ADMIN');
-        const newMenuItems = [];
-
-        // 修改密码菜单 - 所有用户可见
-        newMenuItems.push({ key: 'ChangePassword', label: '修改密码', icon: 'lock' });
+        const newMenuItems = [];        
 
         // 仪表盘菜单 - 仪表盘管理员或管理员可见
         if (isAdmin || roles.some((role: string) => role === 'ROLE_YBPGL')) {
@@ -67,6 +64,9 @@ const Portal = () => {
         if (isAdmin) {
           newMenuItems.push({ key: 'SystemSettings', label: '系统管理', icon: 'settings' });
         }
+
+        // 修改密码菜单 - 所有用户可见
+        newMenuItems.push({ key: 'ChangePassword', label: '修改密码', icon: 'lock' });
 
         setMenuItems(newMenuItems);
       } catch (error) {
