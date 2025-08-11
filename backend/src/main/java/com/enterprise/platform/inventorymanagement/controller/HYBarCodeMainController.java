@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import com.enterprise.platform.inventorymanagement.model.sqlserver.HYBarCodeMain;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/inventory/hy-barcode-main")
+@Transactional(transactionManager = "sqlServerTransactionManager")
 public class HYBarCodeMainController {
     private static final Logger logger = LoggerFactory.getLogger(HYBarCodeMainController.class);
 

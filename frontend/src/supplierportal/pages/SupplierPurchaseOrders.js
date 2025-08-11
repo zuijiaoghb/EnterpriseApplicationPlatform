@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Table, Card, Typography, Spin, message, Form, Input, DatePicker, Button, Divider, Empty, Space, Tooltip } from 'antd';
-import { useNavigate } from 'react-router-dom';
 import locale from 'antd/lib/date-picker/locale/zh_CN';
 import api from '../../api';
 import { SearchOutlined, ExportOutlined, FilterOutlined, CalendarOutlined } from '@ant-design/icons';
@@ -16,7 +15,6 @@ const SupplierPurchaseOrders = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10); // 减小默认页码以提升性能
   const [total, setTotal] = useState(0);
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useState({});
   const [form] = Form.useForm();
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
@@ -89,47 +87,200 @@ const SupplierPurchaseOrders = () => {
 
   // 打印条码 - 调用HYBarCodeMainController接口
   const handlePrintBarcode = async (record) => {
-    try {
+    try {      
       setLoading(true);
       
-      // 构建条码数据
+      // 生成唯一条码值
+      const timestamp = Date.now();
+      const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const barcode = `${record.cVenCode}_${record.cPOID}_${record.irowno}_${record.cInvCode}_${timestamp}-${randomStr}`;          
+      
+      // 获取当前日期（yyyy-MM-dd格式）
+      const currentDate = new Date().toISOString().split('T')[0];
+      
+      // 构建条码数据 - 严格按照后端HYBarCodeMain实体字段匹配
       const barcodeData = {
-        cPOID: record.cPOID,
-        dPODate: record.dPODate,
-        cVenCode: record.cVenCode,
-        cDefine1: record.cDefine1,
-        cPersonCode: record.cPersonCode,
-        cDepCode: record.cDepCode,
+        barcode: barcode, // 设置条码值作为主键
+        barCodeRule: '301', // 设置条码规则
         cInvCode: record.cInvCode,
-        cItemName: record.cItemName,
-        iQuantity: record.iQuantity,
-        cUnitID: record.cUnitID,
-        unitName: record.unitName,
-        dArriveDate: record.dArriveDate,
-        remainingQuantity: record.remainingQuantity,
-        receivedQuantity: record.receivedQuantity,
-        batchNumber: record.batchNumber || '',
-        irowno: record.irowno,
-        supplierName: record.supplierName
+        cVenCode: record.cVenCode,
+        cWhCode: '', // 默认仓库代码
+        cPosCode: '', // 默认货位代码
+        iInvSaleCost: 0,
+        dMdate: currentDate,
+        dVdate: '', 
+        iMassdate: 0,
+        cMassUnit: '',
+        cChkItemCode: '',
+        cOther: '',
+        cHoldItem: '_',
+        cSHoldItem: '',
+        cSilvItem: '',
+        cFree1: '',
+        cFree2: '',
+        cFree3: '',
+        cFree4: '',
+        cFree5: '',
+        cFree6: '',
+        cFree7: '',
+        cFree8: '',
+        cFree9: '',
+        cFree10: '',        
+        qty: record.remainingQuantity || 0,
+        iNum: 0,
+        pLot: currentDate,
+        ichangerate: 0,
+        cInvSN: '',
+        cDefine1: '江西江特电机有限公司',
+        cDefine2: '',
+        cDefine3: '',
+        cDefine4: '',
+        cDefine5: '',
+        cDefine6: '',
+        cDefine7: '',
+        cDefine8: '',
+        cDefine9: '',
+        cDefine10: '',
+        cDefine11: '',
+        cDefine12: '',
+        cDefine13: '',
+        cDefine14: '',
+        cDefine15: '',
+        cDefine16: '',
+        cDefine22: record.cPOID,
+        cDefine23: '',
+        cDefine24: '',
+        cDefine25: '',
+        cDefine26: '',
+        cDefine27: '',
+        cDefine28: '',
+        cDefine29: '',
+        cDefine30: '',
+        cDefine31: '',
+        cDefine32: '',
+        cDefine33: '',
+        cDefine34: '',
+        cDefine35: '',
+        cDefine36: '',
+        cDefine37: '',
+        createDate: currentDate,
+        createTime: new Date().toISOString(), // ISO格式，后端会自动解析
+        dBusDate: currentDate,
+        cBarcodeDefine1: '',
+        cBarcodeDefine2: '',
+        cBarcodeDefine3: '',
+        cBarcodeDefine4: '',
+        cBarcodeDefine5: '',
+        cBarcodeDefine6: '',
+        cBarcodeDefine7: '',
+        cBarcodeDefine8: '',
+        cBarcodeDefine9: '',
+        cBarcodeDefine10: '',
+        cComUnitCode: record.cComUnitCode,
+        cComAddUnitCode:'',        
+        cSrcCode: record.cPOID,        
+        cSrcVouchType: '采购订单',
+        cSrcSubID: record.cSrcSubID,
+        cBarMainID: '',
+        cBarMainAutoID: '',        
+        cMaker: record.cVenName,        
+        cGuid: '',
+        cLabelCode: '5000',
+        supBarCode:'',
+        iPrtCount: 0,        
+        iBarCodeState: 0, // 改为数字类型
+        bExpSub: 0,
+        cNoUseMaker: '',       
+        dNoUseTime: null,
+        bUseLs: 0,
+        cInvBarCode: null,
+        cinvcBarCode: null,
+        cWhBarCode: null,
+        cPosBarCode: null,
+        cVenBarCode: null,
+        cSaleUnitCode: '',
+        iSaleQty: 0,
+        iSalePrice: 0,
+        iExpiratDateCalcu: 0,
+        cExpirationdate: '',
+        dExpirationdate: null,
+        cBatchProperty1: '',
+        cBatchProperty2: '',
+        cBatchProperty3: '',
+        cBatchProperty4: '',
+        cBatchProperty5: '',
+        cBatchProperty6: '',
+        cBatchProperty7: '',
+        cBatchProperty8: '',
+        cBatchProperty9: '',
+        cBatchProperty10: '',
+        irowno: record.irowno || 0,
+        iRelAutoid: 21,
+        cCusCode: '',
+        idemandtype: 0,
+        cdemandcode: '',
+        idemandseq: 0,
+        cdemandid: '',
+        clastscantype: null,
+        vt_id: 131219,
+        UBarCode: '',
+        iPrtPerson: null
       };
 
+      console.log('准备保存条码数据:', barcodeData);
+      
       // 调用HYBarCodeMainController接口保存条码
       const response = await api.post('/api/inventory/hy-barcode-main', barcodeData);
       
-      if (response.status === 201) {
+      if (response.status === 201 || response.status === 200) {
         message.success('条码生成成功，准备打印...');
         
-        // 这里可以添加打印逻辑
-        // 例如：调用浏览器打印API或生成打印预览
-        console.log('生成的条码数据:', response.data);
+        // 更新本地数据
+        setOrders(prevOrders => 
+          prevOrders.map(order => 
+            order.cPOID === record.cPOID && order.irowno === record.irowno
+              ? { ...order, barcode: barcode }
+              : order
+          )
+        );
         
         // 模拟打印操作
         setTimeout(() => {
-          if (window.confirm(`条码已生成，条码号: ${response.data.barCode || '自动生成'}
+          if (window.confirm(`条码已生成，条码号: ${barcode}
 
-是否立即打印？`)) {
-            // 这里可以集成实际的打印功能
-            window.print();
+          存货: ${record.cItemName}
+          数量: ${record.remainingQuantity} ${record.unitName}
+
+          是否立即打印？`)) {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+              <html>
+                <head>
+                  <title>条码打印</title>
+                  <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    .barcode-label { 
+                      border: 1px solid #000; 
+                      padding: 10px; 
+                      margin: 10px 0; 
+                      text-align: center;
+                    }
+                    .barcode-value { font-size: 16px; font-weight: bold; }
+                    .item-info { margin: 5px 0; font-size: 12px; }
+                  </style>
+                </head>
+                <body>
+                  <div class="barcode-label">
+                    <div class="barcode-value">${barcode}</div>
+                    <div class="item-info">存货: ${record.cItemName}</div>
+                    <div class="item-info">数量: ${record.remainingQuantity} ${record.unitName}</div>
+                    <div class="item-info">订单: ${record.cPOID}</div>
+                  </div>
+                </body>
+              </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
           }
         }, 500);
       }
@@ -386,7 +537,7 @@ const SupplierPurchaseOrders = () => {
                   expandedRowKeys: expandedRowKeys
                 }}
                 rowClassName={(record, index) => index % 2 === 0 ? 'even-row' : 'odd-row'}
-                onRow={(record) => ({
+                onRow={() => ({
                   onMouseEnter: () => {},
                   onMouseLeave: () => {},
                 })}

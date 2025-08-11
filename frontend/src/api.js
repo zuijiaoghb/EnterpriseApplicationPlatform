@@ -153,7 +153,7 @@ function checkTokenExpiration() {
               if (response.data.refresh_token) {
                 localStorage.setItem('refreshToken', response.data.refresh_token);
               }
-              message.success('登录已自动续期');
+              //message.success('登录已自动续期');
             }
           }).catch((error) => {
             console.error('自动刷新令牌失败:', error);
@@ -169,7 +169,7 @@ function checkTokenExpiration() {
         }
       } else if (timeLeft > 0 && timeLeft < 5 * 60 * 1000) {
         // 当令牌将在5分钟内过期时，提示用户
-        message.warning('登录即将过期，将自动续期或请刷新页面');
+        //message.warning('登录即将过期，将自动续期或请刷新页面');
       } else if (timeLeft <= 0) {
         // 令牌已过期
         localStorage.removeItem('token');

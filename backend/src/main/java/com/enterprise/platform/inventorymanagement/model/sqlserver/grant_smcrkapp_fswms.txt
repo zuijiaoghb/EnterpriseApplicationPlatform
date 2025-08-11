@@ -1,0 +1,5 @@
+--授予smcrkapp用户访问fswms数据库的权限
+USE fswms;
+EXEC sp_addrolemember 'db_datareader', 'smcrkapp';
+-- 授予插入权限
+GRANT INSERT ON fswms.dbo.mom_NotClosedOrdersBarcode TO smcrkapp;  
