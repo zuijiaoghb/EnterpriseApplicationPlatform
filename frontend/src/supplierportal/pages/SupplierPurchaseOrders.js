@@ -92,11 +92,14 @@ const SupplierPurchaseOrders = () => {
       
       // 生成唯一条码值
       const timestamp = Date.now();
-      const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
-      const barcode = `${record.cVenCode}_${record.cPOID}_${record.irowno}_${record.cInvCode}_${timestamp}-${randomStr}`;          
+      console.log('timestamp:', timestamp);
+      const randomStr = Math.random().toString(36).substring(2, 5).toUpperCase();
+      console.log('randomStr:', randomStr);
+      const barcode = `${record.cVenCode}_${record.cPOID}_${record.irowno}_${record.cInvCode}_${timestamp}_${randomStr}`;          
       
       // 获取当前日期（yyyy-MM-dd格式）
       const currentDate = new Date().toISOString().split('T')[0];
+      console.log('currentDate:', currentDate);
       
       // 构建条码数据 - 严格按照后端HYBarCodeMain实体字段匹配
       const barcodeData = {
@@ -176,14 +179,14 @@ const SupplierPurchaseOrders = () => {
         cBarcodeDefine8: '',
         cBarcodeDefine9: '',
         cBarcodeDefine10: '',
-        cComUnitCode: record.cComUnitCode,
+        cComUnitCode: record.cUnitID,
         cComAddUnitCode:'',        
         cSrcCode: record.cPOID,        
         cSrcVouchType: '采购订单',
         cSrcSubID: record.cSrcSubID,
         cBarMainID: '',
         cBarMainAutoID: '',        
-        cMaker: record.cVenName,        
+        cMaker: record.supplierName,        
         cGuid: '',
         cLabelCode: '5000',
         supBarCode:'',

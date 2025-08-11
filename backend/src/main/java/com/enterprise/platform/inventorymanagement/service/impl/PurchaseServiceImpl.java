@@ -262,8 +262,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         dto.setcInvCode(podetails.getcInvCode());
         dto.setiQuantity(podetails.getiQuantity());
         dto.setIrowno(podetails.getIvouchrowno());
-        dto.setBoxQuantity(podetails.getiNum());
-        dto.setcUnitID(podetails.getcUnitID());
+        dto.setBoxQuantity(podetails.getiNum());        
+        dto.setcSrcSubID(podetails.getId());
 
         // 设置存货名称
         Inventory inventory = inventoryMap.get(podetails.getcInvCode());
@@ -272,6 +272,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             // 设置单位名称
             ComputationUnit unit = unitMap.get(inventory.getCComUnitCode());
             if (unit != null) {
+                dto.setcUnitID(unit.getCComunitCode());
                 dto.setUnitName(unit.getCComUnitName());
             } else {
                 log.warn("单位不存在: {}", inventory.getCComUnitCode());

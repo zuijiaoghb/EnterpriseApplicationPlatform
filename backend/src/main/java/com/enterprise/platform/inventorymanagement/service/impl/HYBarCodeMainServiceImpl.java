@@ -18,6 +18,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,6 +90,37 @@ public class HYBarCodeMainServiceImpl implements HYBarCodeMainService {
 
     @Override
     public HYBarCodeMain saveBarCodeMain(HYBarCodeMain barCodeMain) {
+        // 确保日期字段的时间部分为00:00:00
+        if (barCodeMain.getCreateDate() != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(barCodeMain.getCreateDate());
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            barCodeMain.setCreateDate(cal.getTime());
+        }
+        
+        if (barCodeMain.getDBusDate() != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(barCodeMain.getDBusDate());
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            barCodeMain.setDBusDate(cal.getTime());
+        }
+        
+        if (barCodeMain.getDMdate() != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(barCodeMain.getDMdate());
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            barCodeMain.setDMdate(cal.getTime());
+        }
+        
         return repository.save(barCodeMain);
     }
 

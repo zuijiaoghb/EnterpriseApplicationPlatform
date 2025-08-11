@@ -47,10 +47,13 @@ const PurchaseIn = () => {
       // if (warehouses.length > 1) {
       //   setSelectedWarehouse(warehouses[1].code);
       // }
-      // 获取产品名称
-      const parts = (scannedData.value ?? '').split('_');
-      const invCode = parts.length > 1 ? parts[1] : scannedData.value;
-      const inventoryResponse = await api.get(`/api/inventory/inventories/${invCode}`);
+      
+      // 获取产品名称 - 通过条码查询HYBarCodeMain获取cInvCode
+      const barCodeValue = scannedData.value;
+      const barcodeResponse = await api.get(`/api/inventory/hy-barcode-main/${barCodeValue}`);
+      const cInvCode = barcodeResponse.data.cInvCode;
+      
+      const inventoryResponse = await api.get(`/api/inventory/inventories/${cInvCode}`);
       setProductName(inventoryResponse.data.cinvName);
     } catch (error) {
       console.error('获取采购订单信息失败:', error);

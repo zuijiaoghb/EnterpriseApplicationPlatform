@@ -39,10 +39,13 @@ const ProductIn = () => {
       setOrderQuantity(response.data.iquantity);
       setQualifiedInQty(response.data.qualifiedInQty);
       setRemainingQuantity(response.data.iquantity - response.data.qualifiedInQty);
+      
+      // 获取产品名称 - 通过条码查询HYBarCodeMain获取cInvCode
+      const barCodeValue = code.value;
+      const barcodeResponse = await api.get(`/api/inventory/hy-barcode-main/${barCodeValue}`);
+      const cInvCode = barcodeResponse.data.cInvCode;
 
-      const parts = (code.value ?? '').split('_');
-      const invCode = parts.length > 1 ? parts[1] : code.value;
-      const inventoryResponse = await api.get(`/api/inventory/inventories/${invCode}`);
+      const inventoryResponse = await api.get(`/api/inventory/inventories/${cInvCode}`);      
       setProductName(inventoryResponse.data.cinvName);
     } catch (error) {
       console.error('获取订单明细失败:', error);
