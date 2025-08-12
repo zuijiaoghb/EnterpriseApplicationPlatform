@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Table, Card, Typography, Spin, message, Form, Input, DatePicker, Button, Divider, Empty, Space, Tooltip } from 'antd';
+import { Table, Card, Typography, Spin, message, Form, Input, DatePicker, Button, Divider, Empty, Space, Tooltip, Modal } from 'antd';
 import locale from 'antd/lib/date-picker/locale/zh_CN';
 import api from '../../api';
 import { SearchOutlined, ExportOutlined, FilterOutlined, CalendarOutlined } from '@ant-design/icons';
@@ -247,45 +247,8 @@ const SupplierPurchaseOrders = () => {
           )
         );
         
-        // 模拟打印操作
-        setTimeout(() => {
-          if (window.confirm(`条码已生成，条码号: ${barcode}
-
-          存货: ${record.cItemName}
-          数量: ${record.remainingQuantity} ${record.unitName}
-
-          是否立即打印？`)) {
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-              <html>
-                <head>
-                  <title>条码打印</title>
-                  <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    .barcode-label { 
-                      border: 1px solid #000; 
-                      padding: 10px; 
-                      margin: 10px 0; 
-                      text-align: center;
-                    }
-                    .barcode-value { font-size: 16px; font-weight: bold; }
-                    .item-info { margin: 5px 0; font-size: 12px; }
-                  </style>
-                </head>
-                <body>
-                  <div class="barcode-label">
-                    <div class="barcode-value">${barcode}</div>
-                    <div class="item-info">存货: ${record.cItemName}</div>
-                    <div class="item-info">数量: ${record.remainingQuantity} ${record.unitName}</div>
-                    <div class="item-info">订单: ${record.cPOID}</div>
-                  </div>
-                </body>
-              </html>
-            `);
-            printWindow.document.close();
-            printWindow.print();
-          }
-        }, 500);
+        // 使用改进的打印方案
+        await performPrint(record, barcode);
       }
       
     } catch (error) {
@@ -294,6 +257,258 @@ const SupplierPurchaseOrders = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // 改进的打印功能
+  const performPrint = async (record, barcode) => {
+    try {
+      // 1. 检查浏览器环境
+      if (typeof window === 'undefined') {
+        throw new Error('浏览器环境不可用');
+      }
+
+      // 2. 检查弹窗权限
+      const popupTest = window.open('', '_blank', 'width=1,height=1,left=-1000,top=-1000');
+      if (!popupTest || popupTest.closed) {
+        console.log('弹窗被阻止，使用备用方案');
+        await iframePrint(record, barcode);
+        return;
+      }
+      popupTest.close();
+
+      // 3. 创建打印窗口
+      const printWindow = window.open('', '_blank', 'width=900,height=700,scrollbars=yes,resizable=yes');
+      if (!printWindow) {
+        throw new Error('无法创建打印窗口');
+      }
+
+      // 4. 准备打印内容
+      const printContent = generatePrintHTML(record, barcode);
+      
+      // 5. 写入内容并打印
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      printWindow.focus();
+
+      // 6. 延迟触发打印
+      setTimeout(() => {
+        if (printWindow && !printWindow.closed) {
+          printWindow.print();
+          // 打印完成后询问是否关闭
+          setTimeout(() => {
+            if (printWindow && !printWindow.closed && window.confirm('打印完成，是否关闭窗口？')) {
+              printWindow.close();
+            }
+          }, 1000);
+        }
+      }, 500);
+
+    } catch (error) {
+      console.error('打印窗口错误:', error);
+      message.warning('检测到浏览器限制，使用备用打印方案...');
+      await iframePrint(record, barcode);
+    }
+  };
+
+  // 使用iframe的备用打印方案
+  const iframePrint = async (record, barcode) => {
+    try {
+      const printContent = generatePrintHTML(record, barcode);
+      
+      // 创建隐藏iframe
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.top = '-10000px';
+      iframe.style.left = '-10000px';
+      iframe.style.width = '1px';
+      iframe.style.height = '1px';
+      
+      document.body.appendChild(iframe);
+      
+      // 写入打印内容
+      iframe.contentDocument.write(printContent);
+      iframe.contentDocument.close();
+      
+      // 触发打印
+      setTimeout(() => {
+        if (iframe.contentWindow) {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+          
+          // 清理iframe
+          setTimeout(() => {
+            if (iframe.parentNode) {
+              document.body.removeChild(iframe);
+            }
+          }, 2000);
+        }
+      }, 100);
+
+    } catch (error) {
+      console.error('iframe打印失败:', error);
+      message.error('打印失败，请检查浏览器设置或手动记录条码信息');
+      
+      // 最后的备用方案：显示条码信息供用户手动记录
+      Modal.info({
+        title: '条码信息',
+        width: 500,
+        content: (
+          <div style={{ marginTop: 16 }}>
+            <p><strong>条码号:</strong> {barcode}</p>
+            <p><strong>存货名称:</strong> {record.cItemName}</p>
+            <p><strong>数量:</strong> {record.remainingQuantity} {record.unitName}</p>
+            <p><strong>订单号:</strong> {record.cPOID}</p>
+            <p><strong>供应商:</strong> {record.supplierName}</p>
+          </div>
+        ),
+        okText: '已记录'
+      });
+    }
+  };
+
+  // 生成打印HTML
+  const generatePrintHTML = (record, barcode) => {
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>条码打印 - ${barcode}</title>
+          <style>
+            @media print {
+              body { margin: 0; padding: 10px; font-size: 12px; }
+              .no-print { display: none !important; }
+              .print-container { 
+                page-break-inside: avoid;
+                margin: 0 auto;
+                max-width: 100%;
+              }
+            }
+            
+            body { 
+              font-family: 'Microsoft YaHei', Arial, sans-serif; 
+              margin: 10px;
+              background: #fff;
+              line-height: 1.4;
+            }
+            
+            .print-container {
+              background: white;
+              border: 2px solid #333;
+              border-radius: 8px;
+              padding: 15px;
+              margin: 0 auto;
+              max-width: 400px;
+              text-align: center;
+            }
+            
+            .barcode-value { 
+              font-size: 16px; 
+              font-weight: bold; 
+              color: #000;
+              letter-spacing: 2px;
+              margin: 10px 0;
+              padding: 8px;
+              border: 1px solid #666;
+              border-radius: 4px;
+              background: #f9f9f9;
+            }
+            
+            .item-info { 
+              margin: 8px 0; 
+              font-size: 13px;
+              text-align: left;
+            }
+            
+            .item-info strong {
+              color: #333;
+              display: inline-block;
+              width: 85px;
+              font-weight: bold;
+            }
+            
+            .print-header {
+              text-align: center;
+              margin-bottom: 15px;
+              padding-bottom: 8px;
+              border-bottom: 2px solid #333;
+            }
+            
+            .print-header h2 {
+              margin: 0;
+              font-size: 16px;
+              color: #333;
+            }
+            
+            .print-footer {
+              text-align: center;
+              margin-top: 15px;
+              padding-top: 8px;
+              border-top: 1px solid #ccc;
+              font-size: 11px;
+              color: #666;
+            }
+            
+            .no-print {
+              margin: 20px 0;
+              text-align: center;
+            }
+            
+            .print-button {
+              background: #1890ff;
+              color: white;
+              border: none;
+              padding: 8px 16px;
+              border-radius: 4px;
+              cursor: pointer;
+              margin: 0 5px;
+              font-size: 14px;
+            }
+            
+            .print-button:hover {
+              background: #40a9ff;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="print-container">
+            <div class="print-header">
+              <h2>物料条码标签</h2>
+            </div>
+            
+            <div class="barcode-value">${barcode}</div>
+            
+            <div class="item-info">
+              <strong>存货名称:</strong> ${record.cItemName}
+            </div>
+            <div class="item-info">
+              <strong>存货编码:</strong> ${record.cInvCode}
+            </div>
+            <div class="item-info">
+              <strong>数量:</strong> ${record.remainingQuantity} ${record.unitName}
+            </div>
+            <div class="item-info">
+              <strong>订单号:</strong> ${record.cPOID}
+            </div>
+            <div class="item-info">
+              <strong>供应商:</strong> ${record.supplierName}
+            </div>
+            <div class="item-info">
+              <strong>打印时间:</strong> ${new Date().toLocaleString('zh-CN')}
+            </div>
+            
+            <div class="print-footer">
+              <p>江西江特电机有限公司 - 物料管理系统</p>
+            </div>
+            
+            <div class="no-print">
+              <button class="print-button" onclick="window.print()">立即打印</button>
+              <button class="print-button" onclick="window.close()">关闭窗口</button>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
   };
 
   // 表格列定义
