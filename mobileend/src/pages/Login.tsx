@@ -37,6 +37,15 @@ const Login = () => {
   const handleLogin = async () => {
     setLoading(true);
     setLoginError('');
+    
+    // 清除之前残留的token和refreshToken
+    await AsyncStorage.removeItem('token');
+    await AsyncStorage.removeItem('refreshToken');
+    await AsyncStorage.removeItem('user');
+    
+    // 清除API默认请求头中的Authorization
+    delete api.defaults.headers.common['Authorization'];
+    
     try {
       const response = await api.post<LoginResponse>('/auth/login', {
         username,

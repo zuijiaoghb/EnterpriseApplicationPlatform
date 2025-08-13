@@ -11,6 +11,7 @@ const ProductIn = () => {
   const [orderQuantity, setOrderQuantity] = useState<number | null>(null);
   const [qualifiedInQty, setQualifiedInQty] = useState<number | null>(null);
   const [remainingQuantity, setRemainingQuantity] = useState<number | null>(null);
+  const [barcodeQty, setBarcodeQty] = useState<number | null>(null);
   const [cwhcode, setCwhcode] = useState('');
   const [productName, setProductName] = useState('');
   const [iQuantity, setIQuantity] = useState('');
@@ -40,10 +41,14 @@ const ProductIn = () => {
       setQualifiedInQty(response.data.qualifiedInQty);
       setRemainingQuantity(response.data.iquantity - response.data.qualifiedInQty);
       
-      // 获取产品名称 - 通过条码查询HYBarCodeMain获取cInvCode
+      // 获取产品名称和条码数量 - 通过条码查询HYBarCodeMain获取cInvCode和qty
       const barCodeValue = code.value;
       const barcodeResponse = await api.get(`/api/inventory/hy-barcode-main/${barCodeValue}`);
       const cInvCode = barcodeResponse.data.cInvCode;
+      const qty = barcodeResponse.data.qty;
+      
+      setBarcodeQty(qty);
+      setIQuantity(qty.toString()); // 设置默认入库数量为条码数量
 
       const inventoryResponse = await api.get(`/api/inventory/inventories/${cInvCode}`);      
       setProductName(inventoryResponse.data.cinvName);
@@ -58,6 +63,7 @@ const ProductIn = () => {
     setScannedData(null);
     setCwhcode('');
     setIQuantity('');
+    setBarcodeQty(null);
   };
 
   const handleConfirm = async () => {
@@ -72,8 +78,13 @@ const ProductIn = () => {
       return;
     }
 
-    if (orderQuantity === null || qualifiedInQty === null || remainingQuantity === null) {
+    if (orderQuantity === null || qualifiedInQty === null || remainingQuantity === null || barcodeQty === null) {
       Alert.alert('错误', '订单信息不完整，请重新扫描');
+      return;
+    }
+
+    if (quantity > barcodeQty) {
+      Alert.alert('错误', `入库数量不能超过条码数量: ${barcodeQty}`);
       return;
     }
 
@@ -138,6 +149,12 @@ const ProductIn = () => {
                   <Text style={styles.resultValue}>{orderQuantity}</Text>
                 </View>
               )}
+              {barcodeQty !== null && (
+                <View style={styles.resultItem}>
+                  <Text style={styles.resultLabel}>条码数量:</Text>
+                  <Text style={styles.resultValue}>{barcodeQty}</Text>
+                </View>
+              )}
               <View style={styles.resultItem}>
                 <Text style={styles.resultLabel}>扫描时间:</Text>
                 <Text style={styles.resultValue}>{new Date().toLocaleString()}</Text>
@@ -164,7 +181,7 @@ const ProductIn = () => {
                   style={styles.formInput}
                   value={iQuantity}
                   onChangeText={setIQuantity}
-                  placeholder={`请输入入库数量 (最大可入库: ${remainingQuantity || 0})`}
+                  placeholder={`请输入入库数量 (最大可入库: ${Math.min(barcodeQty || 0, remainingQuantity || 0)})`}
                   keyboardType="numeric"
                 />
                 {remainingQuantity !== null && (

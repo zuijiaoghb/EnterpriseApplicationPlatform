@@ -256,7 +256,7 @@ const SupplierPurchaseOrders = () => {
       const response = await api.post('/api/inventory/hy-barcode-main', barcodeData);
       
       if (response.status === 201 || response.status === 200) {
-        message.success(`条码生成成功，数量：${qty} ${record.unitName}，准备打印...`);
+        message.success(`条码生成成功，条码数量：${qty} ${record.unitName}，准备打印...`);
         
         // 更新本地数据
         setOrders(prevOrders => 
@@ -268,7 +268,7 @@ const SupplierPurchaseOrders = () => {
         );
         
         // 使用Ant Design QRCode组件的打印方案
-        await performPrint(record, barcode);
+        await performPrint(record, barcode, qty);
       }
       
     } catch (error) {
@@ -280,7 +280,7 @@ const SupplierPurchaseOrders = () => {
   };
 
   // 改进的打印功能 - 使用Ant Design QRCode
-  const performPrint = async (record, barcode) => {
+  const performPrint = async (record, barcode, qty) => {
     try {
       // 1. 检查浏览器环境
       if (typeof window === 'undefined') {
@@ -322,13 +322,13 @@ const SupplierPurchaseOrders = () => {
                 document.body.removeChild(tempDiv);
                 
                 // 使用生成的二维码图像创建打印内容
-                const printContent = generatePrintHTMLWithQR(record, barcode, qrCodeDataUrl);
+                const printContent = generatePrintHTMLWithQR(record, barcode, qty, qrCodeDataUrl);
                 
                 // 检查弹窗权限
                 const popupTest = window.open('', '_blank', 'width=1,height=1,left=-1000,top=-1000');
                 if (!popupTest || popupTest.closed) {
                   console.log('弹窗被阻止，使用备用方案');
-                  iframePrintWithQR(record, barcode, qrCodeDataUrl);
+                  iframePrintWithQR(record, barcode, qty, qrCodeDataUrl);
                   resolve();
                   return;
                 }
@@ -376,7 +376,7 @@ const SupplierPurchaseOrders = () => {
       message.warning('检测到浏览器限制，使用备用打印方案...');
       
       // 备用方案：使用简化二维码
-      const printContent = generatePrintHTML(record, barcode);
+      const printContent = generatePrintHTML(record, barcode, qty);
       const printWindow = window.open('', '_blank', 'width=900,height=700');
       printWindow.document.open();
       printWindow.document.write(printContent);
@@ -386,9 +386,9 @@ const SupplierPurchaseOrders = () => {
   };
 
   // 使用iframe的备用打印方案 - 带二维码
-  const iframePrintWithQR = async (record, barcode, qrCodeDataUrl) => {
+  const iframePrintWithQR = async (record, barcode, qty, qrCodeDataUrl) => {
     try {
-      const printContent = generatePrintHTMLWithQR(record, barcode, qrCodeDataUrl);
+      const printContent = generatePrintHTMLWithQR(record, barcode, qty, qrCodeDataUrl);
       
       const iframe = document.createElement('iframe');
       iframe.style.position = 'fixed';
@@ -426,7 +426,7 @@ const SupplierPurchaseOrders = () => {
   };
 
   // 生成带二维码的打印HTML
-  const generatePrintHTMLWithQR = (record, barcode, qrCodeDataUrl) => {
+  const generatePrintHTMLWithQR = (record, barcode, qty, qrCodeDataUrl) => {
     return `
       <!DOCTYPE html>
       <html>
@@ -569,7 +569,7 @@ const SupplierPurchaseOrders = () => {
               <strong>存货编码:</strong> ${record.cInvCode}
             </div>
             <div class="item-info">
-              <strong>数量:</strong> ${record.remainingQuantity} ${record.unitName}
+              <strong>条码数量:</strong> ${qty} ${record.unitName}
             </div>
             <div class="item-info">
               <strong>订单号:</strong> ${record.cPOID}
@@ -599,7 +599,7 @@ const SupplierPurchaseOrders = () => {
   };
 
   // 生成简化的打印HTML（备用方案）
-  const generatePrintHTML = (record, barcode) => {
+  const generatePrintHTML = (record, barcode, qty) => {
     return `
       <!DOCTYPE html>
       <html>
@@ -718,7 +718,7 @@ const SupplierPurchaseOrders = () => {
               <strong>存货编码:</strong> ${record.cInvCode}
             </div>
             <div class="item-info">
-              <strong>数量:</strong> ${record.remainingQuantity} ${record.unitName}
+              <strong>条码数量:</strong> ${qty} ${record.unitName}
             </div>
             <div class="item-info">
               <strong>订单号:</strong> ${record.cPOID}

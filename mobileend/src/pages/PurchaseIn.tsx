@@ -15,6 +15,7 @@ const PurchaseIn = () => {
   const [productName, setProductName] = useState('');
   const [inboundQuantity, setInboundQuantity] = useState('');
   const [loading, setLoading] = useState(false);
+  const [barcodeQty, setBarcodeQty] = useState(0);
 
   // 获取仓库列表（前端硬编码）
   useEffect(() => {
@@ -43,15 +44,16 @@ const PurchaseIn = () => {
       const response = await api.get(`/api/inventory/purchase/scan-in?barcode=${scannedData.value}`);
       setPoQuantity(response.data.iQuantity);
       setRemainingQuantity(response.data.remainingQuantity || 0);
-      // 默认选中第一个仓库
-      // if (warehouses.length > 1) {
-      //   setSelectedWarehouse(warehouses[1].code);
-      // }
       
-      // 获取产品名称 - 通过条码查询HYBarCodeMain获取cInvCode
+      // 获取产品名称 - 通过条码查询HYBarCodeMain获取cInvCode和条码数量
       const barCodeValue = scannedData.value;
       const barcodeResponse = await api.get(`/api/inventory/hy-barcode-main/${barCodeValue}`);
       const cInvCode = barcodeResponse.data.cInvCode;
+      const qty = barcodeResponse.data.qty || 0;
+      setBarcodeQty(qty);
+      
+      // 设置默认入库数量为条码数量
+      setInboundQuantity(qty.toString());
       
       const inventoryResponse = await api.get(`/api/inventory/inventories/${cInvCode}`);
       setProductName(inventoryResponse.data.cinvName);
@@ -93,15 +95,15 @@ const PurchaseIn = () => {
       return false;
     }
 
+    if (quantity > barcodeQty) {
+      Alert.alert('错误', `入库数量不能大于条码数量(${barcodeQty})`);
+      return false;
+    }
+
     if (quantity > remainingQuantity) {
       Alert.alert('错误', `入库数量不能大于未入库量(${remainingQuantity})`);
       return false;
     }
-
-    // if (quantity > poQuantity) {
-    //   Alert.alert('错误', `入库数量不能大于采购订单数量(${poQuantity})`);
-    //   return false;
-    // }
 
     return true;
   };
@@ -187,13 +189,17 @@ const PurchaseIn = () => {
                 </Picker>
               </View>
               <View style={styles.resultItem}>
+                <Text style={styles.resultLabel}>条码数量:</Text>
+                <Text style={styles.resultValue}>{barcodeQty} 件</Text>
+              </View>
+              <View style={styles.resultItem}>
                 <Text style={styles.resultLabel}>入库数量:</Text>
                 <TextInput
                   style={styles.input}
                   keyboardType="numeric"
                   value={inboundQuantity}
                   onChangeText={setInboundQuantity}
-                  placeholder={`请输入(1-${remainingQuantity})`}
+                  placeholder={`请输入(1-${Math.min(barcodeQty, remainingQuantity)})`}
                 />
               </View>
               <View style={styles.resultItem}>

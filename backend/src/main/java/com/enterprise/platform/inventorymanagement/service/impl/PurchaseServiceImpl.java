@@ -41,6 +41,7 @@ import com.enterprise.platform.inventorymanagement.repository.sqlserver.Computat
 public class PurchaseServiceImpl implements PurchaseService {
     private static final Logger log = LoggerFactory.getLogger(PurchaseServiceImpl.class);
 
+    // 在类中添加HYBarCodeMainRepository的注入
     @Autowired
     private HYBarCodeMainRepository hyBarCodeMainRepository;
 
@@ -284,12 +285,24 @@ public class PurchaseServiceImpl implements PurchaseService {
             dto.setUnitName("未知单位");
         }
 
-        // 生成批号和条码
+        // 生成批号
         String batchNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         dto.setBatchNumber(batchNumber);
-        dto.setBarcode(String.format("%s_%s_%s_%s_%d_%s",
-                pomain.getcVenCode(), podetails.getcInvCode(), dto.getBoxQuantity(),
-                pomain.getcPOID(), podetails.getIvouchrowno(), batchNumber));
+        
+        // 根据采购订单号和订单子表ID获取最新的条码
+        List<HYBarCodeMain> existingBarcodes = hyBarCodeMainRepository.findByCsrccodeAndCsrcsubidOrderByCreateTimeDesc(pomain.getcPOID(), podetails.getId());
+        String latestBarcode = null;
+        if (!existingBarcodes.isEmpty()) {
+            // 获取最新的条码（按创建时间降序排序的第一个）
+            latestBarcode = existingBarcodes.get(0).getBarcode();
+        } else {
+            // 如果没有现有条码，使用默认格式生成
+            latestBarcode = String.format("%s_%s_%s_%s_%d_%s",
+                    pomain.getcVenCode(), podetails.getcInvCode(), dto.getBoxQuantity(),
+                    pomain.getcPOID(), podetails.getIvouchrowno(), batchNumber);
+        }
+        
+        dto.setBarcode(latestBarcode);
         dto.setSupplierName(supplierName);
 
         // 计算已入库数量和剩余未入库数量

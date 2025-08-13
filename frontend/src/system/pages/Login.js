@@ -18,6 +18,15 @@ const Login = () => {
   const onFinish = async (values) => {
     setLoading(true);
     setLoginError(false);
+    
+    // 清除之前残留的token和refreshToken
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    
+    // 清除axios默认请求头中的Authorization
+    delete api.defaults.headers.common['Authorization'];
+    
     try {
       const response = await api.post('/auth/login', values, {
         withCredentials: true

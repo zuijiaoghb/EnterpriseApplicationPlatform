@@ -206,7 +206,9 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
         // 7. 创建并保存主表扩展记录
         Rdrecord10Extradefine recordExtradefine = new Rdrecord10Extradefine();
         recordExtradefine.setID(savedInbound.getId());
-        recordExtradefine.setChdefine2("单据数据发送成功");
+        if ("046".equals(cwhcode)) {
+            recordExtradefine.setChdefine2("单据数据发送成功");
+        }
         rdrecord10ExtradefineRepository.save(recordExtradefine);
 
         // 8. 创建并保存明细表扩展记录
@@ -266,48 +268,50 @@ public class Rdrecord10ServiceImpl implements Rdrecord10Service {
         }
     
 
-        // 同步创建U8ToWms记录
-        U8ToWmsDTO u8ToWmsDTO = new U8ToWmsDTO();
-        u8ToWmsDTO.setID(savedInbound.getId());
-        u8ToWmsDTO.setVoucherType("产成品入库"); 
-        u8ToWmsDTO.setCCode(savedInbound.getCCode());
-        u8ToWmsDTO.setDDate(savedInbound.getDDate().toLocalDate());
-        u8ToWmsDTO.setCDepCode(orderDetail.getMDeptCode());
-        u8ToWmsDTO.setCDepName("");
-        u8ToWmsDTO.setCVenCode(null);
-        u8ToWmsDTO.setCVenName(null);
-        u8ToWmsDTO.setCWhCode(savedInbound.getCWhCode());  
-        u8ToWmsDTO.setCWhName("");   
-        u8ToWmsDTO.setCPersonCode(null);
-        u8ToWmsDTO.setCPersonName(null);  
-        u8ToWmsDTO.setCDeliverCode("");
-        u8ToWmsDTO.setCMemo(savedInbound.getCMemo());
-        u8ToWmsDTO.setCMaker(savedInbound.getCMaker());
-        u8ToWmsDTO.setAutoID(savedDetail.getAutoId());
-        u8ToWmsDTO.setIRowNo(savedDetail.getIrowno());        
-        u8ToWmsDTO.setCInvCode(savedDetail.getCInvCode());
-        // 查询并设置cInvName
-        Optional<Inventory> inventoryOpt = inventoryRepository.findById(u8ToWmsDTO.getCInvCode());
-        if (inventoryOpt.isPresent()) {
-            u8ToWmsDTO.setCInvName(inventoryOpt.get().getCInvName());
-        } else {
-            u8ToWmsDTO.setCInvName("");
+        // 同步创建U8ToWms记录 - 仅当仓库代码为046时执行
+        if ("046".equals(cwhcode)) {
+            U8ToWmsDTO u8ToWmsDTO = new U8ToWmsDTO();
+            u8ToWmsDTO.setID(savedInbound.getId());
+            u8ToWmsDTO.setVoucherType("产成品入库"); 
+            u8ToWmsDTO.setCCode(savedInbound.getCCode());
+            u8ToWmsDTO.setDDate(savedInbound.getDDate().toLocalDate());
+            u8ToWmsDTO.setCDepCode(orderDetail.getMDeptCode());
+            u8ToWmsDTO.setCDepName("");
+            u8ToWmsDTO.setCVenCode(null);
+            u8ToWmsDTO.setCVenName(null);
+            u8ToWmsDTO.setCWhCode(savedInbound.getCWhCode());  
+            u8ToWmsDTO.setCWhName("");   
+            u8ToWmsDTO.setCPersonCode(null);
+            u8ToWmsDTO.setCPersonName(null);  
+            u8ToWmsDTO.setCDeliverCode("");
+            u8ToWmsDTO.setCMemo(savedInbound.getCMemo());
+            u8ToWmsDTO.setCMaker(savedInbound.getCMaker());
+            u8ToWmsDTO.setAutoID(savedDetail.getAutoId());
+            u8ToWmsDTO.setIRowNo(savedDetail.getIrowno());        
+            u8ToWmsDTO.setCInvCode(savedDetail.getCInvCode());
+            // 查询并设置cInvName
+            Optional<Inventory> inventoryOpt = inventoryRepository.findById(u8ToWmsDTO.getCInvCode());
+            if (inventoryOpt.isPresent()) {
+                u8ToWmsDTO.setCInvName(inventoryOpt.get().getCInvName());
+            } else {
+                u8ToWmsDTO.setCInvName("");
+            }
+            u8ToWmsDTO.setCInvStd(inventoryOpt.get().getCInvStd());
+            u8ToWmsDTO.setWb("");
+            u8ToWmsDTO.setCBatch(savedDetail.getCBatch());
+            u8ToWmsDTO.setCSnCode(null);
+            u8ToWmsDTO.setCUnitCode(inventoryOpt.get().getCComUnitCode());
+            u8ToWmsDTO.setCUnitName("");        
+            u8ToWmsDTO.setIQuantity(savedDetail.getIQuantity());
+            u8ToWmsDTO.setIOriTaxCost(null);
+            u8ToWmsDTO.setIOriTaxMoney(null);
+            u8ToWmsDTO.setCbMemo(savedDetail.getCbMemo());
+            u8ToWmsDTO.setU8CreateDatetime(now);
+            u8ToWmsDTO.setU8Status("新增");
+            u8ToWmsDTO.setWmsReadError(null);
+            u8ToWmsDTO.setCInvCCode(inventoryOpt.get().getCInvCCode());
+            u8ToWmsService.save(u8ToWmsDTO);
         }
-        u8ToWmsDTO.setCInvStd(inventoryOpt.get().getCInvStd());
-        u8ToWmsDTO.setWb("");
-        u8ToWmsDTO.setCBatch(savedDetail.getCBatch());
-        u8ToWmsDTO.setCSnCode(null);
-        u8ToWmsDTO.setCUnitCode(inventoryOpt.get().getCComUnitCode());
-        u8ToWmsDTO.setCUnitName("");        
-        u8ToWmsDTO.setIQuantity(savedDetail.getIQuantity());
-        u8ToWmsDTO.setIOriTaxCost(null);
-        u8ToWmsDTO.setIOriTaxMoney(null);
-        u8ToWmsDTO.setCbMemo(savedDetail.getCbMemo());
-        u8ToWmsDTO.setU8CreateDatetime(now);
-        u8ToWmsDTO.setU8Status("新增");
-        u8ToWmsDTO.setWmsReadError(null);
-        u8ToWmsDTO.setCInvCCode(inventoryOpt.get().getCInvCCode());
-        u8ToWmsService.save(u8ToWmsDTO);
 
         // 执行存储过程IA_SP_WriteUnAccountVouchForST
         try {
