@@ -285,7 +285,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
 
         // 生成批号和条码
-        String batchNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        String batchNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         dto.setBatchNumber(batchNumber);
         dto.setBarcode(String.format("%s_%s_%s_%s_%d_%s",
                 pomain.getcVenCode(), podetails.getcInvCode(), dto.getBoxQuantity(),
