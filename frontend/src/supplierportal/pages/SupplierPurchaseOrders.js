@@ -35,6 +35,7 @@ const SupplierPurchaseOrders = () => {
 
         // 调用后端API获取供应商已审核的采购订单
         const response = await api.get('/api/inventory/purchase/vendor/audited-orders', {
+          timeout: 30000,
           params: {
             vendorCode,
             pageNum: currentPage,
@@ -425,7 +426,7 @@ const SupplierPurchaseOrders = () => {
     }
   };
 
-  // 生成带二维码的打印HTML
+  // 生成带二维码的打印HTML - 调整为10cm x 7cm规格
   const generatePrintHTMLWithQR = (record, barcode, qty, qrCodeDataUrl) => {
     return `
       <!DOCTYPE html>
@@ -435,101 +436,110 @@ const SupplierPurchaseOrders = () => {
           <title>条码打印 - ${barcode}</title>
           <style>
             @media print {
-              body { margin: 0; padding: 10px; font-size: 12px; }
+              body { margin: 0; padding: 0; font-size: 10px; }
               .no-print { display: none !important; }
               .print-container { 
                 page-break-inside: avoid;
-                margin: 0 auto;
-                max-width: 100%;
+                margin: 0;
+                width: 70mm;
+                height: 100mm;
+                box-sizing: border-box;
               }
             }
             
             body { 
               font-family: 'Microsoft YaHei', Arial, sans-serif; 
-              margin: 10px;
+              margin: 0;
+              padding: 0;
               background: #fff;
-              line-height: 1.4;
+              line-height: 1.2;
             }
             
             .print-container {
               background: white;
-              border: 2px solid #333;
-              border-radius: 8px;
-              padding: 15px;
-              margin: 0 auto;
-              max-width: 400px;
-              text-align: center;
+              border: 1px solid #333;
+              border-radius: 4px;
+              padding: 8px;
+              margin: 0;
+              width: 70mm;
+              height: 100mm;
+              box-sizing: border-box;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
             }
             
             .qr-code-container {
-              margin: 15px 0;
               text-align: center;
+              margin: 4px 0;
             }
             
             .qr-code {
               display: inline-block;
-              padding: 10px;
+              padding: 4px;
               background: #fff;
               border: 1px solid #333;
-              border-radius: 4px;
+              border-radius: 2px;
             }
             
             .qr-code img {
               display: block;
-              width: 160px;
-              height: 160px;
+              width: 45mm;
+              height: 45mm;
             }
             
             .barcode-text {
-              font-size: 14px;
+              font-size: 11px;
               font-weight: bold;
               color: #000;
-              letter-spacing: 1px;
-              margin-top: 8px;
-              padding: 5px;
+              letter-spacing: 0.5px;
+              margin-top: 4px;
+              padding: 2px;
               background: #f9f9f9;
               border: 1px solid #ccc;
-              border-radius: 2px;
+              border-radius: 1px;
               word-break: break-all;
+              text-align: center;
             }
             
             .item-info { 
-              margin: 8px 0; 
-              font-size: 13px;
-              text-align: left;
+              margin: 2px 0; 
+              font-size: 9px;
+              line-height: 1.1;
             }
             
             .item-info strong {
               color: #333;
               display: inline-block;
-              width: 85px;
+              width: 60px;
               font-weight: bold;
             }
             
             .print-header {
               text-align: center;
-              margin-bottom: 15px;
-              padding-bottom: 8px;
-              border-bottom: 2px solid #333;
+              margin-bottom: 4px;
+              padding-bottom: 2px;
+              border-bottom: 1px solid #333;
             }
             
             .print-header h2 {
               margin: 0;
-              font-size: 16px;
+              font-size: 12px;
               color: #333;
+              font-weight: bold;
             }
             
             .print-footer {
               text-align: center;
-              margin-top: 15px;
-              padding-top: 8px;
+              margin-top: 4px;
+              padding-top: 2px;
               border-top: 1px solid #ccc;
-              font-size: 11px;
+              font-size: 8px;
               color: #666;
             }
             
             .no-print {
-              margin: 20px 0;
+              margin: 10px 0;
               text-align: center;
             }
             
@@ -537,11 +547,11 @@ const SupplierPurchaseOrders = () => {
               background: #1890ff;
               color: white;
               border: none;
-              padding: 8px 16px;
-              border-radius: 4px;
+              padding: 4px 8px;
+              border-radius: 2px;
               cursor: pointer;
-              margin: 0 5px;
-              font-size: 14px;
+              margin: 0 2px;
+              font-size: 10px;
             }
             
             .print-button:hover { 
@@ -563,34 +573,40 @@ const SupplierPurchaseOrders = () => {
             </div>
             
             <div class="item-info">
-              <strong>存货名称:</strong> ${record.cItemName}
+              <strong>品名:</strong> ${record.cItemName}
             </div>
             <div class="item-info">
-              <strong>存货编码:</strong> ${record.cInvCode}
+              <strong>编码:</strong> ${record.cInvCode}
             </div>
             <div class="item-info">
-              <strong>条码数量:</strong> ${qty} ${record.unitName}
+              <strong>数量:</strong> ${qty} ${record.unitName}
             </div>
             <div class="item-info">
-              <strong>订单号:</strong> ${record.cPOID}
+              <strong>订单:</strong> ${record.cPOID}
             </div>
             <div class="item-info">
               <strong>供应商:</strong> ${record.supplierName}
             </div>
             <div class="item-info">
-              <strong>批号:</strong> ${record.batchNumber}
+              <strong>批号:</strong> ${record.batchNumber || ''}
             </div>
             <div class="item-info">
-              <strong>打印时间:</strong> ${new Date().toLocaleString('zh-CN')}
+              <strong>时间:</strong> ${new Date().toLocaleString('zh-CN', { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
             </div>
             
             <div class="print-footer">
-              <p>江西江特电机有限公司 - 物料管理系统</p>
+              <p>江西江特电机有限公司 · 物料管理系统</p>
             </div>
             
             <div class="no-print">
-              <button class="print-button" onclick="window.print()">立即打印</button>
-              <button class="print-button" onclick="window.close()">关闭窗口</button>
+              <button class="print-button" onclick="window.print()">打印</button>
+              <button class="print-button" onclick="window.close()">关闭</button>
             </div>
           </div>
         </body>
@@ -598,8 +614,11 @@ const SupplierPurchaseOrders = () => {
     `;
   };
 
-  // 生成简化的打印HTML（备用方案）
+  // 生成简化的打印HTML（备用方案）- 使用更优雅的二维码实现
   const generatePrintHTML = (record, barcode, qty) => {
+    // 使用Google Charts API生成二维码，样式更接近Ant Design
+    const qrCodeDataUrl = `https://chart.googleapis.com/chart?cht=qr&chs=160x160&chld=M|0&choe=UTF-8&chl=${encodeURIComponent(barcode)}`;
+    
     return `
       <!DOCTYPE html>
       <html>
@@ -608,82 +627,115 @@ const SupplierPurchaseOrders = () => {
           <title>条码打印 - ${barcode}</title>
           <style>
             @media print {
-              body { margin: 0; padding: 10px; font-size: 12px; }
+              body { margin: 0; padding: 0; font-size: 11px; }
               .no-print { display: none !important; }
               .print-container { 
                 page-break-inside: avoid;
-                margin: 0 auto;
-                max-width: 100%;
+                margin: 0;
+                width: 70mm;
+                height: 100mm;
+                box-sizing: border-box;
               }
             }
             
             body { 
-              font-family: 'Microsoft YaHei', Arial, sans-serif; 
-              margin: 10px;
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; 
+              margin: 0;
+              padding: 0;
               background: #fff;
               line-height: 1.4;
+              color: rgba(0, 0, 0, 0.85);
             }
             
             .print-container {
               background: white;
-              border: 2px solid #333;
-              border-radius: 8px;
-              padding: 15px;
-              margin: 0 auto;
-              max-width: 400px;
+              border: 1px solid #d9d9d9;
+              border-radius: 6px;
+              padding: 12px;
+              margin: 0;
+              width: 70mm;
+              height: 100mm;
+              box-sizing: border-box;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            }
+            
+            .qr-code-container {
               text-align: center;
+              margin: 8px 0;
+            }
+            
+            .qr-code {
+              display: inline-block;
+              padding: 8px;
+              background: #fff;
+              border: 1px solid #f0f0f0;
+              border-radius: 4px;
+              box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            }
+            
+            .qr-code img {
+              display: block;
+              width: 45mm;
+              height: 45mm;
+              border-radius: 2px;
             }
             
             .barcode-text {
-              font-size: 14px;
-              font-weight: bold;
-              color: #000;
-              letter-spacing: 1px;
-              margin: 15px 0;
-              padding: 8px;
-              background: #f9f9f9;
-              border: 1px solid #ccc;
-              border-radius: 2px;
+              font-size: 11px;
+              font-weight: 600;
+              color: #262626;
+              letter-spacing: 0.5px;
+              margin-top: 6px;
+              padding: 4px 6px;
+              background: #fafafa;
+              border: 1px solid #e8e8e8;
+              border-radius: 4px;
               word-break: break-all;
+              text-align: center;
+              font-family: 'Courier New', monospace;
             }
             
             .item-info { 
-              margin: 8px 0; 
-              font-size: 13px;
-              text-align: left;
+              margin: 4px 0; 
+              font-size: 10px;
+              line-height: 1.3;
             }
             
             .item-info strong {
-              color: #333;
+              color: #595959;
               display: inline-block;
-              width: 85px;
-              font-weight: bold;
+              width: 55px;
+              font-weight: 600;
             }
             
             .print-header {
               text-align: center;
-              margin-bottom: 15px;
-              padding-bottom: 8px;
-              border-bottom: 2px solid #333;
+              margin-bottom: 8px;
+              padding-bottom: 4px;
+              border-bottom: 1px solid #f0f0f0;
             }
             
             .print-header h2 {
               margin: 0;
-              font-size: 16px;
-              color: #333;
+              font-size: 13px;
+              color: #262626;
+              font-weight: 600;
             }
             
             .print-footer {
               text-align: center;
-              margin-top: 15px;
-              padding-top: 8px;
-              border-top: 1px solid #ccc;
-              font-size: 11px;
-              color: #666;
+              margin-top: 8px;
+              padding-top: 4px;
+              border-top: 1px solid #f0f0f0;
+              font-size: 9px;
+              color: #8c8c8c;
             }
             
             .no-print {
-              margin: 20px 0;
+              margin: 8px 0;
               text-align: center;
             }
             
@@ -691,15 +743,18 @@ const SupplierPurchaseOrders = () => {
               background: #1890ff;
               color: white;
               border: none;
-              padding: 8px 16px;
+              padding: 6px 12px;
               border-radius: 4px;
               cursor: pointer;
-              margin: 0 5px;
-              font-size: 14px;
+              margin: 0 3px;
+              font-size: 10px;
+              font-weight: 500;
+              transition: all 0.3s ease;
             }
             
             .print-button:hover { 
               background: #40a9ff;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
             }
           </style>
         </head>
@@ -709,37 +764,48 @@ const SupplierPurchaseOrders = () => {
               <h2>物料条码标签</h2>
             </div>
             
-            <div class="barcode-text">${barcode}</div>
+            <div class="qr-code-container">
+              <div class="qr-code">
+                <img src="${qrCodeDataUrl}" alt="二维码" />
+              </div>
+              <div class="barcode-text">${barcode}</div>
+            </div>
             
             <div class="item-info">
-              <strong>存货名称:</strong> ${record.cItemName}
+              <strong>品名:</strong> ${record.cItemName}
             </div>
             <div class="item-info">
-              <strong>存货编码:</strong> ${record.cInvCode}
+              <strong>编码:</strong> ${record.cInvCode}
             </div>
             <div class="item-info">
-              <strong>条码数量:</strong> ${qty} ${record.unitName}
+              <strong>数量:</strong> ${qty} ${record.unitName}
             </div>
             <div class="item-info">
-              <strong>订单号:</strong> ${record.cPOID}
+              <strong>订单:</strong> ${record.cPOID}
             </div>
             <div class="item-info">
               <strong>供应商:</strong> ${record.supplierName}
             </div>
             <div class="item-info">
-              <strong>批号:</strong> ${record.batchNumber}
+              <strong>批号:</strong> ${record.batchNumber || ''}
             </div>
             <div class="item-info">
-              <strong>打印时间:</strong> ${new Date().toLocaleString('zh-CN')}
+              <strong>时间:</strong> ${new Date().toLocaleString('zh-CN', { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
             </div>
             
             <div class="print-footer">
-              <p>江西江特电机有限公司 - 物料管理系统</p>
+              <p>江西江特电机有限公司 · 物料管理系统</p>
             </div>
             
             <div class="no-print">
-              <button class="print-button" onclick="window.print()">立即打印</button>
-              <button class="print-button" onclick="window.close()">关闭窗口</button>
+              <button class="print-button" onclick="window.print()">打印</button>
+              <button class="print-button" onclick="window.close()">关闭</button>
             </div>
           </div>
         </body>

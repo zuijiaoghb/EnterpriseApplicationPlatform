@@ -40,11 +40,17 @@ public class PurchaseController {
     public ResponseEntity<PageResultDTO<PurchaseScanDTO>> getVendorAuditedOrders(
         @RequestParam String vendorCode,
         @RequestParam(defaultValue = "1") Integer pageNum,
-        @RequestParam(defaultValue = "50") Integer pageSize,
+        @RequestParam(defaultValue = "10") Integer pageSize, // 减小默认页大小
         @RequestParam(required = false) String cPOID,
         @RequestParam(required = false) String dPODate,
         @RequestParam(required = false) String cInvCode,
         @RequestParam(required = false) String cItemName) {
+        
+        // 限制页大小，防止过大查询
+        if (pageSize > 50) {
+            pageSize = 50;
+        }
+        
         PageResultDTO<PurchaseScanDTO> orders = purchaseService.getVendorAuditedOrders(
             vendorCode, cPOID, dPODate, cInvCode, cItemName, pageNum, pageSize);
         return ResponseEntity.ok(orders);
