@@ -1,0 +1,7 @@
+    -- 创建复合索引
+CREATE NONCLUSTERED INDEX [IX_HY_BarCodeMain_SrcCode_SrcSubID] 
+ON [dbo].[HY_BarCodeMain] 
+(
+    [cSrcCode] ASC,
+    [cSrcSubID] ASC
+)
