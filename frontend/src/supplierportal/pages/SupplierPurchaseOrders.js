@@ -68,10 +68,224 @@ const SupplierPurchaseOrders = () => {
     }
   };
 
-  // 导出数据
-  const handleExport = () => {
-    message.info('正在导出数据，请稍候...');
-    // 实现导出逻辑
+  // 导出数据 - 实现导出所有页数据的功能
+  const handleExport = async () => {
+    try {
+      message.info('正在准备导出数据，请稍候...');
+      
+      // 获取当前登录用户信息
+      const userResponse = await api.get('/auth/info');
+      const vendorCode = userResponse.data.username;
+
+      if (!vendorCode) {
+        message.error('无法获取供应商信息');
+        return;
+      }
+
+      // 创建导出参数，移除分页参数以获取所有数据
+      const exportParams = {
+        vendorCode,
+        cPOID: searchParams.cPOID,
+        dPODate: searchParams.dPODate,
+        cInvCode: searchParams.cInvCode,
+        cItemName: searchParams.cItemName,
+        pageNum: 1, // 获取第一页开始
+        pageSize: 10000 // 设置较大的页大小来获取所有数据
+      };
+
+      // 调用后端API获取所有数据
+      const response = await api.get('/api/inventory/purchase/vendor/audited-orders', {
+        timeout: 60000, // 设置更长的超时时间
+        params: exportParams
+      });
+
+      if (response.data && response.data.records && response.data.records.length > 0) {
+        const allData = response.data.records;
+        
+        // 处理数据格式
+        const exportData = allData.map((item, index) => ({
+          '序号': index + 1,
+          '订单编号': item.cPOID || '',
+          '订单日期': item.dPODate ? new Date(item.dPODate).toLocaleDateString() : '',
+          '供应商代码': item.cVenCode || '',
+          '供应商名称': item.supplierName || '',
+          '存货编码': item.cInvCode || '',
+          '存货名称': item.cItemName || '',
+          '执行公司': item.cDefine1 || '',
+          '采购数量': item.iQuantity ? parseFloat(item.iQuantity).toFixed(2) : '0.00',
+          '已入库数量': item.receivedQuantity ? parseFloat(item.receivedQuantity).toFixed(2) : '0.00',
+          '剩余未入库数量': item.remainingQuantity ? parseFloat(item.remainingQuantity).toFixed(2) : '0.00',
+          '单位': item.unitName || '',
+          '计划到货日期': item.dArriveDate ? new Date(item.dArriveDate).toLocaleDateString() : '',
+          '采购员': item.cPersonCode || '',
+          '采购部门': item.cDepCode || '',
+          '订单行号': item.irowno || '',
+          '条码值': item.barcode || '',
+          '批号': item.batchNumber || ''
+        }));
+
+        // 创建CSV内容
+        const headers = Object.keys(exportData[0]);
+        const csvContent = [
+          headers.join(','), // 表头
+          ...exportData.map(row => 
+            headers.map(header => {
+              let value = row[header] || '';
+              // 处理包含逗号或引号的字段
+              if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
+                value = `"${value.replace(/"/g, '""')}"`;
+              }
+              return value;
+            }).join(',')
+          )
+        ].join('\n');
+
+        // 创建Blob对象
+        const blob = new Blob(['\ufeff' + csvContent], { 
+          type: 'text/csv;charset=utf-8;' 
+        });
+
+        // 创建下载链接
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        // 设置文件名
+        const currentDate = new Date().toISOString().split('T')[0];
+        const fileName = `供应商采购订单_${currentDate}.csv`;
+        
+        link.href = url;
+        link.setAttribute('download', fileName);
+        link.style.display = 'none';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // 释放URL对象
+        URL.revokeObjectURL(url);
+        
+        message.success(`成功导出 ${exportData.length} 条数据到 ${fileName}`);
+      } else {
+        message.warning('当前查询条件下没有可导出的数据');
+      }
+    } catch (error) {
+      console.error('导出数据失败:', error);
+      message.error('导出数据失败: ' + (error.response?.data?.message || error.message));
+    }
+  };
+
+  // 可选：导出为Excel格式的备用方法
+  const handleExportExcel = async () => {
+    try {
+      message.info('正在准备导出Excel数据，请稍候...');
+      
+      // 使用第三方库导出Excel（需要安装xlsx库）
+      // 如果项目中已安装xlsx库，可以启用此方法
+      if (window.XLSX) {
+        const XLSX = window.XLSX;
+        
+        // 获取数据（与CSV导出相同的逻辑）
+        const userResponse = await api.get('/auth/info');
+        const vendorCode = userResponse.data.username;
+
+        if (!vendorCode) {
+          message.error('无法获取供应商信息');
+          return;
+        }
+
+        const exportParams = {
+          vendorCode,
+          ...searchParams,
+          pageNum: 1,
+          pageSize: 10000
+        };
+
+        const response = await api.get('/api/inventory/purchase/vendor/audited-orders', {
+          timeout: 60000,
+          params: exportParams
+        });
+
+        if (response.data && response.data.records && response.data.records.length > 0) {
+          const allData = response.data.records;
+          
+          const worksheetData = allData.map((item, index) => ({
+            '序号': index + 1,
+            '订单编号': item.cPOID || '',
+            '订单日期': item.dPODate ? new Date(item.dPODate).toLocaleDateString() : '',
+            '供应商代码': item.cVenCode || '',
+            '供应商名称': item.supplierName || '',
+            '存货编码': item.cInvCode || '',
+            '存货名称': item.cItemName || '',
+            '执行公司': item.cDefine1 || '',
+            '采购数量': item.iQuantity ? parseFloat(item.iQuantity) : 0,
+            '已入库数量': item.receivedQuantity ? parseFloat(item.receivedQuantity) : 0,
+            '剩余未入库数量': item.remainingQuantity ? parseFloat(item.remainingQuantity) : 0,
+            '单位': item.unitName || '',
+            '计划到货日期': item.dArriveDate ? new Date(item.dArriveDate).toLocaleDateString() : '',
+            '采购员': item.cPersonCode || '',
+            '采购部门': item.cDepCode || '',
+            '订单行号': item.irowno || '',
+            '条码值': item.barcode || '',
+            '批号': item.batchNumber || ''
+          }));
+
+          const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, '采购订单');
+
+          // 设置列宽
+          const cols = [
+            { wch: 8 },  // 序号
+            { wch: 15 }, // 订单编号
+            { wch: 12 }, // 订单日期
+            { wch: 12 }, // 供应商代码
+            { wch: 20 }, // 供应商名称
+            { wch: 15 }, // 存货编码
+            { wch: 25 }, // 存货名称
+            { wch: 15 }, // 执行公司
+            { wch: 12 }, // 采购数量
+            { wch: 12 }, // 已入库数量
+            { wch: 15 }, // 剩余未入库数量
+            { wch: 8 },  // 单位
+            { wch: 12 }, // 计划到货日期
+            { wch: 12 }, // 采购员
+            { wch: 12 }, // 采购部门
+            { wch: 8 },  // 订单行号
+            { wch: 20 }, // 条码值
+            { wch: 12 }  // 批号
+          ];
+          worksheet['!cols'] = cols;
+
+          // 设置样式
+          const range = XLSX.utils.decode_range(worksheet['!ref']);
+          for (let R = range.s.r; R <= range.e.r; ++R) {
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+              const cell = worksheet[XLSX.utils.encode_cell({r: R, c: C})];
+              if (cell) {
+                cell.s = {
+                  font: { name: '微软雅黑', sz: 11 },
+                  alignment: { horizontal: 'center', vertical: 'center' }
+                };
+              }
+            }
+          }
+
+          const currentDate = new Date().toISOString().split('T')[0];
+          const fileName = `供应商采购订单_${currentDate}.xlsx`;
+          XLSX.writeFile(workbook, fileName);
+
+          message.success(`成功导出 ${worksheetData.length} 条数据到 ${fileName}`);
+        } else {
+          message.warning('当前查询条件下没有可导出的数据');
+        }
+      } else {
+        // 如果XLSX库不可用，回退到CSV导出
+        handleExport();
+      }
+    } catch (error) {
+      console.error('Excel导出失败:', error);
+      message.error('Excel导出失败: ' + (error.response?.data?.message || error.message));
+    }
   };
 
   // 重置搜索条件
@@ -116,7 +330,7 @@ const SupplierPurchaseOrders = () => {
       console.log('timestamp:', timestamp);
       const randomStr = Math.random().toString(36).substring(2, 5).toUpperCase();
       console.log('randomStr:', randomStr);
-      const barcode = `${record.cVenCode}_${record.cPOID}_${record.irowno}_${record.cInvCode}_${timestamp}_${randomStr}`;          
+      const barcode = `${record.cPOID}_${record.irowno}_${timestamp}_${randomStr}`;          
       
       // 获取当前日期（yyyy-MM-dd格式）
       const currentDate = new Date().toISOString().split('T')[0];
@@ -263,7 +477,7 @@ const SupplierPurchaseOrders = () => {
         setOrders(prevOrders => 
           prevOrders.map(order => 
             order.cPOID === record.cPOID && order.irowno === record.irowno
-              ? { ...order, barcode: barcode }
+              ? { ...order, barcode: barcode, batchNumber: currentDate }
               : order
           )
         );

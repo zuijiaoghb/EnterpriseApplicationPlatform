@@ -287,7 +287,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             }
             
             dto.setcItemName(row[16] != null ? String.valueOf(row[16]) : null); // cInvName
-            dto.setBatchNumber(batchNumber);
+            
             
             // 设置供应商信息
             Object venCode = row[3];
@@ -333,15 +333,19 @@ public class PurchaseServiceImpl implements PurchaseService {
                     List<HYBarCodeMain> barCodeList = hyBarCodeMainRepository.findByCsrccodeAndCsrcsubidOrderByCreateTimeDesc(cPOID, detailId);
                     if (!barCodeList.isEmpty()) {
                         dto.setBarcode(barCodeList.get(0).getBarcode()); // 获取最新的条码值
+                        dto.setBatchNumber(barCodeList.get(0).getPLot());
                     } else {
                         dto.setBarcode(null); // 没有条码则为null
+                        dto.setBatchNumber(null);
                     }
                 } catch (Exception e) {
                     log.warn("获取订单条码失败: cPOID={}, detailId={}, error={}", cPOID, detailId, e.getMessage());
                     dto.setBarcode(null);
+                    dto.setBatchNumber(null);
                 }
             } else {
                 dto.setBarcode(null);
+                dto.setBatchNumber(null);
             }
             
             return dto;
