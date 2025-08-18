@@ -1,0 +1,41 @@
+
+
+/****** Object:  Table [dbo].[Person]    Script Date: 08/18/2025 08:49:01 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Person](
+	[cPersonCode] [nvarchar](20) NOT NULL,
+	[cPersonName] [nvarchar](40) NULL,
+	[cDepCode] [nvarchar](12) NOT NULL,
+	[cPersonProp] [nvarchar](20) NULL,
+	[fCreditQuantity] [float] NULL,
+	[iCreDate] [int] NULL,
+	[cCreGrade] [nvarchar](6) NULL,
+	[iLowRate] [float] NULL,
+	[cOfferGrade] [nvarchar](20) NULL,
+	[iOfferRate] [float] NULL,
+	[pubufts] [timestamp] NULL,
+	[cPersonEmail] [nvarchar](100) NULL,
+	[cPersonPhone] [nvarchar](100) NULL,
+	[dPValidDate] [datetime] NULL,
+	[dPInValidDate] [datetime] NULL,
+ CONSTRAINT [aaaaaPerson_PK] PRIMARY KEY NONCLUSTERED 
+(
+	[cPersonCode] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[Person]  WITH CHECK ADD  CONSTRAINT [FK__Person__cDepCode__35D2D7FA] FOREIGN KEY([cDepCode])
+REFERENCES [dbo].[Department] ([cDepCode])
+GO
+
+ALTER TABLE [dbo].[Person] CHECK CONSTRAINT [FK__Person__cDepCode__35D2D7FA]
+GO
+
+

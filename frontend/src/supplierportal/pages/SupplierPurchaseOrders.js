@@ -117,7 +117,7 @@ const SupplierPurchaseOrders = () => {
           '剩余未入库数量': item.remainingQuantity ? parseFloat(item.remainingQuantity).toFixed(2) : '0.00',
           '单位': item.unitName || '',
           '计划到货日期': item.dArriveDate ? new Date(item.dArriveDate).toLocaleDateString() : '',
-          '采购员': item.cPersonCode || '',
+          '采购员': item.personName || '',
           '采购部门': item.cDepCode || '',
           '订单行号': item.irowno || '',
           '条码值': item.barcode || '',
@@ -222,7 +222,7 @@ const SupplierPurchaseOrders = () => {
             '剩余未入库数量': item.remainingQuantity ? parseFloat(item.remainingQuantity) : 0,
             '单位': item.unitName || '',
             '计划到货日期': item.dArriveDate ? new Date(item.dArriveDate).toLocaleDateString() : '',
-            '采购员': item.cPersonCode || '',
+            '采购员': item.personName || '',
             '采购部门': item.cDepCode || '',
             '订单行号': item.irowno || '',
             '条码值': item.barcode || '',
@@ -1155,7 +1155,7 @@ const SupplierPurchaseOrders = () => {
         <div><span style={{ color: '#999' }}>条码值:</span> {record.barcode || '-'}</div>
         <div><span style={{ color: '#999' }}>批号:</span> {record.batchNumber || '-'}</div>
           <div><span style={{ color: '#999' }}>订单行号:</span> {record.irowno || '-'}</div>
-          <div><span style={{ color: '#999' }}>采购员:</span> {record.cPersonCode || '-'}</div>
+          <div><span style={{ color: '#999' }}>采购员:</span> {record.personName || '-'}</div>
           <div><span style={{ color: '#999' }}>供应商代码:</span> {record.cVenCode || '-'}</div>
           <div><span style={{ color: '#999' }}>采购部门:</span> {record.cDepCode || '-'}</div>
         <div><span style={{ color: '#999' }}>订单状态:</span> <span style={{ padding: '2px 8px', backgroundColor: '#52c41a', color: 'white', borderRadius: '4px', fontSize: '12px' }}>已审核</span></div>
@@ -1227,7 +1227,7 @@ const SupplierPurchaseOrders = () => {
                       <Form.Item name="cVenCode" label="供应商代码" className="search-item">
                         <Input placeholder="请输入供应商代码" />
                       </Form.Item>
-                      <Form.Item name="cPersonCode" label="采购员" className="search-item">
+                      <Form.Item name="personName" label="采购员" className="search-item">
                         <Input placeholder="请输入采购员" />
                       </Form.Item>
                       <Form.Item name="cDepCode" label="采购部门" className="search-item">

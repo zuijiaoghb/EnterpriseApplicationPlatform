@@ -6,7 +6,6 @@ import com.enterprise.platform.inventorymanagement.model.sqlserver.HYBarCodeMain
 import com.enterprise.platform.inventorymanagement.model.sqlserver.PO_Podetails;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.PO_Pomain;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.HYBarCodeMainRepository;
-import com.enterprise.platform.inventorymanagement.repository.sqlserver.InventoryRepository;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.PO_PomainRepository;
 import com.enterprise.platform.inventorymanagement.service.PurchaseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +33,8 @@ import com.enterprise.platform.inventorymanagement.model.sqlserver.Vendor;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.VendorRepository;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.ComputationUnit;
 import com.enterprise.platform.inventorymanagement.repository.sqlserver.ComputationUnitRepository;
+import com.enterprise.platform.inventorymanagement.model.sqlserver.Person;
+import com.enterprise.platform.inventorymanagement.repository.sqlserver.PersonRepository;
 import java.util.HashSet;
 
 @Service
@@ -53,6 +54,9 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Autowired
     private ComputationUnitRepository computationUnitRepository;
+
+    @Autowired
+    private PersonRepository personRepository;
 
     @Override    
     public PurchaseScanDTO scanPurchaseIn(String barcode) {
@@ -172,9 +176,10 @@ public class PurchaseServiceImpl implements PurchaseService {
         List<PurchaseScanDTO> dtos = new ArrayList<>();
         String batchNumber = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         
-        // 收集所有需要的供应商编码和单位编码，用于批量查询
+        // 收集所有需要的供应商编码、单位编码和人员编码，用于批量查询
         Set<String> venCodeSet = new HashSet<>();
         Set<String> unitCodeSet = new HashSet<>();
+        Set<String> personCodeSet = new HashSet<>();
         
         for (Object[] row : results) {
             if (row.length >= 18) {
@@ -186,19 +191,25 @@ public class PurchaseServiceImpl implements PurchaseService {
                 if (unitCode != null) {
                     unitCodeSet.add(unitCode.toString());
                 }
+                Object personCode = row[7];
+                if (personCode != null) {
+                    personCodeSet.add(personCode.toString());
+                }
             }
         }
         
-        // 批量查询供应商和单位信息
+        // 批量查询供应商、单位和人员信息
         Map<String, Vendor> vendorMap = vendorRepository.findByCVenCodeIn(venCodeSet).stream()
                 .collect(Collectors.toMap(Vendor::getCVenCode, vendor -> vendor));
         Map<String, ComputationUnit> unitMap = computationUnitRepository.findByCComunitCodeIn(unitCodeSet).stream()
                 .collect(Collectors.toMap(ComputationUnit::getCComunitCode, unit -> unit));
+        Map<String, Person> personMap = personRepository.findByPersonCodeIn(personCodeSet).stream()
+                .collect(Collectors.toMap(Person::getPersonCode, person -> person));
         
         // 转换每个查询结果
         for (Object[] row : results) {
             if (row.length >= 18) {
-                PurchaseScanDTO dto = buildPurchaseScanDTOFromObjectArray(row, vendorMap, unitMap, batchNumber);
+                PurchaseScanDTO dto = buildPurchaseScanDTOFromObjectArray(row, vendorMap, unitMap, personMap, batchNumber);
                 if (dto != null) {
                     dtos.add(dto);
                 }
@@ -215,7 +226,7 @@ public class PurchaseServiceImpl implements PurchaseService {
      * 从Object[]构建PurchaseScanDTO
      */
     private PurchaseScanDTO buildPurchaseScanDTOFromObjectArray(Object[] row, Map<String, Vendor> vendorMap, 
-                                                            Map<String, ComputationUnit> unitMap, String batchNumber) {
+                                                            Map<String, ComputationUnit> unitMap, Map<String, Person> personMap, String batchNumber) {
         try {
             PurchaseScanDTO dto = new PurchaseScanDTO();
             
@@ -306,6 +317,16 @@ public class PurchaseServiceImpl implements PurchaseService {
                 dto.setUnitName(unit.getCComUnitName());
             } else {
                 dto.setUnitName("未知单位");
+            }
+            
+            // 设置人员信息
+            Object personCode = row[7];
+            String personCodeStr = personCode != null ? String.valueOf(personCode) : "";
+            Person person = personMap.get(personCodeStr);
+            if (person != null) {
+                dto.setPersonName(person.getPersonName());
+            } else {
+                dto.setPersonName(null); // 没有对应人员则设为null
             }
             
             // 计算数量信息

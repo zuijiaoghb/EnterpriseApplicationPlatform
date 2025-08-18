@@ -23,6 +23,7 @@ public class PurchaseScanDTO {
     private Integer irowno; // 行号
     private BigDecimal boxQuantity; // 一箱的数量
     private String supplierName; // 供应商名称
+    private String personName; // 人员名称
     private Integer cSrcSubID; // 采购订单子表ID
 
     // Getters and Setters
@@ -65,6 +66,9 @@ public class PurchaseScanDTO {
     public void setUnitName(String unitName) { this.unitName = unitName; }
     public String getSupplierName() { return supplierName; }
     public void setSupplierName(String supplierName) { this.supplierName = supplierName; }
+    
+    public String getPersonName() { return personName; }
+    public void setPersonName(String personName) { this.personName = personName; }
     
     public Integer getcSrcSubID() { return cSrcSubID; }
     public void setcSrcSubID(Integer cSrcSubID) { this.cSrcSubID = cSrcSubID; }
