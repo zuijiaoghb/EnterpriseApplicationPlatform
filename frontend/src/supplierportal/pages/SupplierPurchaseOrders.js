@@ -802,7 +802,7 @@ const SupplierPurchaseOrders = () => {
               <strong>供应商:</strong> ${record.supplierName}
             </div>
             <div class="item-info">
-              <strong>批号:</strong> ${record.batchNumber || ''}
+              <strong>批号:</strong> ${record.batchNumber || new Date().toISOString().split('T')[0]}
             </div>
             <div class="item-info">
               <strong>时间:</strong> ${new Date().toLocaleString('zh-CN', { 
@@ -1001,7 +1001,7 @@ const SupplierPurchaseOrders = () => {
               <strong>供应商:</strong> ${record.supplierName}
             </div>
             <div class="item-info">
-              <strong>批号:</strong> ${record.batchNumber || ''}
+              <strong>批号:</strong> ${record.batchNumber || new Date().toISOString().split('T')[0]}
             </div>
             <div class="item-info">
               <strong>时间:</strong> ${new Date().toLocaleString('zh-CN', { 
