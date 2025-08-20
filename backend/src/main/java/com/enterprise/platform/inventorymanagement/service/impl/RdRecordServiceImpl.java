@@ -20,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -242,7 +243,7 @@ public class RdRecordServiceImpl implements RdRecordService {
         BigDecimal receivedMoney = Optional.ofNullable(poPodetails.getiReceivedMoney()).orElse(BigDecimal.ZERO);
         BigDecimal unitPrice = Optional.ofNullable(poPodetails.getiUnitPrice()).orElse(BigDecimal.ZERO);
         BigDecimal addMoney = unitPrice.multiply(new BigDecimal(quantity));
-        BigDecimal newReceivedMoney = receivedMoney.add(addMoney);
+        BigDecimal newReceivedMoney = receivedMoney.add(addMoney).setScale(2, RoundingMode.HALF_UP);
         if (newReceivedMoney.compareTo(iMoney) > 0) {
             throw new IllegalArgumentException("累计到货金额不能超过订单金额: " + iMoney);
         }
