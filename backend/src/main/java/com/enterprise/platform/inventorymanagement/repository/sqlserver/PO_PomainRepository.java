@@ -22,6 +22,7 @@ public interface PO_PomainRepository extends JpaRepository<PO_Pomain, Integer> {
             "WHERE p.cVenCode = :cVenCode " +
             "AND p.cAuditDate IS NOT NULL " +
             "AND p.cState != 2 " +
+            "AND isnull(pd.cbcloser,'') = '' " +
             "AND (COALESCE(:cPOID, '') = '' OR p.cPOID LIKE '%' + COALESCE(:cPOID, '') + '%') " +
             "AND (COALESCE(:dPODate, '') = '' OR CONVERT(VARCHAR, p.dPODate, 23) LIKE '%' + COALESCE(:dPODate, '') + '%') " +
             "AND (COALESCE(:cInvCode, '') = '' OR pd.cInvCode = COALESCE(:cInvCode, '')) " +
@@ -47,6 +48,7 @@ public interface PO_PomainRepository extends JpaRepository<PO_Pomain, Integer> {
             "WHERE p.cVenCode = :cVenCode " +
             "AND p.cAuditDate IS NOT NULL " +
             "AND p.cState != 2 " +
+            "AND isnull(pd.cbcloser,'') = '' " +
             "AND (COALESCE(:cPOID, '') = '' OR p.cPOID LIKE '%' + COALESCE(:cPOID, '') + '%') " +
             "AND (COALESCE(:dPODate, '') = '' OR CONVERT(VARCHAR, p.dPODate, 23) LIKE '%' + COALESCE(:dPODate, '') + '%') " +
             "AND (COALESCE(:cInvCode, '') = '' OR pd.cInvCode = COALESCE(:cInvCode, '')) " +
@@ -71,6 +73,7 @@ public interface PO_PomainRepository extends JpaRepository<PO_Pomain, Integer> {
             "WHERE p.cVenCode = :cVenCode " +
             "AND p.cAuditDate IS NOT NULL " +
             "AND p.cState != 2 " +
+            "AND isnull(pd.cbcloser,'') = '' " +
             "AND (:cPOID IS NULL OR p.cPOID LIKE '%' + :cPOID + '%') " +
             "AND (:dPODate IS NULL OR CONVERT(VARCHAR, p.dPODate, 23) LIKE '%' + :dPODate + '%') " +
             "AND (:cInvCode IS NULL OR pd.cInvCode = :cInvCode) " +
