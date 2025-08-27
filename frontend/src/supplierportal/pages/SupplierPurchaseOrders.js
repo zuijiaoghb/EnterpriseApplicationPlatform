@@ -1039,6 +1039,13 @@ const SupplierPurchaseOrders = () => {
       render: (text) => <Text strong>{text}</Text>
     },
     {
+      title: '采购员',
+      dataIndex: 'personName',
+      key: 'personName',
+      sorter: (a, b) => (a.personName || '').localeCompare(b.personName || ''),
+      width: 100
+    },  
+    {
       title: '订单日期',
       dataIndex: 'dPODate',
       key: 'dPODate',
@@ -1050,14 +1057,14 @@ const SupplierPurchaseOrders = () => {
       dataIndex: 'supplierName',
       key: 'supplierName',
       sorter: (a, b) => a.supplierName.localeCompare(b.supplierName),
-      width: 180
+      width: 160
     },
     {
       title: '执行公司',
       dataIndex: 'cDefine1',
       key: 'cDefine1',
       sorter: (a, b) => a.cDefine1.localeCompare(b.cDefine1),
-      width: 120
+      width: 100
     },
     {
       title: '存货编码',
@@ -1097,7 +1104,7 @@ const SupplierPurchaseOrders = () => {
       render: (date) => date ? new Date(date).toLocaleDateString() : '',
       sorter: (a, b) => new Date(a.dArriveDate) - new Date(b.dArriveDate),
       width: 120
-    },
+    },      
     {
       title: '剩余未入库数量',
       dataIndex: 'remainingQuantity',
@@ -1155,7 +1162,6 @@ const SupplierPurchaseOrders = () => {
         <div><span style={{ color: '#999' }}>条码值:</span> {record.barcode || '-'}</div>
         <div><span style={{ color: '#999' }}>批号:</span> {record.batchNumber || '-'}</div>
           <div><span style={{ color: '#999' }}>订单行号:</span> {record.irowno || '-'}</div>
-          <div><span style={{ color: '#999' }}>采购员:</span> {record.personName || '-'}</div>
           <div><span style={{ color: '#999' }}>供应商代码:</span> {record.cVenCode || '-'}</div>
           <div><span style={{ color: '#999' }}>采购部门:</span> {record.cDepCode || '-'}</div>
         <div><span style={{ color: '#999' }}>订单状态:</span> <span style={{ padding: '2px 8px', backgroundColor: '#52c41a', color: 'white', borderRadius: '4px', fontSize: '12px' }}>已审核</span></div>
