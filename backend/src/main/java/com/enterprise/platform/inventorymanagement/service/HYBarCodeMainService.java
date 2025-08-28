@@ -13,4 +13,11 @@ public interface HYBarCodeMainService {
     Page<HYBarCodeMain> getAllBarCodeMains(Pageable pageable);
     Optional<HYBarCodeMain> getBarCodeMainById(String barCode);
     HYBarCodeMain saveBarCodeMain(HYBarCodeMain barCodeMain);    
+    /**
+     * 根据采购订单号和订单行号获取总打印次数
+     * @param csrccode 
+     * @param csrcsubid 
+     * @return 总打印次数
+     */
+    Long getTotalPrintCount(String csrccode, Integer csrcsubid);
 }

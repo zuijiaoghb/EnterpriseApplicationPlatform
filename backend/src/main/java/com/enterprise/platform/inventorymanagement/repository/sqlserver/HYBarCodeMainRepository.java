@@ -18,5 +18,9 @@ public interface HYBarCodeMainRepository extends JpaRepository<HYBarCodeMain, St
     @Query("SELECT h FROM HYBarCodeMain h WHERE h.csrccode = :csrccode AND h.csrcsubid = :csrcsubid ORDER BY h.createTime DESC")
     List<HYBarCodeMain> findByCsrccodeAndCsrcsubidOrderByCreateTimeDesc(@Param("csrccode") String csrccode, @Param("csrcsubid") Integer csrcsubid);
     
+    // 统计指定采购订单的总打印次数（按csrccode和csrcsubid分组统计记录条数）
+    @Query("SELECT COUNT(h) FROM HYBarCodeMain h WHERE h.csrccode = :csrccode AND h.csrcsubid = :csrcsubid")
+    Long countByCsrccodeAndCsrcsubid(@Param("csrccode") String csrccode, @Param("csrcsubid") Integer csrcsubid);
+    
     void deleteByBarcode(String barcode);
 }

@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import com.enterprise.platform.inventorymanagement.model.sqlserver.HYBarCodeMain;
 import com.enterprise.platform.inventorymanagement.service.HYBarCodeMainService;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -48,4 +50,30 @@ public class HYBarCodeMainController {
         return new ResponseEntity<>(savedBarCodeMain, HttpStatus.CREATED);
     }
 
+    /**
+     * 获取指定采购订单的总打印次数
+     * @param csrccode 采购订单号
+     * @param csrcsubid 订单行号
+     * @return 总打印次数
+     */
+    @GetMapping("/total-print-count")
+    public ResponseEntity<Map<String, Object>> getTotalPrintCount(
+            @RequestParam String csrccode,
+            @RequestParam Integer csrcsubid) {
+        try {
+            Long totalCount = service.getTotalPrintCount(csrccode, csrcsubid);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("totalPrintCount", totalCount != null ? totalCount : 0);
+            response.put("csrccode", csrccode);
+            response.put("csrcsubid", csrcsubid);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("获取总打印次数失败: {}", e.getMessage(), e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "获取总打印次数失败: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
 }

@@ -46,7 +46,33 @@ const SupplierPurchaseOrders = () => {
             cItemName: searchParams.cItemName
           }
         });
-        setOrders(response.data.records);
+        
+        // 获取订单数据后，为每个订单获取总打印次数
+        const ordersData = response.data.records;
+        const ordersWithPrintCount = await Promise.all(
+          ordersData.map(async (order) => {
+            try {
+              const printCountResponse = await api.get('/api/inventory/hy-barcode-main/total-print-count', {
+                params: {
+                  csrccode: order.cPOID,
+                  csrcsubid: order.cSrcSubID
+                }
+              });
+              return {
+                ...order,
+                totalPrintCount: printCountResponse.data.totalPrintCount || 0
+              };
+            } catch (error) {
+              console.error(`获取订单 ${order.cPOID} 行 ${order.cSrcSubID} 的打印次数失败:`, error);
+              return {
+                ...order,
+                totalPrintCount: 0
+              };
+            }
+          })
+        );
+        
+        setOrders(ordersWithPrintCount);
         setTotal(response.data.total);
       } catch (error) {
         message.error('获取采购订单失败: ' + (error.response?.data?.message || error.message));
@@ -175,118 +201,6 @@ const SupplierPurchaseOrders = () => {
   };
 
   // 可选：导出为Excel格式的备用方法
-  const handleExportExcel = async () => {
-    try {
-      message.info('正在准备导出Excel数据，请稍候...');
-      
-      // 使用第三方库导出Excel（需要安装xlsx库）
-      // 如果项目中已安装xlsx库，可以启用此方法
-      if (window.XLSX) {
-        const XLSX = window.XLSX;
-        
-        // 获取数据（与CSV导出相同的逻辑）
-        const userResponse = await api.get('/auth/info');
-        const vendorCode = userResponse.data.username;
-
-        if (!vendorCode) {
-          message.error('无法获取供应商信息');
-          return;
-        }
-
-        const exportParams = {
-          vendorCode,
-          ...searchParams,
-          pageNum: 1,
-          pageSize: 10000
-        };
-
-        const response = await api.get('/api/inventory/purchase/vendor/audited-orders', {
-          timeout: 60000,
-          params: exportParams
-        });
-
-        if (response.data && response.data.records && response.data.records.length > 0) {
-          const allData = response.data.records;
-          
-          const worksheetData = allData.map((item, index) => ({
-            '序号': index + 1,
-            '订单编号': item.cPOID || '',
-            '订单日期': item.dPODate ? new Date(item.dPODate).toLocaleDateString() : '',
-            '供应商代码': item.cVenCode || '',
-            '供应商名称': item.supplierName || '',
-            '存货编码': item.cInvCode || '',
-            '存货名称': item.cItemName || '',
-            '执行公司': item.cDefine1 || '',
-            '采购数量': item.iQuantity ? parseFloat(item.iQuantity) : 0,
-            '已入库数量': item.receivedQuantity ? parseFloat(item.receivedQuantity) : 0,
-            '剩余未入库数量': item.remainingQuantity ? parseFloat(item.remainingQuantity) : 0,
-            '单位': item.unitName || '',
-            '计划到货日期': item.dArriveDate ? new Date(item.dArriveDate).toLocaleDateString() : '',
-            '采购员': item.personName || '',
-            '采购部门': item.cDepCode || '',
-            '订单行号': item.irowno || '',
-            '条码值': item.barcode || '',
-            '批号': item.batchNumber || ''
-          }));
-
-          const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-          const workbook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workbook, worksheet, '采购订单');
-
-          // 设置列宽
-          const cols = [
-            { wch: 8 },  // 序号
-            { wch: 15 }, // 订单编号
-            { wch: 12 }, // 订单日期
-            { wch: 12 }, // 供应商代码
-            { wch: 20 }, // 供应商名称
-            { wch: 15 }, // 存货编码
-            { wch: 25 }, // 存货名称
-            { wch: 15 }, // 执行公司
-            { wch: 12 }, // 采购数量
-            { wch: 12 }, // 已入库数量
-            { wch: 15 }, // 剩余未入库数量
-            { wch: 8 },  // 单位
-            { wch: 12 }, // 计划到货日期
-            { wch: 12 }, // 采购员
-            { wch: 12 }, // 采购部门
-            { wch: 8 },  // 订单行号
-            { wch: 20 }, // 条码值
-            { wch: 12 }  // 批号
-          ];
-          worksheet['!cols'] = cols;
-
-          // 设置样式
-          const range = XLSX.utils.decode_range(worksheet['!ref']);
-          for (let R = range.s.r; R <= range.e.r; ++R) {
-            for (let C = range.s.c; C <= range.e.c; ++C) {
-              const cell = worksheet[XLSX.utils.encode_cell({r: R, c: C})];
-              if (cell) {
-                cell.s = {
-                  font: { name: '微软雅黑', sz: 11 },
-                  alignment: { horizontal: 'center', vertical: 'center' }
-                };
-              }
-            }
-          }
-
-          const currentDate = new Date().toISOString().split('T')[0];
-          const fileName = `供应商采购订单_${currentDate}.xlsx`;
-          XLSX.writeFile(workbook, fileName);
-
-          message.success(`成功导出 ${worksheetData.length} 条数据到 ${fileName}`);
-        } else {
-          message.warning('当前查询条件下没有可导出的数据');
-        }
-      } else {
-        // 如果XLSX库不可用，回退到CSV导出
-        handleExport();
-      }
-    } catch (error) {
-      console.error('Excel导出失败:', error);
-      message.error('Excel导出失败: ' + (error.response?.data?.message || error.message));
-    }
-  };
 
   // 重置搜索条件
   const handleReset = () => {
@@ -473,11 +387,16 @@ const SupplierPurchaseOrders = () => {
       if (response.status === 201 || response.status === 200) {
         message.success(`条码生成成功，条码数量：${qty} ${record.unitName}，准备打印...`);
         
-        // 更新本地数据
+        // 更新本地数据 - 增加总打印次数
         setOrders(prevOrders => 
           prevOrders.map(order => 
             order.cPOID === record.cPOID && order.irowno === record.irowno
-              ? { ...order, barcode: barcode, batchNumber: currentDate }
+              ? { 
+                  ...order, 
+                  barcode: barcode, 
+                  batchNumber: currentDate,
+                  totalPrintCount: (order.totalPrintCount || 0) + 1
+                }
               : order
           )
         );
@@ -1043,21 +962,21 @@ const SupplierPurchaseOrders = () => {
       dataIndex: 'personName',
       key: 'personName',
       sorter: (a, b) => (a.personName || '').localeCompare(b.personName || ''),
-      width: 100
+      width: 90
     },  
     {
       title: '订单日期',
       dataIndex: 'dPODate',
       key: 'dPODate',
       render: (date) => date ? new Date(date).toLocaleDateString() : '',
-      sorter: (a, b) => new Date(a.dPODate) - new Date(b.dPODate),
+      sorter: (a, b) => new Date(a.dPODate) - new Date(b.dPODate),      
     },
     {
       title: '供应商名称',
       dataIndex: 'supplierName',
       key: 'supplierName',
       sorter: (a, b) => a.supplierName.localeCompare(b.supplierName),
-      width: 160
+      width: 140
     },
     {
       title: '执行公司',
@@ -1071,7 +990,7 @@ const SupplierPurchaseOrders = () => {
       dataIndex: 'cInvCode',
       key: 'cInvCode',
       sorter: (a, b) => a.cInvCode.localeCompare(b.cInvCode),
-      width: 120
+      width: 110
     },
     {
       title: '存货名称',
@@ -1088,14 +1007,14 @@ const SupplierPurchaseOrders = () => {
         <div style={{ textAlign: 'right' }}>{(quantity ?? 0).toFixed(2)}</div>
       ),
       sorter: (a, b) => (a.iQuantity ?? 0) - (b.iQuantity ?? 0),
-      width: 100
+      width: 90
     },
     {
       title: '单位名称',
       dataIndex: 'unitName',
       key: 'unitName',
       sorter: (a, b) => a.unitName.localeCompare(b.unitName),
-      width: 100
+      width: 80
     },
     {
       title: '计划到货日期',
@@ -1103,7 +1022,19 @@ const SupplierPurchaseOrders = () => {
       key: 'dArriveDate',
       render: (date) => date ? new Date(date).toLocaleDateString() : '',
       sorter: (a, b) => new Date(a.dArriveDate) - new Date(b.dArriveDate),
-      width: 120
+      width: 100
+    },
+    {
+      title: '总打印次数',
+      dataIndex: 'totalPrintCount',
+      key: 'totalPrintCount',
+      render: (count) => (
+        <div style={{ textAlign: 'center', fontWeight: 'bold', color: count > 0 ? '#1890ff' : '#999' }}>
+          {count || 0}
+        </div>
+      ),
+      sorter: (a, b) => (a.totalPrintCount || 0) - (b.totalPrintCount || 0),
+      width: 90
     },      
     {
       title: '剩余未入库数量',
@@ -1115,7 +1046,7 @@ const SupplierPurchaseOrders = () => {
         </div>
       ),
       sorter: (a, b) => (a.remainingQuantity ?? 0) - (b.remainingQuantity ?? 0),
-      width: 120
+      width: 110
     },
     {
       title: '已入库数量',

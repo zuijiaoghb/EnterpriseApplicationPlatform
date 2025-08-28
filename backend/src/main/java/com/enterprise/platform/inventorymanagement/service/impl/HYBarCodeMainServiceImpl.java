@@ -124,5 +124,9 @@ public class HYBarCodeMainServiceImpl implements HYBarCodeMainService {
         return repository.save(barCodeMain);
     }
 
+    @Override
+    public Long getTotalPrintCount(String csrccode, Integer csrcsubid) {
+        return repository.countByCsrccodeAndCsrcsubid(csrccode, csrcsubid);
+    }
     
 }
