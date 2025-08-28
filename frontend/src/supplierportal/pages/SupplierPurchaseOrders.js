@@ -955,49 +955,245 @@ const SupplierPurchaseOrders = () => {
       sorter: (a, b) => a.cPOID.localeCompare(b.cPOID),
       width: 120,
       fixed: 'left',
-      render: (text) => <Text strong>{text}</Text>
+      render: (text) => <Text strong>{text}</Text>,
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            placeholder="搜索订单编号"
+            value={selectedKeys[0]}
+            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onPressEnter={() => confirm()}
+            style={{ marginBottom: 8, display: 'block' }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              icon={<SearchOutlined />}
+              size="small"
+              style={{ width: 90 }}
+            >
+              搜索
+            </Button>
+            <Button
+              onClick={() => clearFilters()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              重置
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) => record.cPOID.toLowerCase().includes(value.toLowerCase()),
     },
     {
       title: '采购员',
       dataIndex: 'personName',
       key: 'personName',
       sorter: (a, b) => (a.personName || '').localeCompare(b.personName || ''),
-      width: 90
+      width: 90,
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            placeholder="搜索采购员"
+            value={selectedKeys[0]}
+            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onPressEnter={() => confirm()}
+            style={{ marginBottom: 8, display: 'block' }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              icon={<SearchOutlined />}
+              size="small"
+              style={{ width: 90 }}
+            >
+              搜索
+            </Button>
+            <Button
+              onClick={() => clearFilters()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              重置
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) => (record.personName || '').toLowerCase().includes(value.toLowerCase()),
     },  
     {
       title: '订单日期',
       dataIndex: 'dPODate',
       key: 'dPODate',
       render: (date) => date ? new Date(date).toLocaleDateString() : '',
-      sorter: (a, b) => new Date(a.dPODate) - new Date(b.dPODate),      
+      sorter: (a, b) => new Date(a.dPODate) - new Date(b.dPODate),
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <DatePicker.RangePicker
+            value={selectedKeys[0]}
+            onChange={(dates) => setSelectedKeys(dates ? [dates] : [])}
+            style={{ marginBottom: 8, display: 'block' }}
+            locale={locale}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              icon={<SearchOutlined />}
+              size="small"
+              style={{ width: 90 }}
+            >
+              筛选
+            </Button>
+            <Button
+              onClick={() => clearFilters()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              重置
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: (filtered) => <CalendarOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) => {
+        if (!value || value.length !== 2) return true;
+        const recordDate = new Date(record.dPODate);
+        const [startDate, endDate] = value;
+        return recordDate >= new Date(startDate) && recordDate <= new Date(endDate);
+      },
     },
     {
       title: '供应商名称',
       dataIndex: 'supplierName',
       key: 'supplierName',
       sorter: (a, b) => a.supplierName.localeCompare(b.supplierName),
-      width: 140
+      width: 140,
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            placeholder="搜索供应商"
+            value={selectedKeys[0]}
+            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onPressEnter={() => confirm()}
+            style={{ marginBottom: 8, display: 'block' }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              icon={<SearchOutlined />}
+              size="small"
+              style={{ width: 90 }}
+            >
+              搜索
+            </Button>
+            <Button
+              onClick={() => clearFilters()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              重置
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) => record.supplierName.toLowerCase().includes(value.toLowerCase()),
     },
     {
       title: '执行公司',
       dataIndex: 'cDefine1',
       key: 'cDefine1',
       sorter: (a, b) => a.cDefine1.localeCompare(b.cDefine1),
-      width: 100
+      width: 100,
+      filters: [
+        { text: '江西江特电机有限公司', value: '江西江特电机有限公司' },
+        { text: '江西特种电机股份有限公司', value: '江西特种电机股份有限公司' },        
+      ],
+      filterIcon: (filtered) => <FilterOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) => record.cDefine1 === value,
     },
     {
       title: '存货编码',
       dataIndex: 'cInvCode',
       key: 'cInvCode',
       sorter: (a, b) => a.cInvCode.localeCompare(b.cInvCode),
-      width: 110
+      width: 110,
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            placeholder="搜索存货编码"
+            value={selectedKeys[0]}
+            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onPressEnter={() => confirm()}
+            style={{ marginBottom: 8, display: 'block' }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              icon={<SearchOutlined />}
+              size="small"
+              style={{ width: 90 }}
+            >
+              搜索
+            </Button>
+            <Button
+              onClick={() => clearFilters()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              重置
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) => record.cInvCode.toLowerCase().includes(value.toLowerCase()),
     },
     {
       title: '存货名称',
       dataIndex: 'cItemName',
       key: 'cItemName',
       sorter: (a, b) => a.cItemName.localeCompare(b.cItemName),
-      width: 180
+      width: 180,
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            placeholder="搜索存货名称"
+            value={selectedKeys[0]}
+            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onPressEnter={() => confirm()}
+            style={{ marginBottom: 8, display: 'block' }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              icon={<SearchOutlined />}
+              size="small"
+              style={{ width: 90 }}
+            >
+              搜索
+            </Button>
+            <Button
+              onClick={() => clearFilters()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              重置
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) => record.cItemName.toLowerCase().includes(value.toLowerCase()),
     },
     {
       title: '订单数量',
@@ -1022,6 +1218,41 @@ const SupplierPurchaseOrders = () => {
       key: 'dArriveDate',
       render: (date) => date ? new Date(date).toLocaleDateString() : '',
       sorter: (a, b) => new Date(a.dArriveDate) - new Date(b.dArriveDate),
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <DatePicker.RangePicker
+            value={selectedKeys[0]}
+            onChange={(dates) => setSelectedKeys(dates ? [dates] : [])}
+            style={{ marginBottom: 8, display: 'block' }}
+            locale={locale}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              icon={<SearchOutlined />}
+              size="small"
+              style={{ width: 90 }}
+            >
+              筛选
+            </Button>
+            <Button
+              onClick={() => clearFilters()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              重置
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: (filtered) => <CalendarOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) => {
+        if (!value || value.length !== 2) return true;
+        const recordDate = new Date(record.dArriveDate);
+        const [startDate, endDate] = value;
+        return recordDate >= new Date(startDate) && recordDate <= new Date(endDate);
+      },
       width: 100
     },
     {
@@ -1034,6 +1265,19 @@ const SupplierPurchaseOrders = () => {
         </div>
       ),
       sorter: (a, b) => (a.totalPrintCount || 0) - (b.totalPrintCount || 0),
+      filters: [
+        { text: '未打印', value: 0 },
+        { text: '已打印', value: 1 },
+        { text: '打印3次以上', value: 3 },
+      ],
+      filterIcon: (filtered) => <FilterOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) => {
+        const count = record.totalPrintCount || 0;
+        if (value === 0) return count === 0;
+        if (value === 1) return count >= 1;
+        if (value === 3) return count >= 3;
+        return true;
+      },
       width: 90
     },      
     {
@@ -1046,6 +1290,18 @@ const SupplierPurchaseOrders = () => {
         </div>
       ),
       sorter: (a, b) => (a.remainingQuantity ?? 0) - (b.remainingQuantity ?? 0),
+      filters: [
+        { text: '全部', value: 'all' },
+        { text: '有剩余', value: 'has_remaining' },
+        { text: '已完成', value: 'completed' },
+      ],
+      filterIcon: (filtered) => <FilterOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) => {
+        const remaining = record.remainingQuantity ?? 0;
+        if (value === 'has_remaining') return remaining > 0;
+        if (value === 'completed') return remaining <= 0;
+        return true;
+      },
       width: 110
     },
     {
