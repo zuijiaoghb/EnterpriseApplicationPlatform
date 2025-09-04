@@ -3,6 +3,7 @@ package com.enterprise.platform.user.controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.enterprise.platform.system.model.OAuth2Client;
+import com.enterprise.platform.system.service.CaptchaService;
 import com.enterprise.platform.system.service.OAuth2ClientService;
 import com.enterprise.platform.user.dto.LoginRequest;
 
@@ -70,12 +71,14 @@ public class AuthController {
 
     private final RefreshTokenService refreshTokenService;    
     private final UserRepository userRepository;
+    private final CaptchaService captchaService;
         
 
     public AuthController(AuthenticationManager authenticationManager, JwtEncoder jwtEncoder,
                           RefreshTokenService refreshTokenService, 
                           UserRepository userRepository, PasswordEncoder passwordEncoder,
-                          OAuth2ClientService oAuth2ClientService, ClientRegistrationRepository clientRegistrationRepository) {
+                          OAuth2ClientService oAuth2ClientService, ClientRegistrationRepository clientRegistrationRepository,
+                          CaptchaService captchaService) {
         this.authenticationManager = authenticationManager;
         this.jwtEncoder = jwtEncoder;
         this.refreshTokenService = refreshTokenService;        
@@ -83,11 +86,29 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
         this.oAuth2ClientService = oAuth2ClientService;
         this.clientRegistrationRepository = clientRegistrationRepository;
+        this.captchaService = captchaService;
     }
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest) {
         try {
+            // 验证码验证
+            if (loginRequest.getCaptchaId() == null || loginRequest.getCaptcha() == null || 
+                loginRequest.getCaptcha().trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("status", 400, "message", "验证码不能为空"));
+            }
+            
+            boolean isValidCaptcha = captchaService.validateCaptcha(
+                loginRequest.getCaptchaId(), 
+                loginRequest.getCaptcha()
+            );
+            
+            if (!isValidCaptcha) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("status", 400, "message", "验证码错误或已过期"));
+            }
+            
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                     loginRequest.getUsername(),

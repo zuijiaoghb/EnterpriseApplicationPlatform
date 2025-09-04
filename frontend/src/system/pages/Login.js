@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, message, Card, Typography } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Form, Input, Button, message, Card, Typography, Row, Col } from 'antd';
 import api from '../../api';
 import { useNavigate } from 'react-router-dom';
 import './Login.css'; // 新增样式文件
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined, SafetyCertificateOutlined, ReloadOutlined } from '@ant-design/icons';
 import bgImage from '../../assets/login-bg.jpg'; // 添加背景图片导入
 
 const { Title } = Typography;
@@ -12,8 +12,42 @@ const { Title } = Typography;
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState(false); // 新增状态
+  const [captchaUrl, setCaptchaUrl] = useState('');
+  const [captchaId, setCaptchaId] = useState('');
 
   const navigate = useNavigate();  
+
+  // 获取验证码
+  const fetchCaptcha = async () => {
+    try {
+      console.log('开始获取验证码...');
+      const response = await api.get('/auth/captcha');
+      console.log('验证码响应:', response.data);
+      
+      if (response.data && response.data.image) {
+        setCaptchaId(response.data.captchaId);
+        setCaptchaUrl(`data:image/png;base64,${response.data.image}`);
+        console.log('验证码设置成功，ID:', response.data.captchaId);
+      } else {
+        console.error('验证码数据格式错误:', response.data);
+        message.error('验证码数据格式错误');
+      }
+    } catch (error) {
+      console.error('获取验证码失败:', error);
+      console.error('错误详情:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
+      message.error('获取验证码失败: ' + (error.response?.data?.message || error.message));
+    }
+  };
+
+  // 组件加载时获取验证码
+  useEffect(() => {
+    console.log('Login component mounted, fetching captcha...');
+    fetchCaptcha();
+  }, []);
 
   const onFinish = async (values) => {
     setLoading(true);
@@ -28,7 +62,12 @@ const Login = () => {
     delete api.defaults.headers.common['Authorization'];
     
     try {
-      const response = await api.post('/auth/login', values, {
+      const loginData = {
+        ...values,
+        captchaId: captchaId,
+        captcha: values.captcha
+      };
+      const response = await api.post('/auth/login', loginData, {
         withCredentials: true
       });
       
@@ -81,8 +120,17 @@ const Login = () => {
       }
     } catch (error) {
       console.error('登录错误:', error);
-      setLoginError(true);
-      message.error(error.message || '登录失败');
+      
+      // 处理验证码错误的特殊情况
+      if (error.response?.data?.message?.includes('验证码')) {
+        message.error(error.response.data.message || '验证码输入错误');
+      } else {
+        setLoginError(true);
+        message.error(error.message || '登录失败');
+      }
+      
+      // 登录失败后刷新验证码
+      fetchCaptcha();
     } finally {
       setLoading(false);
     }
@@ -129,6 +177,71 @@ const Login = () => {
               prefix={<LockOutlined className="input-icon" />}
             />
           </Form.Item>
+
+          <Row gutter={12} align="middle">
+            <Col flex="auto">
+              <Form.Item 
+                name="captcha" 
+                rules={[{ required: true, message: '请输入验证码' }]}
+                style={{ marginBottom: 0 }}
+              >
+                <Input 
+                  placeholder="验证码" 
+                  size="large"
+                  prefix={<SafetyCertificateOutlined className="input-icon" />}
+                />
+              </Form.Item>
+            </Col>
+            <Col flex="none">
+              <div style={{ display: 'flex', alignItems: 'center', height: '40px' }}>
+                {captchaUrl ? (
+                  <img 
+                    src={captchaUrl} 
+                    alt="验证码" 
+                    style={{ 
+                      height: '40px', 
+                      width: '120px',
+                      cursor: 'pointer',
+                      borderRadius: '6px',
+                      border: '1px solid #d9d9d9',
+                      objectFit: 'cover',
+                      backgroundColor: '#fff'
+                    }}
+                    onClick={fetchCaptcha}
+                    onError={(e) => {
+                      console.error('验证码图片加载失败');
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div style={{ 
+                    height: '40px', 
+                    width: '120px', 
+                    background: '#f5f5f5', 
+                    border: '1px solid #d9d9d9',
+                    borderRadius: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 12,
+                    color: '#999',
+                    cursor: 'pointer'
+                  }}
+                  onClick={fetchCaptcha}
+                  >
+                    加载中...
+                  </div>
+                )}
+                <Button 
+                  type="text" 
+                  icon={<ReloadOutlined />} 
+                  onClick={fetchCaptcha}
+                  style={{ marginLeft: 4, padding: '0 8px', height: '40px' }}
+                  title="刷新验证码"
+                />
+              </div>
+            </Col>
+          </Row>
           
           <Form.Item>
             <Button 
